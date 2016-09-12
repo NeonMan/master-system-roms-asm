@@ -9,9 +9,20 @@ ADD_EXECUTABLE(rel-sample rel-sample.c)
 ADD_DEPENDENCIES(rel-sample crt0-sms-ram)
 TARGET_LINK_LIBRARIES(rel-sample console vdp)
 
+ADD_EXECUTABLE(uart-sample uart-sample.c)
+ADD_DEPENDENCIES(uart-sample crt0-sms-ram)
+#TARGET_LINK_LIBRARIES(uart-sample console vdp)
+
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(rel-sample-bin ALL
         COMMAND makebin -s 53248 rel-sample.ihx rel-sample-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/../scripts/trim.py rel-sample-raw.sms rel-sample.sms 49152
+		DEPENDS rel-sample
+    )
+
+#Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(uart-sample-bin ALL
+        COMMAND makebin -s 53248 uart-sample.ihx uart-sample-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/../scripts/trim.py uart-sample-raw.sms uart-sample.sms 49152
 		DEPENDS rel-sample
     )
