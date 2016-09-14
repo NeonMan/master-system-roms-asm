@@ -14,14 +14,15 @@
  *   - Move the result to a buffer
  *   - Prepare for the next bit
  *   - Being able to do this 130 times in a row because... XMODEM ;)
- *   - Get to 1200bps or, as the bare minimum, 300bps
+ *   - Get to 4800bps or, as the bare minimum, 1200bps
  *
- * The with of a single bit in miliseconds and in T-States:
- *    300bps       3.333  ms    11823 T-PAL    11931 T-NTSC
- *    600bps       1.667  ms     5913 T-PAL     5967 T-NTSC
- *   1200bps       0.833  ms     2956 T-PAL     2982 T-NTSC
- *   1T (NTSC)     0.2794 us     0.99 T-PAL        1 T-NTSC
- *   1T (PAL)      0.2819 us        1 T-PAL    1.009 T-NTSC
+ * The width of a single bit in T-States:
+ *   300bps:     11822 T-PAL  11931 T-NTSC  11877 T-AVG
+ *   600bps:      5911 T-PAL   5965 T-NTSC   5938 T-AVG
+ *  1200bps:      2955 T-PAL   2982 T-NTSC   2969 T-AVG
+ *  2400bps:      1477 T-PAL   1491 T-NTSC   1484 T-AVG
+ *  4800bps:       738 T-PAL    745 T-NTSC    742 T-AVG
+ *  9600bps:       369 T-PAL    372 T-NTSC    371 T-AVG
  *
  * UART:
  *
@@ -32,45 +33,29 @@
  *        |  |  |  |  |  |  |  |  |  |                                        
  *        |__|__|__|__|__|__|__|__|__|                                        
  *
- * Start bit (1200bps):
- *
+ * Start bit (4800bps):
  * __________                                                            __
- *           | <------------------  ~2970 T-States  ------------------> |
+ *           |<-------------------  ~742 T-States  -------------------->|
  *        -->| |<-- 36T                                                 |
- *           | |<--------------------  2934 T-States  ----------------> |
+ *           | |<--------------------  706 T-States  ------------------>|
+ *           |>|   |<-- 46T                                             |
  *           |                                                          |
+ *           |     S     S     S     S     S     S     S     S          |
+ *           |<82T>|<82T>|<82T>|<82T>|<82T>|<82T>|<82T>|<82T>|<82T> <4T>|
+ *           |     |     |     |     |     |     |     |     |          |
+ *           |_____|_____|_____|_____|_____|_____|_____|_____|__________|
+ *
+ *
+ * Data bit (4800bps):
+ * __________                                                            __
+ *           |<-------------------  ~742 T-States  -------------------->|
  *           |                                                          |
- *           |                                                          |
- *           |                                                          |
- *           |__________________________________________________________|
+ *           |                            S                             |
+ *           |<--------- 371T ----------->|<---------- 371T ----------->|
+ *           |                            |                             |
+ *           |____________________________|_____________________________|
  *
  *
- * Data bit sampling:
- * __________                                                             __
- *           |<-------------------  ~2970 T-States  -------------------->|  
- *           |<297> <297> <297> <297> <297> <297> <297> <297> <297> <297>|  
- *           |           |     |     |     |     |     |     |           |  
- *           |        S0>|  S1>|  S2>|  S3>|  S4>|  S5>|  S6>|           |  
- *           |           |     |     |     |     |     |     |           |  
- *           |<-- 594 -->|     |     |     |     |     |     |<-- 594 -->|  
- *           |           |     |     |     |     |     |     |           |  
- *           |___________|_____|_____|_____|_____|_____|_____|___________|  
- *
- *
- * Sampling the TH line using IN and the carry bit takes XXX T -states (T)
- *
- *
- *          IN   A, (#0xDD)            ; 11T
- *          RLCA                      ;  4T
- *          RET  C                     ;  5T
- *    ;                             ---> 36T
- *
- *    ; -----------------------------------------
- *    ; --- Skip 2933 T-states til bit0 start ---
- *    ; --- Use this to initiallize stuff     ---
- *    ; -----------------------------------------
- *
- *    ;Bit 0
  *        
  */
  
@@ -130,199 +115,211 @@ intersample_delay:
  
 #include <stdint.h> 
 
-uint8_t uart_sample_0;
-uint8_t uart_sample_1;
-uint8_t uart_sample_2;
-uint8_t uart_sample_3;
-
-uint8_t uart_sample_4;
-uint8_t uart_sample_5;
-uint8_t uart_sample_6;
-uint8_t uart_sample_7;
-
 uint8_t uart_result;
+uint8_t uart_status;
 
-
-void get_byte(){
+static void uart_getc(){
     __asm
+    PERIPHERAL_PORT  = 0xDD
+    VALID_START      = 0xFF
+    PRESAMPLE_DELAY  = 26
+    POSTSAMPLE_DELAY = 24
+    UART_STATUS_OK   = 0x00
+    UART_STATUS_NOK  = 0xFF
+    ; ----------------------------------------
+    ; --- Detect start bit (82T    budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RET  C                     ;  5T (presumed false)
+    ; Remaining budget: 62T
+        LD HL, #_uart_result       ; 10T
+        LD (HL), #0x00             ; 10T  ; HL points to uart_result
+        LD A, #0x00                ;  7T  ; 
+        LD BC, #0x00               ; 10T  ; B will keep the start bit sampling
+    ; Remaining budget: 25T
+        PUSH HL                    ; 11T  ;
+        POP  HL                    ; 10T  ;
+        NOP                        ; 4T   ; Delay
     
-    ;Start bit. Return if line is up.
-        IN   A, (#0xDD)            ; 11T
-        RLCA                       ;  4T
-        RET  C                     ;  5T
-        
-    ;Initialize stuff
-        LD HL, #0x0000             ; 10T
-        LD (_uart_sample_0), HL    ; 16T
-        LD (_uart_sample_1), HL    ; 16T
-        LD (_uart_sample_2), HL    ; 16T
-        LD (_uart_sample_3), HL    ; 16T
-        LD (_uart_sample_4), HL    ; 16T
-        LD (_uart_sample_5), HL    ; 16T
-        LD (_uart_sample_6), HL    ; 16T
-        LD (_uart_sample_7), HL    ; 16T
-        LD (_uart_result), HL      ; 16T
-        
-    ; -------------------------------------------------
-    ; --- Skip util the start of the first data bit ---
-    ; -------------------------------------------------
+    ; ----------------------------------------
+    ; --- Start sample #0/7 (82T   Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 1T
     
-    ;Pre-sample delay (594T)
-        LD    A,#32                ;   7T
-    presample_delay:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, presample_delay     ;  10T
-        LD A,#0x00                 ;   7T
-        NOP                        ;   4T
-        ;                       ---> 594T
-        
-    ;Acquire sample 0
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_0)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_0),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_0:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_0 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
-        
-    ;Acquire sample 1
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_1)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_1),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_1:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_1 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
-        
-    ;Acquire sample 2
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_2)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_2),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_2:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_2 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
-        
-    ;Acquire sample 3
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_3)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_3),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_3:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_3 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
-        
-    ;Acquire sample 4
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_4)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_4),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_4:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_4 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
-        
-    ;Acquire sample 5
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_5)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_5),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_5:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_5 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
-        
-    ;Acquire sample 6
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_6)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_6),A    ;  13T
-        ;                       ---> +45T
-        ;Inter-sample delay (252T)
-        LD    A,#13                ;   7T
-    intersample_delay_6:
-        NOP                        ;   4T
-        DEC   A                    ;   4T
-        JP NZ, intersample_delay_6 ;  10T
-        LD    A,#0x00              ;   7T
-        NOP                        ;   4T 
-        ;                       --->+252T
+    ; ----------------------------------------
+    ; --- Start sample #1/7 (82+1T Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59+1T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 2T
     
-    ;Acquire sample 7
-        IN   A, (#0xDD)            ;  11T
-        RLCA                       ;   4T
-        LD   A,(_uart_sample_7)    ;  13T
-        RRCA                       ;   4T
-        LD   (_uart_sample_7),A    ;  13T
-        ;                       ---> +45T
+    ; ----------------------------------------
+    ; --- Start sample #2/7 (82+2T Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59+2T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 3T
+    
+    ; ----------------------------------------
+    ; --- Start sample #3/7 (82+3T Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59+3T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 4T
+        NOP
+    ; Leftover: 0T
+    
+    ; ----------------------------------------
+    ; --- Start sample #4/7 (82T   Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 1T
+
+    ; ----------------------------------------
+    ; --- Start sample #5/7 (82+1T Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59+1T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 2T
+    
+    ; ----------------------------------------
+    ; --- Start sample #6/7 (82+2T Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
+    ; Remaining budget 59+2T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ; Delay
+    ; Leftover: 3T
+    
+    ; ----------------------------------------
+    ; --- Start sample #7/7 (82+3T Budget) ---
+    ; ----------------------------------------
+        IN   A, (#PERIPHERAL_PORT) ; 11T
+        RLA                        ;  4T
+        RL   B                     ;  8T
         
-    ; -------------------------------------------
-    ; --- Process samples. Cycle budget: 549T ---
-    ; -------------------------------------------
-    ret                            ;  10T
+    ; --- Check if it is a start bit-
+    ; Last sample of the start bit has been made. To check
+    ; wether this is a start bit or not we shall check the
+    ; current value of B and test against 0xFF or 0x00
+    ; depending on UART polarity. Presumed positive here.
+    ;       Remaining sample budget: 59+3T
+    ; Additional last sample budget:    4T
+    ;                        Budget:   66T
+    
+        LD   A, B                  ;  4T
+        CP   #VALID_START          ;  7T
+        RET  NC                    ;  5T (presumed false)
+    ; Remaining budget: 50T
+        PUSH IX                    ; 15T ;
+        POP  IX                    ; 14T ;
+        PUSH HL                    ; 11T ;
+        POP  HL                    ; 10T ; Delay
+    ; Leftover: 0
+    
+    
+    ; We start sampling the data bits. A will be used for
+    ; port input and delay counter, while B will store the
+    ; sampled byte
+    
+        ; ----------------------------------------
+        ; --- Sample data bit macro (371+371T) ---
+        ; ----------------------------------------
+        .macro sample_bit ?delay_pre,?delay_post
+        ; Skip 371T
+            LD   A, #PRESAMPLE_DELAY   ;  7T
+            
+        delay_pre:
+            DEC  A                     ;  4T  ;
+            JP   NZ, delay_pre         ; 10T  ; Execute 26 times
+            
+        ; Sample
+            IN   A, (#PERIPHERAL_PORT) ; 11T
+            RLA                        ;  4T
+            RL   B                     ;  8T
+        ; Remaining budget: 354 (skip it)
+            LD   A, #POSTSAMPLE_DELAY  ;  7T
+            
+        delay_post:
+            DEC  A                     ;  4T  ;
+            JP   NZ, delay_post        ; 10T  ; Execute 24 times
+            NOP                        ;  4T  ; Delay
+            LD   (HL), B               ;  7T  ; Store (partial) result
+            
+        ; Leftover: 0
+        .endm
+    
+    ; ---------------------
+    ; --- Sample 8 bits ---
+    ; ---------------------
+    sample_bit
+    sample_bit
+    sample_bit
+    sample_bit
+    
+    sample_bit
+    sample_bit
+    sample_bit
+    sample_bit
+    
+    ; By this time the value shall be stored at uart_result (HL)
+    ; and A should be Zero.
+    ;
+    ; The stop bit starts here so we should have a reasonable ammount
+    ; of time to copy the byte to a buffer even using C
+    
+    ; Budget: 742T
+    LD HL, #_uart_status     ; 10T
+    LD (HL), #UART_STATUS_OK ; 10T
+    ret                      ; 10T
+    ; Remaining budget: 712T
     
     __endasm;
 }
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
  
 void main(){
     while(1){
