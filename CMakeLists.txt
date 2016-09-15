@@ -24,6 +24,7 @@ ADD_SUBDIRECTORY(sms)
 ADD_SUBDIRECTORY(crc)
 ADD_SUBDIRECTORY(bios-menu)
 ADD_SUBDIRECTORY(relocatable)
+ADD_SUBDIRECTORY(comp)
 
 #ROM "executables" ;)
 ADD_EXECUTABLE(empty empty.c)
