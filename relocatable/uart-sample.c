@@ -58,67 +58,14 @@
  *
  *        
  */
- 
- 
- 
-/*
-
-    ;Pre-sample delay (594T)
-    LD    A,32                 ;   7T
-sample_delay:
-    NOP                        ;   4T
-    DEC   A                    ;   4T
-    JP NZ, sample_delay        ;  10T
-    AND 0xFF                   ;   7T
-    NOP                        ;   4T
-    ;                       ---> 594T
-
-    
-    
-    
-    
-    ;Acquire sample
-    IN   A, (#0xDD)            ;  11T
-    RLC                        ;   4T
-    LD   A,(sample_storage)    ;  13T
-    RRC                        ;   4T
-    LD   (sample_storage),A    ;  13T
-    ;                       ---> +45T
-    ;Inter-sample delay (252T)
-    LD    A,13                 ;   7T
-intersample_delay:
-    NOP                        ;   4T
-    DEC   A                    ;   4T
-    JP NZ, intersample_delay   ;  10T
-    LD    A,0x00               ;   7T
-    NOP                        ;   4T 
-    ;                       --->+252T
-
-    
-    ;          Sample-total ---> 297T
- */
- 
- 
- 
- 
- 
-/*
-
-    IN   A, (#0xDD)            ; 11T
-    RLC                        ;  4T
-    LD   A,(sample_storage)    ; 13T
-    RRC                        ;  4T
-    LD   (sample_storage),A    ; 13T
-    ;                     -----> 45T
-
- */
- 
 #include <stdint.h> 
 
 uint8_t uart_result;
 uint8_t uart_status;
 
 static void uart_getc(){
+    
+    
     __asm
     PERIPHERAL_PORT  = 0xDD
     VALID_START      = 0xFF
@@ -133,14 +80,15 @@ static void uart_getc(){
         RLA                        ;  4T
         RET  C                     ;  5T (presumed false)
     ; Remaining budget: 62T
+        LD HL, #_uart_status       ; 10T
+        LD (HL), #UART_STATUS_NOK  ; 10T
         LD HL, #_uart_result       ; 10T
         LD (HL), #0x00             ; 10T  ; HL points to uart_result
         LD A, #0x00                ;  7T  ; 
         LD BC, #0x00               ; 10T  ; B will keep the start bit sampling
-    ; Remaining budget: 25T
-        PUSH HL                    ; 11T  ;
-        POP  HL                    ; 10T  ;
+    ; Remaining budget:  5T
         NOP                        ; 4T   ; Delay
+    ; Leftover: 1T (Ignored bc of changes)
     
     ; ----------------------------------------
     ; --- Start sample #0/7 (82T   Budget) ---
