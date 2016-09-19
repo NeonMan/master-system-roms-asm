@@ -2,3 +2,9 @@ syntax: regexp
 Build\/
 build\/
 \/_
+
+\.asm$
+\.lst
+\.rel
+\.sym
+\.ihx
