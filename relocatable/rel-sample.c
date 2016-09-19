@@ -5,7 +5,7 @@ static const char hello[] = " Hello world! ";
 
 static void delay_loop(){
     volatile uint16_t i;
-    for(i=0; i<5000; i++){
+    for(i=0; i<10000; i++){
         i = i;
     }
 }

@@ -19,7 +19,7 @@ ADD_DEFINITIONS(-DCOMMIT_ID=\"${COMMIT_ID}\")
 #Make includes available everywhere
 include_directories(${PROJECT_SOURCE_DIR})
 
-# Find python3 (code generation)
+# Find python3
 find_package(PythonInterp 3 REQUIRED)
 
 #Libraries

@@ -47,18 +47,39 @@ if __name__ == '__main__':
     buff = f.read()
     f.close()
   
+  size = len(buff)
+  header_location = None
+  header_size = None
+  
+  if   size >= 1024*32:
+    header_location = (32*1024) - 16
+    header_size = 0x4C
+  elif size >= 1024*16:
+    header_location = (16*1024) - 16
+    header_size = 0x4B
+  elif size >= 1024*8:
+    header_location = (8*1024) - 16
+    header_size = 0x4A
+  else:
+    #Add padding to the ROM to fill 8K
+    buff = buff + bytes("?" * ((8*1024) - len(buff)), 'ASCII')
+    header_location = (8*1024) - 16
+    header_size = 0x4A
+    
+  
   sum = 0
   
-  for b in buff[:(32*1024) - 16]:
+  for b in buff[:header_location]:
     sum = (sum + b) & 0xFFFF
   
   header = bytes("TMR SEGA", 'utf-8') #TMR sega
   header = header + bytes((0,0))      #Reserved
   header = header + bytes( (sum & 0xFF, (sum >> 8)& 0xFF) ) #Checksum
   header = header + bytes( (0,0,0) ) #Product code & version
-  header = header + bytes((0x4C,))
+  header = header + bytes((header_size,))
   
   with open(path_in, 'wb') as f:
-    f.write(buff[:(32*1024)-16])
+    f.write(buff[:header_location])
     f.write(header)
+    f.write(buff[header_location + 16:])
     f.close()
