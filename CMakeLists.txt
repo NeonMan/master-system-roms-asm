@@ -19,6 +19,9 @@ ADD_DEFINITIONS(-DCOMMIT_ID=\"${COMMIT_ID}\")
 #Make includes available everywhere
 include_directories(${PROJECT_SOURCE_DIR})
 
+# Find python3 (code generation)
+find_package(PythonInterp 3 REQUIRED)
+
 #Libraries
 ADD_SUBDIRECTORY(sms)
 ADD_SUBDIRECTORY(crc)
@@ -68,6 +71,7 @@ ADD_CUSTOM_TARGET(simple-bios-bin ALL
     )
 ADD_CUSTOM_TARGET(console-test-bin ALL
         COMMAND makebin -s 32768 console-test.ihx console-test.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py console-test.sms
 		DEPENDS console-test
     )
 ADD_CUSTOM_TARGET(sys-info-bin ALL
