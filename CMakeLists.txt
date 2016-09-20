@@ -22,6 +22,9 @@ include_directories(${PROJECT_SOURCE_DIR})
 # Find python3
 find_package(PythonInterp 3 REQUIRED)
 
+#uncoment and properly set this param if detection fails.
+#set(PYTHON_EXECUTABLE "C:/Python31/python.exe")
+
 #Libraries
 ADD_SUBDIRECTORY(sms)
 ADD_SUBDIRECTORY(crc)
@@ -56,18 +59,22 @@ TARGET_LINK_LIBRARIES(sys-info sms vdp console)
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(sample-bin ALL
         COMMAND makebin -s 32768 sample.ihx sample.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py sample.sms
 		DEPENDS sample
     )
 ADD_CUSTOM_TARGET(empty-bin ALL
         COMMAND makebin -s 32768 empty.ihx empty.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py empty.sms
 		DEPENDS empty
     )
 ADD_CUSTOM_TARGET(test-ram-bin ALL
         COMMAND makebin -s 32768 test-ram.ihx test-ram.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-ram.sms
 		DEPENDS test-ram
     )
 ADD_CUSTOM_TARGET(simple-bios-bin ALL
         COMMAND makebin -s 32768 simple-bios.ihx simple-bios.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py simple-bios.sms
 		DEPENDS simple-bios
     )
 ADD_CUSTOM_TARGET(console-test-bin ALL
@@ -77,5 +84,6 @@ ADD_CUSTOM_TARGET(console-test-bin ALL
     )
 ADD_CUSTOM_TARGET(sys-info-bin ALL
         COMMAND makebin -s 32768 sys-info.ihx sys-info.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py sys-info.sms
 		DEPENDS sys-info
     )
