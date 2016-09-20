@@ -72,7 +72,7 @@ if __name__ == '__main__':
   for b in buff[:header_location]:
     sum = (sum + b) & 0xFFFF
   
-  header = bytes("TMR SEGA", 'utf-8') #TMR sega
+  header = bytes("TMR SEGA", 'ASCII') #TMR sega
   header = header + bytes((0,0))      #Reserved
   header = header + bytes( (sum & 0xFF, (sum >> 8)& 0xFF) ) #Checksum
   header = header + bytes( (0,0,0) ) #Product code & version

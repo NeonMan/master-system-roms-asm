@@ -20,10 +20,10 @@ ADD_DEFINITIONS(-DCOMMIT_ID=\"${COMMIT_ID}\")
 include_directories(${PROJECT_SOURCE_DIR})
 
 # Find python3
-find_package(PythonInterp 3 REQUIRED)
+#find_package(PythonInterp 3 REQUIRED)
 
 #uncoment and properly set this param if detection fails.
-#set(PYTHON_EXECUTABLE "C:/Python31/python.exe")
+set(PYTHON_EXECUTABLE "C:/Python31/python.exe")
 
 #Libraries
 ADD_SUBDIRECTORY(sms)
@@ -43,10 +43,6 @@ TARGET_LINK_LIBRARIES(sample sdsc emu-hooks )
 ADD_EXECUTABLE(test-ram test-ram.c)
 ADD_DEPENDENCIES(test-ram crt0-sms)
 TARGET_LINK_LIBRARIES(test-ram sdsc)
-
-ADD_EXECUTABLE(simple-bios simple-bios.c)
-ADD_DEPENDENCIES(simple-bios crt0-sms)
-TARGET_LINK_LIBRARIES(simple-bios sdsc io)
 
 ADD_EXECUTABLE(console-test console-test.c)
 ADD_DEPENDENCIES(console-test crt0-sms)
@@ -71,11 +67,6 @@ ADD_CUSTOM_TARGET(test-ram-bin ALL
         COMMAND makebin -s 32768 test-ram.ihx test-ram.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-ram.sms
 		DEPENDS test-ram
-    )
-ADD_CUSTOM_TARGET(simple-bios-bin ALL
-        COMMAND makebin -s 32768 simple-bios.ihx simple-bios.sms
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py simple-bios.sms
-		DEPENDS simple-bios
     )
 ADD_CUSTOM_TARGET(console-test-bin ALL
         COMMAND makebin -s 32768 console-test.ihx console-test.sms

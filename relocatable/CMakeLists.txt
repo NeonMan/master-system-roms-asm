@@ -13,6 +13,10 @@ ADD_EXECUTABLE(uart-sample uart-sample.c)
 ADD_DEPENDENCIES(uart-sample crt0-sms-ram)
 #TARGET_LINK_LIBRARIES(uart-sample console vdp)
 
+ADD_EXECUTABLE(simple-bios simple-bios.c)
+ADD_DEPENDENCIES(simple-bios crt0-sms-ram)
+TARGET_LINK_LIBRARIES(simple-bios io)
+
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(rel-sample-bin ALL
         COMMAND makebin -s 53248 rel-sample.ihx rel-sample-raw.sms
@@ -20,11 +24,16 @@ ADD_CUSTOM_TARGET(rel-sample-bin ALL
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py rel-sample.sms
 		DEPENDS rel-sample
     )
-
-#Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(uart-sample-bin ALL
         COMMAND makebin -s 53248 uart-sample.ihx uart-sample-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py uart-sample-raw.sms uart-sample.sms 49152
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py uart-sample.sms
 		DEPENDS rel-sample
+    )
+
+ADD_CUSTOM_TARGET(simple-bios-bin ALL
+        COMMAND makebin -s 53248 simple-bios.ihx simple-bios-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py simple-bios-raw.sms simple-bios.sms 49152
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py simple-bios.sms
+		DEPENDS simple-bios
     )
