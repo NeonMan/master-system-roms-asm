@@ -25,13 +25,12 @@
  *  9600bps:       369 T-PAL    372 T-NTSC    371 T-AVG
  *
  * UART:
- *
- * _______    __ __ __ __ __ __ __ __ ______                                  
- *        |  |  |  |  |  |  |  |  |  |                                        
- *        |  |  |  |  |  |  |  |  |  |                                        
- *        |ST|00|01|02|03|04|05|06|07|ST                                      
- *        |  |  |  |  |  |  |  |  |  |                                        
- *        |__|__|__|__|__|__|__|__|__|                                        
+ * _______     ___ ___ ___ ___ ___ ___ ___ ___________
+ *        |   |   |   |   |   |   |   |   |   |
+ *        |   |   |   |   |   |   |   |   |   |
+ *        |STA| 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |STO
+ *        |   |   |   |   |   |   |   |   |   |
+ *        |___|___|___|___|___|___|___|___|___|
  *
  * Start bit (4800bps):
  * __________                                                            __
@@ -59,11 +58,16 @@
  *        
  */
 #include <stdint.h> 
+#include "uart.h"
 
 uint8_t uart_result;
 uint8_t uart_status;
 
-static void uart_getc(){
+uint8_t uart_get_status(){
+    return uart_status;
+}
+
+void uart_getc(){
     
     
     __asm
@@ -71,8 +75,8 @@ static void uart_getc(){
     VALID_START      = 0xFF
     PRESAMPLE_DELAY  = 26
     POSTSAMPLE_DELAY = 24
-    UART_STATUS_OK   = 0x00
-    UART_STATUS_NOK  = 0xFF
+    ; UART_STATUS_OK   = 0x00
+    ; UART_STATUS_NOK  = 0xFF
     ; ----------------------------------------
     ; --- Detect start bit (82T    budget) ---
     ; ----------------------------------------
@@ -268,10 +272,3 @@ static void uart_getc(){
     
     __endasm;
 }
- 
-void main(){
-    while(1){
-        
-    }
-}
- 
