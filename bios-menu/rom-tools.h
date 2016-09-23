@@ -34,6 +34,12 @@ typedef struct sdsc_header_s sdsc_header_t;
 #define ROM_BIOS      0b11100000
 #define ROM_RAM       0b00000000 /*<-- No, is not a joke u_u */
 
+#ifndef PROGRAM_MEDIA
+#warning PROGRAM_MEDIA not defined. Building CARTRIDGE ROM by default
+#define PROGRAM_MEDIA ROM_CARTRIDGE
+#endif
+
+
 /*SEGA header constants*/
 #define SEGA_HEADER_OFFSET 0x3f0
 #define SH_CHECKSUM_OFFSET (SEGA_HEADER_OFFSET + 0x0A)

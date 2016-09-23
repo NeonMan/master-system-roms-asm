@@ -12,13 +12,15 @@
 #define STATE_BOOT_CARTRIDGE     2
 #define STATE_BOOT_CARD_SLOT     3
 #define STATE_BOOT_EXPANSION     4
-#define STATE_SYSTEM_INFO        5
+#define STATE_BOOT_BIOS          5
 #define STATE_BOOT_GENERIC       6
-#define STATE_CARTRIDGE_ROM_INFO 7 
-#define STATE_CARD_ROM_INFO      8
-#define STATE_EXPANSION_ROM_INFO 9
-#define STATE_GENERIC_ROM_INFO   10
-#define STATE_BOOT_GENERIC_CHECK 11
+#define STATE_SYSTEM_INFO        7
+#define STATE_CARTRIDGE_ROM_INFO 8 
+#define STATE_CARD_ROM_INFO      9
+#define STATE_EXPANSION_ROM_INFO 10
+#define STATE_BIOS_ROM_INFO      11
+#define STATE_GENERIC_ROM_INFO   12
+#define STATE_BOOT_GENERIC_CHECK 13
 
 
 #define STATE_INITIAL     STATE_MAIN_MENU
@@ -59,16 +61,25 @@ static uint8_t state_main_menu(int8_t mode){
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 2);
         con_put("Expansion port");
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 3);
+        con_put("BIOS");
+        con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 4);
         con_put("System info");
         
         con_gotoxy(3, 23);
-#ifdef COMMIT_ID
-        con_put("Rev: " COMMIT_ID);
+        con_put("Build type: ");
+#if PROGRAM_MEDIA == ROM_BIOS
+        con_put("BIOS");
+#elif PROGRAM_MEDIA == ROM_CARTRIDGE
+        con_put("CARTRIDGE");
+#elif PROGRAM_MEDIA == ROM_CARD_SLOT
+        con_put("CARD SLOT");
+#elif PROGRAM_MEDIA == ROM_EXPANSION
+        con_put("EXPANSION");
 #else
-        con_put("Rev: " __DATE__ " " __TIME__);
+#error Unknown PROGRAM_MEDIA value
 #endif
         
-        set_cursor_limits(0,3);
+        set_cursor_limits(0,4);
         draw_cursor(0);
     }
     else if(mode == ON_EXIT){
@@ -83,19 +94,27 @@ static uint8_t state_main_menu(int8_t mode){
         key = update_input_and_cursor();
         cursor = get_cursor();
         
-        if((key == KEY_1) && (cursor == 0)){
-            return STATE_BOOT_CARTRIDGE;
+        if(key == KEY_1){
+            switch(cursor){
+                case 0:
+                return STATE_BOOT_CARTRIDGE;
+                
+                case 1:
+                return STATE_BOOT_CARD_SLOT;
+                
+                case 2:
+                return STATE_BOOT_EXPANSION;
+                
+                case 3:
+                return STATE_BOOT_BIOS;
+                
+                case 4:
+                return STATE_SYSTEM_INFO;
+                
+                default:
+                break;
+            }
         }
-        else if((key == KEY_1) && (cursor == 1)){
-            return STATE_BOOT_CARD_SLOT;
-        }
-        else if((key == KEY_1) && (cursor == 2)){
-            return STATE_BOOT_EXPANSION;
-        }
-        else if((key == KEY_1) && (cursor == 3)){
-            return STATE_SYSTEM_INFO;
-        }
-        
     }
     return STATE_MAIN_MENU;
 }
@@ -167,6 +186,18 @@ static uint8_t state_boot_expansion(int8_t mode){
     return STATE_BOOT_GENERIC;
 }
 
+static uint8_t state_boot_bios(int8_t mode){
+    if(mode == ON_ENTRY){
+        con_clear();
+        con_gotoxy(1, TOP_MARGIN + 0);
+        con_put("BIOS");
+        
+        /*Set BOOT mode to BIOS*/
+        boot_media = ROM_BIOS;
+    }
+    return STATE_BOOT_GENERIC;
+}
+
 static uint8_t state_boot_generic(int8_t mode){
     if (mode == ON_ENTRY){
         /* Draw boot options */
@@ -205,6 +236,7 @@ static uint8_t state_boot_generic(int8_t mode){
                     if(boot_media == ROM_CARTRIDGE) return STATE_CARTRIDGE_ROM_INFO;
                     if(boot_media == ROM_CARD_SLOT) return STATE_CARD_ROM_INFO;
                     if(boot_media == ROM_EXPANSION) return STATE_EXPANSION_ROM_INFO;
+                    if(boot_media == ROM_BIOS)      return STATE_BIOS_ROM_INFO;
                 }
                 default:
                 break;
@@ -236,7 +268,7 @@ uint8_t state_boot_generic_check(int8_t mode){
             con_put("Failed!");
         }
         /*Add a small delay*/
-        for(vi=0; vi<3000; vi++){
+        for(vi=0; vi<5000; vi++){
             vi = vi;
         }
     }
@@ -288,6 +320,19 @@ uint8_t state_expansion_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
+uint8_t state_bios_rom_info(int8_t mode){
+    if (mode == ON_ENTRY){
+        /* Draw expansion info header */
+        con_clear();
+        con_gotoxy(1, TOP_MARGIN + 0);
+        con_put("BIOS ROM info");
+        
+        /*Set media to Expansion*/
+        boot_media = ROM_BIOS;
+    }
+    return STATE_GENERIC_ROM_INFO;
+}
+
 uint8_t state_generic_rom_info(int8_t mode){
     if (mode == ON_ENTRY){
         /*print ROM info*/
@@ -307,6 +352,7 @@ uint8_t state_generic_rom_info(int8_t mode){
             if(boot_media == ROM_CARD_SLOT) return STATE_BOOT_CARD_SLOT;
             if(boot_media == ROM_CARTRIDGE) return STATE_BOOT_CARTRIDGE;
             if(boot_media == ROM_EXPANSION) return STATE_BOOT_EXPANSION;
+            if(boot_media == ROM_BIOS)      return STATE_BOOT_BIOS;
         }
     }
     return STATE_GENERIC_ROM_INFO;
@@ -324,6 +370,8 @@ static uint8_t call_state(uint8_t state_id, int8_t mode){
         return state_boot_cartridge(mode);
         case STATE_BOOT_EXPANSION:
         return state_boot_expansion(mode);
+        case STATE_BOOT_BIOS:
+        return state_boot_bios(mode);
         case STATE_BOOT_GENERIC:
         return state_boot_generic(mode);
         case STATE_SYSTEM_INFO:
@@ -334,6 +382,8 @@ static uint8_t call_state(uint8_t state_id, int8_t mode){
         return state_card_rom_info(mode);
         case STATE_EXPANSION_ROM_INFO:
         return state_expansion_rom_info(mode);
+        case STATE_BIOS_ROM_INFO:
+        return state_bios_rom_info(mode);
         case STATE_GENERIC_ROM_INFO:
         return state_generic_rom_info(mode);
         case STATE_BOOT_GENERIC_CHECK:

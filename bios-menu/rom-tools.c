@@ -96,12 +96,9 @@ void rom_boot(uint8_t rom_media){
  *  available during this operation.
  */
 void _media_read(uint16_t block_index, uint8_t media){
-    uint8_t  old_media;
     uint8_t  bank;
     uint16_t address;
     uint16_t i;
-    
-    old_media = media;
     
     /*Enable external media*/
     sms_enable_port = media;
@@ -139,7 +136,7 @@ void _media_read(uint16_t block_index, uint8_t media){
     *sms_mapper_slot2 = 2;
     
     /*Re-enable BIOS*/
-    sms_enable_port = ROM_BIOS;
+    sms_enable_port = PROGRAM_MEDIA;
 }
 
 void media_read(uint16_t block_index, uint8_t media){
