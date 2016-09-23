@@ -83,7 +83,7 @@ ADD_CUSTOM_TARGET(sys-info-bin ALL
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py sys-info.sms
 		DEPENDS sys-info
     )
-ADD_CUSTOM_TARGET(stest-input-bin ALL
+ADD_CUSTOM_TARGET(test-input-bin ALL
         COMMAND makebin -s 32768 test-input.ihx test-input.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-input.sms
 		DEPENDS test-input

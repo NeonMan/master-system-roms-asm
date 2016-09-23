@@ -1,3 +1,13 @@
+/**
+ * @file test-input.c
+ * @brief Test ROM for peripheral ports.
+ *
+ * This program dumps the state of the peripheral port registers and allows
+ * to set the level/direction of the pins that allow it.
+ *
+ * This ROM has been tested on a real Master System (Europe).
+ */
+
 #include <sms/console.h>
 #include <sms/sms.h>
 #include <sms/intv-dummy.h>
