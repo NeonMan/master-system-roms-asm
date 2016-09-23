@@ -21,10 +21,10 @@ ADD_DEFINITIONS(-DPROGRAM_MEDIA=ROM_CARTRIDGE)
 include_directories(${PROJECT_SOURCE_DIR})
 
 # Find python3
-#find_package(PythonInterp 3 REQUIRED)
+find_package(PythonInterp 3 REQUIRED)
 
 #uncoment and properly set this param if detection fails.
-set(PYTHON_EXECUTABLE "C:/Python31/python.exe")
+#set(PYTHON_EXECUTABLE "C:/Python31/python.exe")
 
 #Libraries
 ADD_SUBDIRECTORY(sms)
@@ -53,6 +53,10 @@ ADD_EXECUTABLE(sys-info sys-info.c)
 ADD_DEPENDENCIES(sys-info crt0-sms)
 TARGET_LINK_LIBRARIES(sys-info sms vdp console)
 
+ADD_EXECUTABLE(test-input test-input.c)
+ADD_DEPENDENCIES(test-input crt0-sms vdp console)
+TARGET_LINK_LIBRARIES(test-input sms vdp console)
+
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(sample-bin ALL
         COMMAND makebin -s 32768 sample.ihx sample.sms
@@ -78,4 +82,9 @@ ADD_CUSTOM_TARGET(sys-info-bin ALL
         COMMAND makebin -s 32768 sys-info.ihx sys-info.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py sys-info.sms
 		DEPENDS sys-info
+    )
+ADD_CUSTOM_TARGET(stest-input-bin ALL
+        COMMAND makebin -s 32768 test-input.ihx test-input.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-input.sms
+		DEPENDS test-input
     )

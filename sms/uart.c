@@ -55,6 +55,14 @@
  *           |____________________________|_____________________________|
  *
  *
+ * Sending a bit should be easier. We use port 0x3F to set the TR bit on port 2
+ * at regular intervals.
+ *
+ * Setting the port bit would be:
+ *   PORT 0x3f <-- 0b01001011 (0x4B)
+ *
+ * Resetting the port would be:
+ *   PORT 0x3f <-- 0b00001011 (0x0B)
  *        
  */
 #include <stdint.h> 
@@ -62,6 +70,13 @@
 
 uint8_t uart_result;
 uint8_t uart_status;
+
+/*What sampling a start bit eight times looks like*/
+/*Either 0x00 (positive logic) or 0xFF (negative logic)*/
+#define UART_VALID_START 0xFF
+
+/*If enabled the result byte will be negated before returning*/
+#define UART_FLIP_RESULT
 
 uint8_t uart_get_status(){
     return uart_status;
@@ -72,11 +87,8 @@ void uart_getc(){
     
     __asm
     PERIPHERAL_PORT  = 0xDD
-    VALID_START      = 0xFF
     PRESAMPLE_DELAY  = 26
     POSTSAMPLE_DELAY = 24
-    ; UART_STATUS_OK   = 0x00
-    ; UART_STATUS_NOK  = 0xFF
     ; ----------------------------------------
     ; --- Detect start bit (82T    budget) ---
     ; ----------------------------------------
@@ -204,8 +216,8 @@ void uart_getc(){
     ;                        Budget:   66T
     
         LD   A, B                  ;  4T
-        CP   #VALID_START          ;  7T
-        RET  NC                    ;  5T (presumed false)
+        CP   #UART_VALID_START     ;  7T
+        RET  NZ                    ;  5T (presumed false)
     ; Remaining budget: 50T
         PUSH IX                    ; 15T ;
         POP  IX                    ; 14T ;
@@ -259,16 +271,55 @@ void uart_getc(){
     sample_bit
     
     ; By this time the value shall be stored at uart_result (HL)
-    ; and A should be Zero.
+    ; A should be Zero and B should have a copy of the result.
     ;
     ; The stop bit starts here so we should have a reasonable ammount
     ; of time to copy the byte to a buffer even using C
     
+    __endasm;
+    
+    
+#ifdef UART_FLIP_RESULT
+    __asm
+    
+    LD A,B
+    NEG
+    LD (HL), A
+    
+    __endasm;
+#endif
+    
+    __asm
     ; Budget: 742T
     LD HL, #_uart_status     ; 10T
     LD (HL), #UART_STATUS_OK ; 10T
-    ret                      ; 10T
+    
+    ;Implicit RET from the function return
+    ;ret                      ; 10T
     ; Remaining budget: 712T
+    __endasm;
+}
+
+/*Output port*/
+#define UART_OUT_PORT 0x3F
+
+/*What to write to control port to set the line LOW/HIGH*/
+#define UART_OUT_LOW 0x0B
+#define UART_OUT_HIGH 0x4B
+
+void uart_putc(uint8_t c){
+    
+    __asm
+        DEC SP                ;  6T
+        POP AF                ; 10T
+        DEC SP                ;  6T; Argument byte on A, Stack restored.
+        
+        NOP
     
     __endasm;
+    
+}
+
+void sample(){
+    uart_putc('U');
 }
