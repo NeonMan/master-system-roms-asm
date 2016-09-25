@@ -73,10 +73,7 @@ uint8_t uart_status;
 
 /*What sampling a start bit eight times looks like*/
 /*Either 0x00 (positive logic) or 0xFF (negative logic)*/
-#define UART_VALID_START 0xFF
-
-/*If enabled the result byte will be negated before returning*/
-#define UART_FLIP_RESULT
+#define UART_VALID_START 0x00
 
 uint8_t uart_get_status(){
     return uart_status;
@@ -87,17 +84,17 @@ void uart_getc(){
     
     __asm
     PERIPHERAL_PORT  = 0xDD
-    PRESAMPLE_DELAY  = 26
-    POSTSAMPLE_DELAY = 24
+    PRESAMPLE_DELAY  = 25   ; Original value 26  ; Tune these two to select the bit width and
+    POSTSAMPLE_DELAY = 24   ; Original value 24  ; where in the bit the sample is made.
     ; ----------------------------------------
     ; --- Detect start bit (82T    budget) ---
     ; ----------------------------------------
         IN   A, (#PERIPHERAL_PORT) ; 11T
         RLA                        ;  4T
-        RET  C                     ;  5T (presumed false)
-    ; Remaining budget: 62T
         LD HL, #_uart_status       ; 10T
         LD (HL), #UART_STATUS_NOK  ; 10T
+        RET  C                     ;  5T (presumed false)
+    ; Remaining budget: 42T
         LD HL, #_uart_result       ; 10T
         LD (HL), #0x00             ; 10T  ; HL points to uart_result
         LD A, #0x00                ;  7T  ; 
@@ -244,7 +241,7 @@ void uart_getc(){
         ; Sample
             IN   A, (#PERIPHERAL_PORT) ; 11T
             RLA                        ;  4T
-            RL   B                     ;  8T
+            RR   B                     ;  8T
         ; Remaining budget: 354 (skip it)
             LD   A, #POSTSAMPLE_DELAY  ;  7T
             
@@ -276,20 +273,6 @@ void uart_getc(){
     ; The stop bit starts here so we should have a reasonable ammount
     ; of time to copy the byte to a buffer even using C
     
-    __endasm;
-    
-    
-#ifdef UART_FLIP_RESULT
-    __asm
-    
-    LD A,B
-    NEG
-    LD (HL), A
-    
-    __endasm;
-#endif
-    
-    __asm
     ; Budget: 742T
     LD HL, #_uart_status     ; 10T
     LD (HL), #UART_STATUS_OK ; 10T
@@ -308,18 +291,97 @@ void uart_getc(){
 #define UART_OUT_HIGH 0x4B
 
 void uart_putc(uint8_t c){
+    (void) c;
     
     __asm
-        DEC SP                ;  6T
-        POP AF                ; 10T
-        DEC SP                ;  6T; Argument byte on A, Stack restored.
+        ;742 T-States for every bit.
+        ;Port-2 TR will be our TX pin.
         
+        UART_DOWN = 0xBB
+        UART_UP   = 0xFB
+        IO_PORT   = 0x3F
+        START_DELAY = 48
+        DATA_DELAY  = 49
+        STOP_DELAY  = 52
+        
+        ;Pull line DOWN to send a start bit
+        LD A, #UART_DOWN      ;  7T
+        OUT (#IO_PORT),A      ; 11T
+        
+        ; -----------------
+        ; --- START BIT ---
+        ; -----------------
+        ;742 T-States
+        
+        POP HL                ; 10T* ; Save return value
+        DEC SP                ;  6T
+        POP BC                ; 10T
+        DEC SP                ;  6T; Argument byte on B, Stack restored.
+        PUSH HL               ; 11T* ; Restore return value
+        
+        
+        
+        ;Remaining budget: 720T (-25T)
+        LD C, #START_DELAY    ;  7T
+    tx_start_delay:
+        DEC C                 ;  4T
+        JP NZ, tx_start_delay ; 10T
+        ;Remaining budget: 2T
+        
+        ; ----------------------
+        ; --- DATA BIT MACRO ---
+        ; ----------------------
+        .macro sendbit ?tx_bit_one,?tx_bit_zero,?tx_bit,?tx_delay
+            RR B               ;  8T ; Move bit to Carry flag
+
+            JP NC, tx_bit_zero ; 10T ;
+            JP C,  tx_bit_one  ; 10T ;
+        tx_bit_zero:                 ;
+            LD A, #UART_DOWN   ;  7T ;
+            JP tx_bit          ; 10T ;
+        tx_bit_one:                  ; Regardless of path taken
+            LD A, #UART_UP     ;  7T ; 17T
+        tx_bit:
+            OUT (#IO_PORT), A  ; 11T ; Change bit edge
+            
+        ; Before edge change we spent 25 + 11 T-States
+        ; Time to waste enough time to fill 706 T-States
+            LD C, #DATA_DELAY  ;  7T
+        tx_delay:
+            DEC C              ;  4T
+            JP NZ, tx_delay    ; 10T
+        ; Remaining budget: 13 T
+        NOP                    ;  4T
+        NOP                    ;  4T
+        NOP                    ;  4T
+        ; Remainder: 1T
+            
+        .endm
+        
+        sendbit
+        sendbit
+        sendbit
+        sendbit
         NOP
-    
+        sendbit
+        sendbit
+        sendbit
+        sendbit
+        
+        ;Use 25T til OUT command
+        LD A, #UART_UP     ;  7T
+        NOP                ;  4T
+        NOP                ;  4T
+        NOP                ;  4T
+        NOP                ;  4T
+        ;Remainder: 2T
+        OUT (#IO_PORT), A  ; 11T ; Change bit edge
+        
+        ;Use 742 T-States
+            LD C, #STOP_DELAY  ;  7T
+        tx_delay:
+            DEC C              ;  4T
+            JP NZ, tx_delay    ; 10T
     __endasm;
     
-}
-
-void sample(){
-    uart_putc('U');
 }

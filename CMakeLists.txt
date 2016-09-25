@@ -57,6 +57,18 @@ ADD_EXECUTABLE(test-input test-input.c)
 ADD_DEPENDENCIES(test-input crt0-sms vdp console)
 TARGET_LINK_LIBRARIES(test-input sms vdp console)
 
+ADD_EXECUTABLE(test-uart-rx test-uart-rx.c)
+ADD_DEPENDENCIES(test-uart-rx crt0-sms)
+TARGET_LINK_LIBRARIES(test-uart-rx sms vdp console uart)
+
+ADD_EXECUTABLE(test-uart-tx test-uart-tx.c)
+ADD_DEPENDENCIES(test-uart-tx crt0-sms)
+TARGET_LINK_LIBRARIES(test-uart-tx sms vdp console uart)
+
+ADD_EXECUTABLE(test-uart-echo test-uart-echo.c)
+ADD_DEPENDENCIES(test-uart-echo crt0-sms)
+TARGET_LINK_LIBRARIES(test-uart-echo sms vdp console uart)
+
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(sample-bin ALL
         COMMAND makebin -s 32768 sample.ihx sample.sms
@@ -88,3 +100,19 @@ ADD_CUSTOM_TARGET(test-input-bin ALL
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-input.sms
 		DEPENDS test-input
     )
+ADD_CUSTOM_TARGET(test-uart-rx-bin ALL
+        COMMAND makebin -s 32768 test-uart-rx.ihx test-uart-rx.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-uart-rx.sms
+		DEPENDS test-input
+    )
+ADD_CUSTOM_TARGET(test-uart-tx-bin ALL
+        COMMAND makebin -s 32768 test-uart-tx.ihx test-uart-tx.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-uart-tx.sms
+		DEPENDS test-input
+    )
+ADD_CUSTOM_TARGET(test-uart-echo-bin ALL
+        COMMAND makebin -s 32768 test-uart-echo.ihx test-uart-echo.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-uart-echo.sms
+		DEPENDS test-input
+    )
+    
