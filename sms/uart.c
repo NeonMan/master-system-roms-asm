@@ -1,18 +1,19 @@
 
 /*
- * Rule number one of embedded development is "make an LED" blink. Rule number
+ * Rule number one of embedded development is "make a LED" blink. Rule number
  * two should be "Now get a serial port going". This file aims to do just that
  * on the SEGA master system.
  *
- * Peripheral ports have two selectable direction pins readable through port
- * 0xDD with the added bonus that one such pin of pad port B is the high order
- * bit of the port register, allowing an easy shift-out of Port B TH sample bit
+ * Peripheral ports have two selectable direction pins readable through ports
+ * DDh DCh with the added bonus that TH on port 2 is the high order bit of the
+ * port register, allowing an easy shift-out of the bit through the carry flag
  *
  * Now, down to business... We want to:
  *   - Sample the TH line until a low level is detected.
- *   - Sample TH line at regular intervals 4/8 times per data bit.
- *   - Move the result to a buffer
- *   - Prepare for the next bit
+ *   - Sample the start bit multiple times for reliable framing.
+ *   - Sample TH line at regular intervals for the data bits.
+ *   - Make result available.
+ *   - Prepare for the next bit.
  *   - Being able to do this 130 times in a row because... XMODEM ;)
  *   - Get to 4800bps or, as the bare minimum, 1200bps
  *
@@ -71,10 +72,6 @@
 uint8_t uart_result;
 uint8_t uart_status;
 
-/*What sampling a start bit eight times looks like*/
-/*Either 0x00 (positive logic) or 0xFF (negative logic)*/
-#define UART_VALID_START 0x00
-
 uint8_t uart_get_status(){
     return uart_status;
 }
@@ -86,6 +83,7 @@ void uart_getc(){
     PERIPHERAL_PORT  = 0xDD
     PRESAMPLE_DELAY  = 25   ; Original value 26  ; Tune these two to select the bit width and
     POSTSAMPLE_DELAY = 24   ; Original value 24  ; where in the bit the sample is made.
+    UART_VALID_START = 0x00 ; What the sampled start bit looks like if correctly sampled.
     ; ----------------------------------------
     ; --- Detect start bit (82T    budget) ---
     ; ----------------------------------------
@@ -103,98 +101,34 @@ void uart_getc(){
         NOP                        ; 4T   ; Delay
     ; Leftover: 1T (Ignored bc of changes)
     
-    ; ----------------------------------------
-    ; --- Start sample #0/7 (82T   Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 1T
     
-    ; ----------------------------------------
-    ; --- Start sample #1/7 (82+1T Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59+1T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 2T
+    ; ------------------------------
+    ; --- Sample start bit macro ---
+    ; ------------------------------
+    .macro sample_start_bit
+            IN   A, (#PERIPHERAL_PORT) ; 11T
+            RLA                        ;  4T
+            RL   B                     ;  8T
+        ; Remaining budget 59T
+            PUSH IX                    ; 15T ;
+            POP  IX                    ; 14T ;
+            PUSH IX                    ; 15T ;
+            POP  IX                    ; 14T ; Delay
+        ; Leftover: 1T
+    .endm
     
-    ; ----------------------------------------
-    ; --- Start sample #2/7 (82+2T Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59+2T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 3T
+    ;Perform the first 7 samples.
+    sample_start_bit
+    sample_start_bit
+    sample_start_bit
+    sample_start_bit
+    NOP
+    sample_start_bit
+    sample_start_bit
+    sample_start_bit
     
-    ; ----------------------------------------
-    ; --- Start sample #3/7 (82+3T Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59+3T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 4T
-        NOP
-    ; Leftover: 0T
-    
-    ; ----------------------------------------
-    ; --- Start sample #4/7 (82T   Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 1T
-
-    ; ----------------------------------------
-    ; --- Start sample #5/7 (82+1T Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59+1T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 2T
-    
-    ; ----------------------------------------
-    ; --- Start sample #6/7 (82+2T Budget) ---
-    ; ----------------------------------------
-        IN   A, (#PERIPHERAL_PORT) ; 11T
-        RLA                        ;  4T
-        RL   B                     ;  8T
-    ; Remaining budget 59+2T
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ;
-        PUSH IX                    ; 15T ;
-        POP  IX                    ; 14T ; Delay
-    ; Leftover: 3T
+    ;Last sample needs to do some extra processing instead of a
+    ;busy delay, hence is sampled separate.
     
     ; ----------------------------------------
     ; --- Start sample #7/7 (82+3T Budget) ---
@@ -283,13 +217,6 @@ void uart_getc(){
     __endasm;
 }
 
-/*Output port*/
-#define UART_OUT_PORT 0x3F
-
-/*What to write to control port to set the line LOW/HIGH*/
-#define UART_OUT_LOW 0x0B
-#define UART_OUT_HIGH 0x4B
-
 void uart_putc(uint8_t c){
     (void) c;
     
@@ -312,14 +239,11 @@ void uart_putc(uint8_t c){
         ; --- START BIT ---
         ; -----------------
         ;742 T-States
-        
         POP HL                ; 10T* ; Save return value
         DEC SP                ;  6T
         POP BC                ; 10T
         DEC SP                ;  6T; Argument byte on B, Stack restored.
         PUSH HL               ; 11T* ; Restore return value
-        
-        
         
         ;Remaining budget: 720T (-25T)
         LD C, #START_DELAY    ;  7T
@@ -332,30 +256,29 @@ void uart_putc(uint8_t c){
         ; --- DATA BIT MACRO ---
         ; ----------------------
         .macro sendbit ?tx_bit_one,?tx_bit_zero,?tx_bit,?tx_delay
-            RR B               ;  8T ; Move bit to Carry flag
+                RR B               ;  8T ; Move bit to Carry flag
 
-            JP NC, tx_bit_zero ; 10T ;
-            JP C,  tx_bit_one  ; 10T ;
-        tx_bit_zero:                 ;
-            LD A, #UART_DOWN   ;  7T ;
-            JP tx_bit          ; 10T ;
-        tx_bit_one:                  ; Regardless of path taken
-            LD A, #UART_UP     ;  7T ; 17T
-        tx_bit:
-            OUT (#IO_PORT), A  ; 11T ; Change bit edge
-            
-        ; Before edge change we spent 25 + 11 T-States
-        ; Time to waste enough time to fill 706 T-States
-            LD C, #DATA_DELAY  ;  7T
-        tx_delay:
-            DEC C              ;  4T
-            JP NZ, tx_delay    ; 10T
-        ; Remaining budget: 13 T
-        NOP                    ;  4T
-        NOP                    ;  4T
-        NOP                    ;  4T
-        ; Remainder: 1T
-            
+                JP NC, tx_bit_zero ; 10T ;
+                JP C,  tx_bit_one  ; 10T ;
+            tx_bit_zero:                 ;
+                LD A, #UART_DOWN   ;  7T ;
+                JP tx_bit          ; 10T ;
+            tx_bit_one:                  ; Regardless of path taken
+                LD A, #UART_UP     ;  7T ; 17T
+            tx_bit:
+                OUT (#IO_PORT), A  ; 11T ; Change bit edge
+                
+            ; Before edge change we spent 25 + 11 T-States
+            ; Time to waste enough time to fill 706 T-States
+                LD C, #DATA_DELAY  ;  7T
+            tx_delay:
+                DEC C              ;  4T
+                JP NZ, tx_delay    ; 10T
+            ; Remaining budget: 13 T
+            NOP                    ;  4T
+            NOP                    ;  4T
+            NOP                    ;  4T
+            ; Remainder: 1T
         .endm
         
         sendbit
@@ -377,6 +300,9 @@ void uart_putc(uint8_t c){
         ;Remainder: 2T
         OUT (#IO_PORT), A  ; 11T ; Change bit edge
         
+        ; ----------------
+        ; --- STOP BIT ---
+        ; ----------------
         ;Use 742 T-States
             LD C, #STOP_DELAY  ;  7T
         tx_delay:
