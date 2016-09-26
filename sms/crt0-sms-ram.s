@@ -36,21 +36,32 @@
 	.globl	_main
 	.area	_HEADER (ABS)
 	
-    CRT0_COPY_SIZE = 0x0FF0
+    CRT0_COPY_SIZE = 0x17F0
     CRT0_STOP_MARK = CRT0_COPY_SIZE + RAM_BASE_ADDRESS
     
     ; Put a visible mark on the ROM where the CRT will stop copying.
+    ; Also acts like a canary mark
 	.org  CRT0_STOP_MARK
-	.ascii "-Crt0 copy ends-"
+_crt0_canary::
+	.ascii "*chirp* *chirp*"
+    .db 0x00
     
 	.org	0x0000
-	.db 0x00
+    di
+    jp 0x0000
+    
+	;NMI vector
+	.org	0x66
+	reti
+    
 	.ascii "Self-reloacating ROM. Trim all data before the 0xc000 offset"
+    .db 0x00
 	
 	;;Signature to easily check the Crt being used.
 crt_signature:
 	.ascii "RAM Crt0 V0.1"
 	.db 0x00
+
     
 	;; Reset vector
 	.org 	0xc000
