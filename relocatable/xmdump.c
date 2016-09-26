@@ -59,7 +59,7 @@ uint8_t  crc_mode;
 
 static void set_status(void* s){
     con_gotoxy(7,8);
-    con_put("          ");
+    con_put("              ");
     con_gotoxy(7,8);
     con_put(s);
 }
@@ -138,16 +138,15 @@ static void transfer(){
         /*Select XMODEM CRC mode*/
         if(uart_result == 'C'){
             crc_mode = CRC_MODE_CRC16;
-            set_status("ACK! CRC16");
+            set_status("Transfer (CRC)");
         }
         else if(uart_result == C_NAK){
             crc_mode = CRC_MODE_CHECKSUM;
-            set_status("ACK! SUM");
+            set_status("Transfer (SUM)");
         }
     }while(crc_mode == CRC_MODE_UNDEF);
     
     /*Basic algorithm. While there is data left*/
-    set_status("Transfer!");
     while(data_left){
         uint8_t has_ack;
         has_ack = 0;
