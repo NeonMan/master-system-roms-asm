@@ -36,22 +36,35 @@
 	.globl	_main
 	.area	_HEADER (ABS)
 	
+    CRT0_COPY_SIZE = 0x0FF0
+    CRT0_STOP_MARK = CRT0_COPY_SIZE + RAM_BASE_ADDRESS
+    
+    ; Put a visible mark on the ROM where the CRT will stop copying.
+	.org  CRT0_STOP_MARK
+	.ascii "-Crt0 copy ends-"
+    
 	.org	0x0000
 	.db 0x00
 	.ascii "Self-reloacating ROM. Trim all data before the 0xc000 offset"
 	
+	;;Signature to easily check the Crt being used.
+crt_signature:
+	.ascii "RAM Crt0 V0.1"
+	.db 0x00
+    
 	;; Reset vector
 	.org 	0xc000
 entry:
 	;;No interrupts. we cannot use most of those anyway...
 	di
-	jr init
+	
+	; --- Some calculated figures ---
 	ENTRY_DIFFERENCE = ret_check - entry
 	RELOCATE_SIZE = relocate_end - relocate
 	RELOCATE_ADDRESS = 0xDFF0 - RELOCATE_SIZE
 	RELOCATE_OFFSET  = relocate - entry
 	RAM_BASE_ADDRESS = 0xc000
-	
+	; -------------------------------
 init:
 	;; Set stack pointer directly above top of memory minus one byte
 	ld	sp,#0xDFFF
@@ -111,7 +124,7 @@ relocate:
 	;;base address of RAM (0xC000)
 	ld de,#RAM_BASE_ADDRESS
 	pop hl ;;<-- Retrieve the real address of 'entry'
-	ld bc,#0x1000
+	ld bc,#CRT0_COPY_SIZE
 	ldir
 	;;Move SP back to the ram top
 	ld sp,#0xE000
@@ -119,15 +132,6 @@ relocate:
 	call	_main
 	jp	_exit
 relocate_end:
-	
-	
-	
-	
-	
-	;;Signature to easily check the Crt being used.
-crt_signature:
-	.ascii "SMS RAM Crt0 V0.1"
-	.db 0x00
 	
 	;; Ordering of segments for the linker.
 	.area	_HOME
