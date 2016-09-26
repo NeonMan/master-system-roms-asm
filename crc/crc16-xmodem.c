@@ -1,19 +1,20 @@
 /**
- * \file crc16-ccitt.c
+ * \file crc16-xmodem.c
  * Functions and types for CRC checks.
  *
- * Generated on Wed Sep  7 22:12:28 2016,
+ * Generated on Mon Sep 26 10:39:19 2016,
  * by pycrc v0.9, https://pycrc.org
  * using the configuration:
  *    Width         = 16
  *    Poly          = 0x1021
- *    Xor_In        = 0x1d0f
+ *    Xor_In        = 0x0000
  *    ReflectIn     = False
  *    Xor_Out       = 0x0000
  *    ReflectOut    = False
- *    Algorithm     = bit-by-bit-fast
+ *    Algorithm     = table-driven
  *****************************************************************************/
-#include "crc16-ccitt.h"     /* include the header file generated with pycrc */
+#include "crc16-xmodem.h"     /* include the header file generated with pycrc */
+#include <stdint.h>
 
 /**
  * Static table used for the table_driven implementation.
@@ -61,7 +62,7 @@ static const crc_t crc_table[256] = {
  * \param data_len Number of bytes in the \a data buffer.
  * \return         The updated crc value.
  *****************************************************************************/
-crc_t crc16_ccitt_update(crc_t crc, const void *data, uint16_t data_len)
+crc_t crc16_xmodem_update(crc_t crc, const void *data, uint16_t data_len)
 {
     const unsigned char *d = (const unsigned char *)data;
     unsigned int tbl_idx;
@@ -74,3 +75,4 @@ crc_t crc16_ccitt_update(crc_t crc, const void *data, uint16_t data_len)
     }
     return crc;
 }
+
