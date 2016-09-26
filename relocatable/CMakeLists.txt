@@ -15,7 +15,7 @@ TARGET_LINK_LIBRARIES(simple-bios io)
 
 ADD_EXECUTABLE(xmdump xmdump.c)
 ADD_DEPENDENCIES(xmdump crt0-sms-ram)
-TARGET_LINK_LIBRARIES(xmdump uart crc16-xmodem-bbb)
+TARGET_LINK_LIBRARIES(xmdump uart crc16-xmodem-bbb console vdp)
 
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(rel-sample-bin ALL
