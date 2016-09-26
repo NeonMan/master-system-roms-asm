@@ -21,9 +21,9 @@
 #define SMS_SLOT2_CONTROL_ADDRESS 0xFFFF
 
 /* --- SEGA mammer pointers --- */
-static uint8_t* sms_mapper_slot0 = (uint8_t*) SMS_SLOT0_CONTROL_ADDRESS;
-static uint8_t* sms_mapper_slot1 = (uint8_t*) SMS_SLOT1_CONTROL_ADDRESS;
-static uint8_t* sms_mapper_slot2 = (uint8_t*) SMS_SLOT2_CONTROL_ADDRESS;
+static volatile uint8_t* const sms_mapper_slot0 = (uint8_t*) SMS_SLOT0_CONTROL_ADDRESS;
+static volatile uint8_t* const sms_mapper_slot1 = (uint8_t*) SMS_SLOT1_CONTROL_ADDRESS;
+static volatile uint8_t* const sms_mapper_slot2 = (uint8_t*) SMS_SLOT2_CONTROL_ADDRESS;
 
 /* --- Port address declarations --- */
 #define SMS_ENABLE_PORT      0x3E

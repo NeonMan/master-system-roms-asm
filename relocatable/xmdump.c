@@ -66,11 +66,38 @@ static void set_status(void* s){
 
 /*Reads a packet, returns true if data left*/
 static uint8_t read_packet(){
-    uint8_t idx;
-    for(idx=0; idx<128;idx++){
-        packet_buffer[idx] = packet_count;
+    uint8_t  idx;
+    uint8_t* rom_buffer;
+    /*Set the SLOT2 mapper to the selected bank*/
+    *((volatile uint8_t*) SMS_SLOT2_CONTROL_ADDRESS) = bank_start;
+    idx = 128;
+    
+    rom_buffer = ((uint8_t*)SMS_SLOT2_BASE_ADDRESS);
+    rom_buffer += addr_start;
+    
+    do{
+        idx--;
+        packet_buffer[127-idx] = *rom_buffer;
+        ++rom_buffer;
+        
+    }while(idx);
+    
+    addr_start += 128;
+    
+    if(bank_start != bank_end){
+        if(addr_start > 0x3FFF){
+            bank_start++;
+            addr_start = addr_start & 0x3FFF;
+        }
     }
-    return packet_count;
+
+    if(bank_start == bank_end){
+        if(addr_start >= addr_end){
+            return 0;
+        }
+    }
+    
+    return 1;
 }
 
 static void get_checksum(){
@@ -118,14 +145,42 @@ static void send_eot(){
 /*XMODEM transfer*/
 static void transfer(){
     uint8_t data_left;
-    /*XMODEM PROTOCOL!*/
     
+    /*Temporal fix. Make the addresses align to 128B*/
+    addr_start = addr_start & 0xFF80;
+    addr_end   = addr_end & 0xFF80;
+    
+    if(bank_end<bank_start){
+        bank_end = bank_start;
+    }
+    /*----------------------------------------------*/
+    
+    /*XMODEM PROTOCOL!*/
     current_crc = crc16_xmodem_init();
     packet_crc = crc16_xmodem_init();
     packet_count = 1;
     crc_mode = CRC_MODE_UNDEF;
     data_left = 1;
     error_count = 0;
+    
+    /*Select media slot*/
+    switch(current_media){
+        case MEDIA_BIOS:
+        sms_enable_port = 0b11100000;
+        break;
+        case MEDIA_CARD:
+        sms_enable_port = 0b11001000;
+        break;
+        case MEDIA_CARTRIDGE:
+        sms_enable_port = 0b10101000;
+        break;
+        case MEDIA_EXT:
+        sms_enable_port = 0b01101000;
+        break;
+        
+        default:
+        break;
+    }
     
     /*Status: Waiting for C or ACK*/
     set_status("Wait ACK");
