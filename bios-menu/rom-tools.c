@@ -125,7 +125,7 @@ void _media_read(uint16_t block_index, uint8_t media){
     address = address << 10;
     
     /*Set SEGA mapper SLOT2 to the selected bank*/
-    *sms_mapper_slot2 = bank;
+    SMS_MAPPER_SLOT2(bank);
     
     /*copy 1K of data from it*/
     for(i = 0; i<1024; i++){
@@ -133,7 +133,7 @@ void _media_read(uint16_t block_index, uint8_t media){
     }
     
     /*Restore mapper bank to the default value (2)*/
-    *sms_mapper_slot2 = 2;
+    SMS_MAPPER_SLOT2(2);
     
     /*Re-enable BIOS*/
     sms_enable_port = PROGRAM_MEDIA;

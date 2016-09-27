@@ -10,8 +10,8 @@ static uint8_t tmp_reg;
 /*Pad input variables*/
 static uint8_t last_input;
 
-/*Address increment*/
-static uint16_t increment; /*Valid values 1,16,256,4096*/
+/*Selects which nibble to increment. Valid: 0,1,2,3*/
+static uint8_t increment;
 
 static uint16_t addr_start;
 static uint16_t addr_end;
@@ -38,7 +38,7 @@ static int8_t current_cursor;
 static const uint8_t cursors[CURSOR_COUNT][2] = {
     {7,17}, {7+15,17},
     {7,18}, {7+15,18},
-    {7,19}, {12,21}
+    {7,19}, {7+11,19}
 };
 
 /*XMODEM related stuff*/
@@ -67,36 +67,37 @@ static void set_status(void* s){
 /*Reads a packet, returns true if data left*/
 static uint8_t read_packet(){
     uint8_t  idx;
-    uint8_t* rom_buffer;
-    /*Set the SLOT2 mapper to the selected bank*/
-    *((volatile uint8_t*) SMS_SLOT2_CONTROL_ADDRESS) = bank_start;
-    idx = 128;
+    uint8_t* rom_buffer;    
     
+    /*Set the SLOT2 mapper to the selected bank*/
+    SMS_MAPPER_SLOT2(bank_start);    
     rom_buffer = ((uint8_t*)SMS_SLOT2_BASE_ADDRESS);
     rom_buffer += addr_start;
-    
+
+    idx = 128;    
     do{
+        /*Copy byte*/
         idx--;
         packet_buffer[127-idx] = *rom_buffer;
-        ++rom_buffer;
         
+        /*Increment pointer*/
+        ++rom_buffer;
+        /*If it goes into RAM addresses, increment bank, reset addr*/
+        if(rom_buffer == ((void*)SMS_RAM_BASE_ADDRESS)){
+            rom_buffer = (void*) SMS_SLOT2_BASE_ADDRESS;
+            bank_start++;
+        }
     }while(idx);
     
-    addr_start += 128;
-    
-    if(bank_start != bank_end){
-        if(addr_start > 0x3FFF){
-            bank_start++;
-            addr_start = addr_start & 0x3FFF;
-        }
-    }
-
-    if(bank_start == bank_end){
+    addr_start = (addr_start + 128) & 0x3FFF;
+    if(bank_start >= bank_end){
         if(addr_start >= addr_end){
             return 0;
         }
+        else if(bank_start > bank_end){
+            return 0;
+        }
     }
-    
     return 1;
 }
 
@@ -145,10 +146,6 @@ static void send_eot(){
 /*XMODEM transfer*/
 static void transfer(){
     uint8_t data_left;
-    
-    /*Temporal fix. Make the addresses align to 128B*/
-    addr_start = addr_start & 0xFF80;
-    addr_end   = addr_end & 0xFF80;
     
     if(bank_end<bank_start){
         bank_end = bank_start;
@@ -235,26 +232,40 @@ static void transfer(){
     set_status("FINISHED");
 }
 
+static uint16_t nibble_increment(uint16_t v, uint16_t nibble){
+    uint16_t nibble_mask;
+    uint16_t nibble_increment;
+    uint16_t rv;
+    
+    nibble_mask = 0x000F << (4*nibble);
+    nibble_increment = 0x0001 << (4*nibble);
+    
+    rv = (v + nibble_increment) & nibble_mask;
+    rv = rv | (v & ~(nibble_mask));
+    
+    return rv;
+}
+
 /*Increment the parameters on the screen*/
 static void increment_val(){
-    uint8_t bank_increment = (increment>>8) | increment;
+    uint8_t bank_increment = increment & 0x01;
     switch(current_cursor){
         case 0: /*Start addr*/
-        addr_start += increment;
+        addr_start = nibble_increment(addr_start, increment);
         addr_start &= 0x3FFF;
         break;
         
         case 1: /*Start bank*/
-        bank_start += bank_increment;
+        bank_start = nibble_increment(bank_start, bank_increment);
         break;
         
         case 2: /*End addr*/
-        addr_end += increment;
+        addr_end = nibble_increment(addr_end, increment);
         addr_end &= 0x3FFF;
         break;
         
         case 3: /*End bank*/
-        bank_end += bank_increment;
+        bank_end = nibble_increment(bank_end, bank_increment);
         break;
         
         case 4: /*Media*/
@@ -284,9 +295,7 @@ static void refresh_main_menu(){
         }
         else if (!(tmp_reg & (1<<5))){
             /*Change increment rate for address values*/
-            increment = (increment << 4);
-            if (increment == 0)
-                increment++;
+            increment = (increment + 1) & 0b00000011;
         }
         else if (!(tmp_reg & (1<<4))){
             /*Increment value if pinting at a value*/
@@ -295,6 +304,12 @@ static void refresh_main_menu(){
             }
             /*Start transfer if pointing to start*/
             else if(current_cursor == 5){
+                /*Increment end_address by one*/
+                addr_end = (addr_end + 1) & 0x3FFF;
+                if(addr_end == 0){
+                    bank_end++;
+                }
+                
                 transfer();
             }
         }
@@ -337,7 +352,6 @@ static void refresh_main_menu(){
     
     /*Debug stuff*/
     con_gotoxy(10,0);
-    con_puth(increment>>8);
     con_puth(increment);
 }
 
@@ -350,7 +364,7 @@ static void init(){
     current_media = MEDIA_CARTRIDGE;
     current_cursor = 0;
     last_input = 0xFF;
-    increment = 1;
+    increment = 0;
    
     /*Draw header and progress info*/
     con_init();
@@ -361,6 +375,8 @@ static void init(){
         con_putc(0x80);  /*Horizontal bar*/
         con_gotoxy(i,4);
         con_putc(0x80);
+        con_gotoxy(i,3);
+        con_putc(0x80+15);
     }
     con_gotoxy(1,3);
     con_putc(0x80 + 1); /*Vertical bar*/
@@ -378,8 +394,8 @@ static void init(){
     
     /*Paint stats menu*/
     con_gotoxy(0,6);
-    con_put(" Size: ???????B Sent: ???????B\n");
-    con_put("  CRC: ????h     Err: ?\n");
+    con_put(" Size: [ToDo]   Sent:  [ToDo]\n");
+    con_put("  CRC: [ToDo]    Err:  [ToDo]\n");
     con_put(" Stat: IDLE\n");
     
     /*Draw settings menu*/
@@ -387,9 +403,7 @@ static void init(){
     con_put("Dump settings\n\n");
     con_put("Start:  ????h   Bank:  ??h\n");
     con_put("  End:  ????h   Bank:  ??h\n");
-    con_put("Media:  ?????\n\n");
-    con_gotoxy(13,21);
-    con_put("START");
+    con_put("Media:  ?????      START\n");
 }
 
 void main(){
