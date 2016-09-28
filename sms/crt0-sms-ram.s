@@ -34,10 +34,11 @@
 
 	.module crt0
 	.globl	_main
+    .globl  _crt0_canary
 	.area	_HEADER (ABS)
 	
-    CRT0_COPY_SIZE = 0x17F0
-    CRT0_STOP_MARK = CRT0_COPY_SIZE + RAM_BASE_ADDRESS
+    CRT0_COPY_SIZE = 0x1800
+    CRT0_STOP_MARK = CRT0_COPY_SIZE + RAM_BASE_ADDRESS - 16
     
     ; Put a visible mark on the ROM where the CRT will stop copying.
     ; Also acts like a canary mark
@@ -47,8 +48,12 @@ _crt0_canary::
     .db 0x00
     
 	.org	0x0000
+    ;Just in case someone loads an untrimmed ROM, set SLOT2
+    ;to bank 0x03 then jump there.
     di
-    jp 0x0000
+    LD HL, #0xFFFF
+    LD (HL), #0x03
+    jp 0x8000
     
 	;NMI vector
 	.org	0x66
@@ -61,7 +66,10 @@ _crt0_canary::
 crt_signature:
 	.ascii "RAM Crt0 V0.1"
 	.db 0x00
-
+    
+    ; NMI vector for trimmed ROMs
+    .org 0xc066
+    reti
     
 	;; Reset vector
 	.org 	0xc000
@@ -80,13 +88,14 @@ init:
 	;; Set stack pointer directly above top of memory minus one byte
 	ld	sp,#0xDFFF
 	
-	;; Set SEGA mapper to the default 0,1,2 slots
+	;; Set SEGA mapper to the default 0,1 slots
+    ; Do not set SLOT 2 in case we were loaded from an untrimmed ROM
 	ld  hl,#0xFFFD
 	ld  (hl),#0x00
 	inc hl
 	ld  (hl),#0x01
-	inc hl
-	ld  (hl),#0x02
+	;inc hl
+	;ld  (hl),#0x02
 	
 	;;write a 'RET' instruction (0xC9) at the 0xDFFF address
 	ld hl,#0xDFFF
@@ -95,6 +104,7 @@ init:
 	;;Call 0xDFFF, this way we have the _real_ address of ret_check
 	;;On the stack
 	call #0xDFFF
+    
 ret_check:
 	;;Make SP point to the 'return' address, real address of ret_check
 	dec sp
