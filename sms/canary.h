@@ -10,7 +10,7 @@ extern unsigned char* crt0_canary;
 #endif
 
 #ifdef CANARY_SAFE_RETURN
-#define return canary_test(); return
+#define return canary_check(); return
 #endif
 
 static void canary_check(){
@@ -20,12 +20,12 @@ static void canary_check(){
     ){
         /*Canary died. Reset the console*/
         __asm
-        JP #0x0000
+        JP 0x0000
         __endasm;
     }
 }
 
-static void canary_set(){
+static void canary_setup(){
     crt0_canary[0] = canary_value[0];
     crt0_canary[1] = canary_value[1];
 }
