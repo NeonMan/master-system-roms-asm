@@ -4,9 +4,6 @@
 #include <sms/sms.h>
 #include <stdint.h>
 
-static int8_t i;
-static uint8_t tmp_reg;
-
 /*Pad input variables*/
 static uint8_t last_input;
 
@@ -66,28 +63,28 @@ static void set_status(void* s){
 
 /*Reads a packet, returns true if data left*/
 static uint8_t read_packet(){
-    uint8_t  idx;
-    uint8_t* rom_buffer;    
-    
+    uint8_t  read_idx;
+    uint8_t* read_rom_buffer;
     /*Set the SLOT2 mapper to the selected bank*/
-    SMS_MAPPER_SLOT2(bank_start);    
-    rom_buffer = ((uint8_t*)SMS_SLOT2_BASE_ADDRESS);
-    rom_buffer += addr_start;
+    SMS_MAPPER_SLOT2(bank_start);
+    read_rom_buffer = ((uint8_t*)SMS_SLOT2_BASE_ADDRESS);
+    read_rom_buffer += addr_start;
 
-    idx = 128;    
+    read_idx = 128;    
     do{
         /*Copy byte*/
-        idx--;
-        packet_buffer[127-idx] = *rom_buffer;
+        read_idx--;
+        packet_buffer[127-read_idx] = *read_rom_buffer;
         
         /*Increment pointer*/
-        ++rom_buffer;
+        ++read_rom_buffer;
         /*If it goes into RAM addresses, increment bank, reset addr*/
-        if(rom_buffer == ((void*)SMS_RAM_BASE_ADDRESS)){
-            rom_buffer = (void*) SMS_SLOT2_BASE_ADDRESS;
+        if(read_rom_buffer == ((void*)SMS_RAM_BASE_ADDRESS)){
+            read_rom_buffer = (void*) SMS_SLOT2_BASE_ADDRESS;
             bank_start++;
+            SMS_MAPPER_SLOT2(bank_start);
         }
-    }while(idx);
+    }while(read_idx);
     
     addr_start = (addr_start + 128) & 0x3FFF;
     if(bank_start >= bank_end){
@@ -144,14 +141,10 @@ static void send_eot(){
 }
 
 /*XMODEM transfer*/
+/*Moving vars out to speed up things*/
+static uint8_t data_left;
+static uint8_t has_ack;
 static void transfer(){
-    uint8_t data_left;
-    
-    if(bank_end<bank_start){
-        bank_end = bank_start;
-    }
-    /*----------------------------------------------*/
-    
     /*XMODEM PROTOCOL!*/
     current_crc = crc16_xmodem_init();
     packet_crc = crc16_xmodem_init();
@@ -200,7 +193,6 @@ static void transfer(){
     
     /*Basic algorithm. While there is data left*/
     while(data_left){
-        uint8_t has_ack;
         has_ack = 0;
         /*Read a packet*/
         data_left = read_packet();
@@ -278,6 +270,8 @@ static void increment_val(){
 }
 
 static void refresh_main_menu(){
+    uint8_t tmp_reg;
+    int8_t i;
     /*Scan input*/
     tmp_reg = sms_ab_port;
     if(last_input != tmp_reg){
@@ -309,7 +303,9 @@ static void refresh_main_menu(){
                 if(addr_end == 0){
                     bank_end++;
                 }
-                
+                if(bank_end<bank_start){
+                    bank_end = bank_start;
+                }
                 transfer();
             }
         }
@@ -356,6 +352,7 @@ static void refresh_main_menu(){
 }
 
 static void init(){
+    uint8_t i;
     /*Init stuff*/
     addr_start = 0x0000;
     addr_end   = 0x3FFF;
