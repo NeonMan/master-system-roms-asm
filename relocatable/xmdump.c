@@ -140,6 +140,67 @@ static void send_eot(){
     uart_putc(C_EOT);
 }
 
+static void print_decimal(uint16_t d){
+    uint8_t leading_zero;
+    uint16_t tmp_digit;
+    leading_zero = 1;
+    
+    /*10000*/
+    tmp_digit = d / 10000;
+    d = d - (tmp_digit * 10000);
+    if(!((tmp_digit == 0))){
+        leading_zero = 1;
+        con_putc('0' + tmp_digit);
+    }
+        
+    
+    /*1000*/
+    tmp_digit = d / 1000;
+    d = d - (tmp_digit * 1000);
+    if(!((tmp_digit == 0) && (leading_zero))){
+        leading_zero = 1;
+        con_putc('0' + tmp_digit);
+    }
+    
+    /*100*/
+    tmp_digit = d / 100;
+    d = d - (tmp_digit * 100);
+    if(!((tmp_digit == 0) && (leading_zero))){
+        leading_zero = 1;
+        con_putc('0' + tmp_digit);
+    }
+    
+    /*10*/
+    tmp_digit = d / 10;
+    d = d - (tmp_digit * 10);
+    if(!((tmp_digit == 0) && (leading_zero))){
+        leading_zero = 1;
+        con_putc('0' + tmp_digit);
+    }
+    
+    /*1*/
+    con_putc('0' + d);
+    
+}
+
+static void update_size(){
+    /*Calculate the ammount of packets to transfer*/
+    {
+        uint16_t start;
+        uint16_t end;
+        
+        start = addr_start >> 6;
+        start |= ((uint16_t)bank_start)<<7;
+        
+        end = addr_end >> 6;
+        end |= ((uint16_t)bank_end)<<7;
+        
+        /*Print the packet count to console*/
+        con_gotoxy(7,6);
+        print_decimal(end - start);
+    }
+}
+
 /*XMODEM transfer*/
 /*Moving vars out to speed up things*/
 static uint8_t data_left;
@@ -217,8 +278,8 @@ static void transfer(){
             }
         }while(!has_ack);
         packet_count++;
+        
     }
-    
     send_eot();
     
     set_status("FINISHED");
@@ -292,9 +353,10 @@ static void refresh_main_menu(){
             increment = (increment + 1) & 0b00000011;
         }
         else if (!(tmp_reg & (1<<4))){
-            /*Increment value if pinting at a value*/
+            /*Increment value if pointing at a value*/
             if(current_cursor < 5){
                 increment_val();
+                update_size();
             }
             /*Start transfer if pointing to start*/
             else if(current_cursor == 5){
@@ -391,7 +453,7 @@ static void init(){
     
     /*Paint stats menu*/
     con_gotoxy(0,6);
-    con_put(" Size: [ToDo]   Sent:  [ToDo]\n");
+    con_put(" Size:          Sent:  [ToDo]\n");
     con_put("  CRC: [ToDo]    Err:  [ToDo]\n");
     con_put(" Stat: IDLE\n");
     
@@ -401,11 +463,13 @@ static void init(){
     con_put("Start:  ????h   Bank:  ??h\n");
     con_put("  End:  ????h   Bank:  ??h\n");
     con_put("Media:  ?????      START\n");
+    
+    /*Draw size*/
+    update_size();
 }
 
 void main(){
     init();
-    crc16_xmodem_update(0,0,0);
     while(1){
         refresh_main_menu();
     }

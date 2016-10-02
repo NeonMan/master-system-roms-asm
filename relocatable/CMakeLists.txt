@@ -21,6 +21,10 @@ ADD_EXECUTABLE(test-canary test-canary.c)
 ADD_DEPENDENCIES(test-canary crt0-sms-ram)
 TARGET_LINK_LIBRARIES(test-canary console vdp)
 
+ADD_EXECUTABLE(test-mapper test-mapper.c)
+ADD_DEPENDENCIES(test-mapper crt0-sms-ram)
+TARGET_LINK_LIBRARIES(test-mapper console vdp uart)
+
 #Make .bin ROMs from the .ihx files
 ADD_CUSTOM_TARGET(rel-sample-bin ALL
         COMMAND makebin -s 57344 rel-sample.ihx rel-sample-raw.sms
@@ -47,5 +51,12 @@ ADD_CUSTOM_TARGET(test-canary-bin ALL
         COMMAND makebin -s 57344 test-canary.ihx test-canary-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py test-canary-raw.sms test-canary.sms 49152
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-canary.sms
+		DEPENDS test-canary
+    )
+    
+ADD_CUSTOM_TARGET(test-mapper-bin ALL
+        COMMAND makebin -s 57344 test-mapper.ihx test-mapper-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py test-mapper-raw.sms test-mapper.sms 49152
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-mapper.sms
 		DEPENDS test-canary
     )
