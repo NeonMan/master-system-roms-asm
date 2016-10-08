@@ -41,12 +41,12 @@
 	.db 0xff,0xff           ; Description pointer
 	
 	;; SEGA ROM header
-	.org 0x7FF0
-	.ascii "TMR SEGA"     ; SEGA string
-	.db 0xff,0xff         ; Reserved
-	.db 0xff,0xff         ; Checksum
-	.db 0xff,0xff,0xff    ; Product ID and version
-	.db 0xff              ; Region and size
+	;.org 0x7FF0
+	;.ascii "TMR SEGA"     ; SEGA string
+	;.db 0xff,0xff         ; Reserved
+	;.db 0xff,0xff         ; Checksum
+	;.db 0xff,0xff,0xff    ; Product ID and version
+	;.db 0xff              ; Region and size
 	
 	;; Reset vector
 	.org 	0

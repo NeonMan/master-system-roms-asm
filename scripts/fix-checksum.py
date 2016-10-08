@@ -36,11 +36,17 @@ Usage: fix-checksum.py INPUT_FILE \
 # --- Main ---
 # ------------
 if __name__ == '__main__':
-  if len(sys.argv) != 2:
+  if len(sys.argv) < 2:
     print(USAGE)
     exit()
   
   path_in   = sys.argv[1]
+  mode = "32"
+  try:
+    mode = sys.argv[2]
+    print("Forcing checksum mode:", mode)
+  except:
+    pass
   buff = None
   
   with open(path_in, 'rb') as f:
@@ -68,6 +74,19 @@ if __name__ == '__main__':
     
   
   sum = 0
+  
+  if mode == '8':
+    header_location = (8*1024) - 16
+    header_size = 0x4A
+  elif mode == '16':
+    header_location = (16*1024) - 16
+    header_size = 0x4B
+  elif mode == '32':
+    header_location = (32*1024) - 16
+    header_size = 0x4C
+  else:
+    print("Unknown mode, using default")
+    pass
   
   for b in buff[:header_location]:
     sum = (sum + b) & 0xFFFF

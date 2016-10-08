@@ -32,6 +32,7 @@ ADD_SUBDIRECTORY(crc)
 ADD_SUBDIRECTORY(bios-menu)
 ADD_SUBDIRECTORY(relocatable)
 ADD_SUBDIRECTORY(comp)
+ADD_SUBDIRECTORY(mapper-abuse)
 
 #ROM "executables" ;)
 ADD_EXECUTABLE(empty empty.c)
