@@ -7,6 +7,7 @@ ADD_EXECUTABLE(bios-menu
         system-info.c
         rom-tools.c
         rom-info.c
+        mapper-test.c
         )
 ADD_DEPENDENCIES(bios-menu crt0-sms)
 TARGET_LINK_LIBRARIES(bios-menu crc16-ccitt sms vdp console io)

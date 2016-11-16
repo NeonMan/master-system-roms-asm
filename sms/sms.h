@@ -15,12 +15,13 @@
 #define SMS_SLOT0_BASE_ADDRESS 0x0000
 #define SMS_SLOT1_BASE_ADDRESS 0x4000
 #define SMS_SLOT2_BASE_ADDRESS 0x8000
+#define SMS_SLOT_SIZE          0x4000
 
 #define SMS_SLOT0_CONTROL_ADDRESS 0xFFFD
 #define SMS_SLOT1_CONTROL_ADDRESS 0xFFFE
 #define SMS_SLOT2_CONTROL_ADDRESS 0xFFFF
 
-/* --- SEGA mammer pointers --- */
+/* --- SEGA mapper pointers --- */
 #define SMS_MAPPER_SLOT0(B) {*((volatile uint8_t*)SMS_SLOT0_CONTROL_ADDRESS) = (B);}
 #define SMS_MAPPER_SLOT1(B) {*((volatile uint8_t*)SMS_SLOT1_CONTROL_ADDRESS) = (B);}
 #define SMS_MAPPER_SLOT2(B) {*((volatile uint8_t*)SMS_SLOT2_CONTROL_ADDRESS) = (B);}

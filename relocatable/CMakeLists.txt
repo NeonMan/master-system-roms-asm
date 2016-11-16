@@ -29,34 +29,34 @@ TARGET_LINK_LIBRARIES(test-mapper console vdp uart)
 ADD_CUSTOM_TARGET(rel-sample-bin ALL
         COMMAND makebin -s 57344 rel-sample.ihx rel-sample-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py rel-sample-raw.sms rel-sample.sms 49152
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py rel-sample.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py rel-sample.sms 8
 		DEPENDS rel-sample
     )
 
 ADD_CUSTOM_TARGET(simple-bios-bin ALL
         COMMAND makebin -s 57344 simple-bios.ihx simple-bios-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py simple-bios-raw.sms simple-bios.sms 49152
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py simple-bios.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py simple-bios.sms 8
 		DEPENDS simple-bios
     )
 
 ADD_CUSTOM_TARGET(xmdump-bin ALL
         COMMAND makebin -s 57344 xmdump.ihx xmdump-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py xmdump-raw.sms xmdump.sms 49152
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py xmdump.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py xmdump.sms 8
 		DEPENDS simple-bios
     )
 
 ADD_CUSTOM_TARGET(test-canary-bin ALL
         COMMAND makebin -s 57344 test-canary.ihx test-canary-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py test-canary-raw.sms test-canary.sms 49152
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-canary.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-canary.sms 8
 		DEPENDS test-canary
     )
     
 ADD_CUSTOM_TARGET(test-mapper-bin ALL
         COMMAND makebin -s 57344 test-mapper.ihx test-mapper-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py test-mapper-raw.sms test-mapper.sms 49152
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-mapper.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-mapper.sms 8
 		DEPENDS test-canary
     )

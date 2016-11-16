@@ -2,6 +2,7 @@
 #include <sms/console.h>
 #include "bios-menu.h"
 #include "rom-tools.h"
+#include "mapper-test.h"
 
 #define ON_ENTRY -1
 #define ON_EXEC  0
@@ -21,6 +22,7 @@
 #define STATE_BIOS_ROM_INFO      11
 #define STATE_GENERIC_ROM_INFO   12
 #define STATE_BOOT_GENERIC_CHECK 13
+#define STATE_MAPPER_TEST        14
 
 
 #define STATE_INITIAL     STATE_MAIN_MENU
@@ -63,6 +65,8 @@ static uint8_t state_main_menu(int8_t mode){
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 3);
         con_put("BIOS");
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 4);
+        con_put("Mapper test");
+        con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 5);
         con_put("System info");
         
         con_gotoxy(3, 23);
@@ -79,7 +83,7 @@ static uint8_t state_main_menu(int8_t mode){
 #error Unknown PROGRAM_MEDIA value
 #endif
         
-        set_cursor_limits(0,4);
+        set_cursor_limits(0,5);
         draw_cursor(0);
     }
     else if(mode == ON_EXIT){
@@ -109,6 +113,9 @@ static uint8_t state_main_menu(int8_t mode){
                 return STATE_BOOT_BIOS;
                 
                 case 4:
+                return STATE_MAPPER_TEST;
+                
+                case 5:
                 return STATE_SYSTEM_INFO;
                 
                 default:
@@ -358,6 +365,24 @@ uint8_t state_generic_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
+uint8_t state_mapper_test(int8_t mode){
+    if(mode == ON_ENTRY){
+        mapper_test();
+    }
+    else if(mode == ON_EXIT){
+        
+    }
+    else{
+        uint8_t key;
+        key = update_input();
+        
+        if(key == KEY_2){
+            return STATE_MAIN_MENU;
+        }
+    }
+    return STATE_MAPPER_TEST;
+}
+
 /* State-update functions */
 
 static uint8_t call_state(uint8_t state_id, int8_t mode){
@@ -388,6 +413,8 @@ static uint8_t call_state(uint8_t state_id, int8_t mode){
         return state_generic_rom_info(mode);
         case STATE_BOOT_GENERIC_CHECK:
         return state_boot_generic_check(mode);
+        case STATE_MAPPER_TEST:
+        return state_mapper_test(mode);
         
         default:
         return state_id;
