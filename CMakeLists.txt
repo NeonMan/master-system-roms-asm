@@ -70,6 +70,10 @@ ADD_EXECUTABLE(test-uart-echo test-uart-echo.c)
 ADD_DEPENDENCIES(test-uart-echo crt0-sms)
 TARGET_LINK_LIBRARIES(test-uart-echo sms vdp console uart)
 
+ADD_EXECUTABLE(test-uart-echo-128 test-uart-echo-128.c)
+ADD_DEPENDENCIES(test-uart-echo-128 crt0-sms)
+TARGET_LINK_LIBRARIES(test-uart-echo-128 sms vdp console uart)
+
 ADD_EXECUTABLE(test-mapper-speed test-mapper-speed.c)
 ADD_DEPENDENCIES(test-mapper-speed crt0-sms)
 TARGET_LINK_LIBRARIES(test-mapper-speed sms vdp console)
@@ -119,6 +123,11 @@ ADD_CUSTOM_TARGET(test-uart-echo-bin ALL
         COMMAND makebin -s 32768 test-uart-echo.ihx test-uart-echo.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-uart-echo.sms
 		DEPENDS test-uart-echo
+    )
+ADD_CUSTOM_TARGET(test-uart-echo-128-bin ALL
+        COMMAND makebin -s 32768 test-uart-echo-128.ihx test-uart-echo-128.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-uart-echo-128.sms
+		DEPENDS test-uart-echo-128
     )
 ADD_CUSTOM_TARGET(test-mapper-speed-bin ALL
         COMMAND makebin -s 655360 -p test-mapper-speed.ihx test-mapper-speed.sms
