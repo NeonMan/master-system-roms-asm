@@ -3,6 +3,7 @@
 #include "bios-menu.h"
 #include "rom-tools.h"
 #include "mapper-test.h"
+#include "x-bootloader.h"
 
 #define ON_ENTRY -1
 #define ON_EXEC  0
@@ -23,6 +24,7 @@
 #define STATE_GENERIC_ROM_INFO   12
 #define STATE_BOOT_GENERIC_CHECK 13
 #define STATE_MAPPER_TEST        14
+#define STATE_BOOTLOADER         15
 
 
 #define STATE_INITIAL     STATE_MAIN_MENU
@@ -65,8 +67,10 @@ static uint8_t state_main_menu(int8_t mode){
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 3);
         con_put("BIOS");
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 4);
-        con_put("Mapper test");
+        con_put("Bootloader");
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 5);
+        con_put("Mapper test");
+        con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 6);
         con_put("System info");
         
         con_gotoxy(3, 23);
@@ -83,7 +87,7 @@ static uint8_t state_main_menu(int8_t mode){
 #error Unknown PROGRAM_MEDIA value
 #endif
         
-        set_cursor_limits(0,5);
+        set_cursor_limits(0,6);
         draw_cursor(0);
     }
     else if(mode == ON_EXIT){
@@ -113,9 +117,12 @@ static uint8_t state_main_menu(int8_t mode){
                 return STATE_BOOT_BIOS;
                 
                 case 4:
-                return STATE_MAPPER_TEST;
+                return STATE_BOOTLOADER;
                 
                 case 5:
+                return STATE_MAPPER_TEST;
+                
+                case 6:
                 return STATE_SYSTEM_INFO;
                 
                 default:
@@ -383,6 +390,13 @@ uint8_t state_mapper_test(int8_t mode){
     return STATE_MAPPER_TEST;
 }
 
+uint8_t state_bootloader(int8_t mode){
+    if(mode == ON_ENTRY){
+        xboot();
+    }
+    return STATE_MAIN_MENU;
+}
+
 /* State-update functions */
 
 static uint8_t call_state(uint8_t state_id, int8_t mode){
@@ -415,6 +429,8 @@ static uint8_t call_state(uint8_t state_id, int8_t mode){
         return state_boot_generic_check(mode);
         case STATE_MAPPER_TEST:
         return state_mapper_test(mode);
+        case STATE_BOOTLOADER:
+        return state_bootloader(mode);
         
         default:
         return state_id;

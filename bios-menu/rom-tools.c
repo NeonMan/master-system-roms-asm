@@ -1,7 +1,7 @@
 #include "bios-menu.h"
 #include "rom-tools.h"
 #include <sms/sms.h>
-#include <crc/crc16-ccitt.h>
+#include <crc/crc16-xmodem.h>
 
 uint8_t rom_buffer [ROM_BUFFER_SIZE];
 uint8_t code_buffer[ROM_CODE_BUFFER_SIZE];
@@ -327,9 +327,9 @@ uint16_t rom_checksum(uint8_t rom_media){
 /*Returns the checksum of the currently stored rom_buffer.*/
 static uint16_t line_sum(){
     uint16_t rv;
-    rv = crc16_ccitt_init();
-    rv = crc16_ccitt_update(rv, rom_buffer, 1024);
-    rv = crc16_ccitt_finalize(rv);
+    rv = crc16_xmodem_init();
+    rv = crc16_xmodem_update(rv, rom_buffer, 1024);
+    rv = crc16_xmodem_finalize(rv);
     return rv;
 }
 

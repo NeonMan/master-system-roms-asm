@@ -33,4 +33,15 @@ uint8_t uart_get_status();
  */
 void    uart_putc(uint8_t c);
 
+/**Sends a byte through the serial line returning at the stop bit.
+ *
+ * Same purpose as uart_putc but will return just after ssetting the STOP bit
+ * so further processing can be done during this time instead of idling.
+ * This operation always succeeds.
+ *
+ * @param c Byte to send.
+ */
+void uart_putc_fast(uint8_t c);
+
+
 #endif

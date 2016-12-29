@@ -39,15 +39,15 @@ static const uint8_t cursors[CURSOR_COUNT][2] = {
 };
 
 /*XMODEM related stuff*/
-uint16_t current_crc;
-uint16_t packet_crc;
-uint8_t  packet_count;
-uint8_t  packet_buffer[128];
-uint16_t error_count;
+static uint16_t current_crc;
+static uint16_t packet_crc;
+static uint8_t  packet_count;
+static uint8_t  packet_buffer[128];
+static uint16_t error_count;
 #define CRC_MODE_CHECKSUM 0
 #define CRC_MODE_CRC16    1
 #define CRC_MODE_UNDEF    0xFF
-uint8_t  crc_mode;
+static uint8_t  crc_mode;
 
 #define C_NAK 0x15
 #define C_ACK 0x06

@@ -58,5 +58,5 @@ ADD_CUSTOM_TARGET(test-mapper-bin ALL
         COMMAND makebin -s 57344 test-mapper.ihx test-mapper-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py test-mapper-raw.sms test-mapper.sms 49152
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-mapper.sms 8
-		DEPENDS test-canary
+		DEPENDS test-mapper
     )

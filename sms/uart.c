@@ -311,3 +311,60 @@ void uart_putc(uint8_t c){
     __endasm;
     
 }
+
+void uart_putc_fast(uint8_t c){
+    (void) c;
+    
+    __asm
+        ;742 T-States for every bit.
+        ;Port-2 TR will be our TX pin.
+        
+        UART_DOWN = 0xBB
+        UART_UP   = 0xFB
+        IO_PORT   = 0x3F
+        START_DELAY = 48
+        DATA_DELAY  = 49
+        STOP_DELAY  = 52
+        
+        ;Pull line DOWN to send a start bit
+        LD A, #UART_DOWN      ;  7T
+        OUT (#IO_PORT),A      ; 11T
+        
+        ; -----------------
+        ; --- START BIT ---
+        ; -----------------
+        ;742 T-States
+        POP HL                ; 10T* ; Save return value
+        DEC SP                ;  6T
+        POP BC                ; 10T
+        DEC SP                ;  6T; Argument byte on B, Stack restored.
+        PUSH HL               ; 11T* ; Restore return value
+        
+        ;Remaining budget: 720T (-25T)
+        LD C, #START_DELAY    ;  7T
+    tx_fast_start_delay:
+        DEC C                 ;  4T
+        JP NZ, tx_fast_start_delay ; 10T
+        ;Remaining budget: 2T
+        
+        sendbit
+        sendbit
+        sendbit
+        sendbit
+        NOP
+        sendbit
+        sendbit
+        sendbit
+        sendbit
+        
+        ;Use 25T til OUT command
+        LD A, #UART_UP     ;  7T
+        NOP                ;  4T
+        NOP                ;  4T
+        NOP                ;  4T
+        NOP                ;  4T
+        ;Remainder: 2T
+        OUT (#IO_PORT), A  ; 11T ; Change bit edge
+    __endasm;
+    
+}
