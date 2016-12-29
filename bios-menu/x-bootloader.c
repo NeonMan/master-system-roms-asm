@@ -16,7 +16,7 @@
 #define C_SOH 0x01
 #define C_EOT 0x04
 #define C_CRC 'C'
-#define XMODEM_FRAME_SIZE (128 + 5)
+#define XMODEM_FRAME_SIZE (128 + 4)
 
 #define CRC_MODE_CHECKSUM 0
 #define CRC_MODE_CRC16    1
@@ -45,7 +45,7 @@ uint8_t read_frame(uint8_t ack){
     /* Frame number       1B  */
     /* Inverse frame no   1B  */
     /* Payload          128B  */
-    /* SUM                1B  */
+    /* SUM/CRC          1/2B  */
     uint16_t bytes_left;
     uint8_t  retry_left;
     uint8_t  frame_index;
@@ -76,7 +76,7 @@ uint8_t read_frame(uint8_t ack){
     {
         /*Debug -- Print frame*/
         
-        for(frame_index=0; frame_index <132; frame_index++){
+        for(frame_index=0; frame_index <XMODEM_FRAME_SIZE; frame_index++){
             con_putc(frame_buffer[frame_index]);
         }
         
@@ -142,10 +142,19 @@ void xboot(){
     
     /*Send initial C/NACK*/
     
+    {
+        rv = read_frame(C_NAK);
+        delay();
+    }
+    
     do{
         rv = read_frame(C_NAK);
         delay();
-    }while (rv != FRAME_OK);
+    }while(rv != FRAME_OK);
+    
+    
+    
+    
     packets_left--;
     con_put("Transmission started:\n");
     

@@ -81,7 +81,7 @@ void uart_getc(){
     
     __asm
     PERIPHERAL_PORT  = 0xDD
-    PRESAMPLE_DELAY  = 25   ; Original value 26  ; Tune these two to select the bit width and
+    PRESAMPLE_DELAY  = 24   ; Original value 26  ; Tune these two to select the bit width and
     POSTSAMPLE_DELAY = 23   ; Original value 24  ; where in the bit the sample is made.
     UART_VALID_START = 0x00 ; What the sampled start bit looks like if correctly sampled.
     ; ----------------------------------------
@@ -154,6 +154,13 @@ void uart_getc(){
         POP  IX                    ; 14T ;
         PUSH HL                    ; 11T ;
         POP  HL                    ; 10T ; Delay
+        
+        NOP
+        NOP
+        NOP
+        NOP
+        NOP
+        
     ; Leftover: 0
     
     
