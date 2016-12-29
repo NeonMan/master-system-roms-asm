@@ -223,11 +223,14 @@ void uart_putc(uint8_t c){
     __asm
         ;742 T-States for every bit.
         ;Port-2 TR will be our TX pin.
+        ;
+        ;Delay times have been refined using a logic analyzer to fit the width
+        ;of every bit within 1% of the expected width.
         
         UART_DOWN = 0xBB
         UART_UP   = 0xFB
         IO_PORT   = 0x3F
-        START_DELAY = 48
+        START_DELAY = 45
         DATA_DELAY  = 49
         STOP_DELAY  = 52
         
@@ -250,6 +253,10 @@ void uart_putc(uint8_t c){
     tx_start_delay:
         DEC C                 ;  4T
         JP NZ, tx_start_delay ; 10T
+        NOP                   ;  4T
+        NOP                   ;  4T
+        NOP                   ;  4T
+        
         ;Remaining budget: 2T
         
         ; ----------------------
@@ -275,9 +282,9 @@ void uart_putc(uint8_t c){
                 DEC C              ;  4T
                 JP NZ, tx_delay    ; 10T
             ; Remaining budget: 13 T
-            NOP                    ;  4T
-            NOP                    ;  4T
-            NOP                    ;  4T
+            ;NOP                    ;  4T
+            ;NOP                    ;  4T
+            ;NOP                    ;  4T
             ; Remainder: 1T
         .endm
         
@@ -285,11 +292,15 @@ void uart_putc(uint8_t c){
         sendbit
         sendbit
         sendbit
-        NOP
+        
         sendbit
         sendbit
         sendbit
         sendbit
+        
+        NOP                ;  4T
+        NOP                ;  4T
+        NOP                ;  4T
         
         ;Use 25T til OUT command
         LD A, #UART_UP     ;  7T
@@ -315,14 +326,17 @@ void uart_putc(uint8_t c){
 void uart_putc_fast(uint8_t c){
     (void) c;
     
-    __asm
+        __asm
         ;742 T-States for every bit.
         ;Port-2 TR will be our TX pin.
+        ;
+        ;Delay times have been refined using a logic analyzer to fit the width
+        ;of every bit within 1% of the expected width.
         
         UART_DOWN = 0xBB
         UART_UP   = 0xFB
         IO_PORT   = 0x3F
-        START_DELAY = 48
+        START_DELAY = 45
         DATA_DELAY  = 49
         STOP_DELAY  = 52
         
@@ -345,17 +359,25 @@ void uart_putc_fast(uint8_t c){
     tx_fast_start_delay:
         DEC C                 ;  4T
         JP NZ, tx_fast_start_delay ; 10T
+        NOP                   ;  4T
+        NOP                   ;  4T
+        NOP                   ;  4T
+        
         ;Remaining budget: 2T
         
         sendbit
         sendbit
         sendbit
         sendbit
-        NOP
+        
         sendbit
         sendbit
         sendbit
         sendbit
+        
+        NOP                ;  4T
+        NOP                ;  4T
+        NOP                ;  4T
         
         ;Use 25T til OUT command
         LD A, #UART_UP     ;  7T
@@ -365,6 +387,8 @@ void uart_putc_fast(uint8_t c){
         NOP                ;  4T
         ;Remainder: 2T
         OUT (#IO_PORT), A  ; 11T ; Change bit edge
+        
+        ;Skip STOP bit and return immediatly
+        
     __endasm;
-    
 }
