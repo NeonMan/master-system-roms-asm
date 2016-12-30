@@ -26,8 +26,8 @@
 #define READ_RETRIES 16
 #define BYTE_RETRIES 250
 
-uint8_t         x_buffer[(MAX_UPLOAD_PACKETS * 128)];
-uint8_t         frame_buffer[XMODEM_FRAME_SIZE];
+uint8_t x_buffer[(MAX_UPLOAD_PACKETS * 128)];
+uint8_t frame_buffer[XMODEM_FRAME_SIZE];
 
 
 #define FRAME_OK   0
@@ -218,26 +218,6 @@ uint8_t xboot_download(){
     uint8_t rv;
     uint8_t packet_count;
     
-    con_clear();
-    con_gotoxy(0, 0);
-    con_put("XMODEM bootloader for SMS.");
-    
-    con_gotoxy(0,2);
-    con_put("Connect an UART transceiver on\n");
-    con_put("the SMS CONTROL 2 port as\n");
-    con_put("Shown below (SMS front):\n\n");
-    con_put("     CONTROL 2\n");
-    con_put("     o o o o o\n");
-    con_put("      o o o o\n");
-    con_put("        | | `---PC TX (SMS RX)\n");
-    con_put("        | `-----Ground\n");
-    con_put("        `-------PC RX (SMS TX)\n");
-    con_put("\n");
-    con_put("Serial config: 4800/8/1/N\n");
-    con_put("\n");
-    con_put("Start an XMODEM transfer on\n");
-    con_put("the PC now. Max ROM size: "  "4K" "\n\n");
-    
     for(i=0; i<(MAX_UPLOAD_PACKETS * 128); i++){
         x_buffer[i] = 0xFF; /*<-- Fill buffer with RST opcodes.*/
     }
@@ -302,6 +282,8 @@ uint8_t xboot_download(){
     }
     else{
         con_put("\nError: Upload too big.\n");
+        delay();
+        delay();
         return BOOT_ERROR;
     }
     

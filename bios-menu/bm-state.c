@@ -25,6 +25,7 @@
 #define STATE_BOOT_GENERIC_CHECK 13
 #define STATE_MAPPER_TEST        14
 #define STATE_BOOTLOADER         15
+#define STATE_BOOTLOADER_ERROR   16
 
 
 #define STATE_INITIAL     STATE_MAIN_MENU
@@ -260,7 +261,7 @@ static uint8_t state_boot_generic(int8_t mode){
     return STATE_BOOT_GENERIC;
 }
 
-uint8_t state_boot_generic_check(int8_t mode){
+static uint8_t state_boot_generic_check(int8_t mode){
     if (mode == ON_ENTRY){
         sega_header_t* header;
         volatile uint16_t vi;
@@ -295,7 +296,7 @@ uint8_t state_boot_generic_check(int8_t mode){
     return STATE_BOOT_GENERIC;
 }
 
-uint8_t state_cartridge_rom_info(int8_t mode){
+static uint8_t state_cartridge_rom_info(int8_t mode){
     if (mode == ON_ENTRY){
         /* Draw cartridge info header */
         con_clear();
@@ -308,7 +309,7 @@ uint8_t state_cartridge_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
-uint8_t state_card_rom_info(int8_t mode){
+static uint8_t state_card_rom_info(int8_t mode){
     if (mode == ON_ENTRY){
         /* Draw card info header */
         con_clear();
@@ -321,7 +322,7 @@ uint8_t state_card_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
-uint8_t state_expansion_rom_info(int8_t mode){
+static uint8_t state_expansion_rom_info(int8_t mode){
     if (mode == ON_ENTRY){
         /* Draw expansion info header */
         con_clear();
@@ -334,7 +335,7 @@ uint8_t state_expansion_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
-uint8_t state_bios_rom_info(int8_t mode){
+static uint8_t state_bios_rom_info(int8_t mode){
     if (mode == ON_ENTRY){
         /* Draw expansion info header */
         con_clear();
@@ -347,7 +348,7 @@ uint8_t state_bios_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
-uint8_t state_generic_rom_info(int8_t mode){
+static uint8_t state_generic_rom_info(int8_t mode){
     if (mode == ON_ENTRY){
         /*print ROM info*/
         rom_info(boot_media);
@@ -372,7 +373,7 @@ uint8_t state_generic_rom_info(int8_t mode){
     return STATE_GENERIC_ROM_INFO;
 }
 
-uint8_t state_mapper_test(int8_t mode){
+static uint8_t state_mapper_test(int8_t mode){
     if(mode == ON_ENTRY){
         mapper_test();
     }
@@ -390,19 +391,92 @@ uint8_t state_mapper_test(int8_t mode){
     return STATE_MAPPER_TEST;
 }
 
-uint8_t state_bootloader(int8_t mode){
+static uint8_t state_bootloader(int8_t mode){
     if(mode == ON_ENTRY){
-        uint8_t rv;
-        rv = xboot_download();
-        if(rv == BOOT_READY){
-            xboot_launch();
-        }
-    }
-    else if(mode == ON_EXIT){
+        /* Draw main menu */
         con_clear();
         con_gotoxy(1, TOP_MARGIN + 0);
+        con_put("Bootloader");
+        
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 0);
+        con_put("Connect UART transceiver");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 1);
+        con_put("on the CONTROL 2 port as");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 2);
+        con_put("shown below (SMS front)");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 4);
+        con_put("   CONTROL 2");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 5);
+        con_put("   o o o o o");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 6);
+        con_put("    o o o o");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 7);
+        con_put("      | | `-- RX (PC TX)");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 8);
+        con_put("      | `---- Ground");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 9);
+        con_put("      `------ TX (PC RX)");
+        
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 11);
+        con_put("Start XMODEM transfer now");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 12);
+        con_put("on PC then press download");
+        con_gotoxy(LEFT_MARGIN + 1, TOP_MARGIN + 2 + 13);
+        con_put("Max 4K   UART: 4800/8/1/N");
+        con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 15);
+        con_put("Download");
+        
+        set_cursor_limits(15,15);
+        draw_cursor(15);
     }
-    return STATE_MAIN_MENU;
+    else if(mode == ON_EXIT){
+        
+    }
+    else{
+        uint8_t key;
+        uint8_t cursor;
+        /*Scan input, if button 1 is pressed and cursor is on*/
+        /*the correct position, transition to a state, if not*/
+        /*stay here.*/
+        key = update_input_and_cursor();
+        cursor = get_cursor();
+        
+        if(key == KEY_1){
+            uint8_t rv;
+            switch(cursor){
+                case 15:
+                {
+                    con_clear();
+                    con_gotoxy(0, 0);
+                    con_put("Starting XMODEM download...");
+                    
+                    con_gotoxy(0,2);
+                    con_put("Reset console if transfer\n");
+                    con_put("fails to complete.\n");
+                }
+                rv = xboot_download();
+                if(rv == BOOT_READY){
+                    xboot_launch();
+                }
+                return STATE_BOOTLOADER_ERROR;
+                
+                default:
+                return STATE_BOOTLOADER;
+            }
+        }
+        else if(key == KEY_2){
+            return STATE_MAIN_MENU;
+        }
+        else{
+            return STATE_BOOTLOADER;
+        }
+    }
+    return STATE_BOOTLOADER;
+}
+
+static uint8_t state_bootloader_error(int8_t mode){
+    (void)mode;
+    return STATE_BOOTLOADER;
 }
 
 /* State-update functions */
@@ -439,6 +513,8 @@ static uint8_t call_state(uint8_t state_id, int8_t mode){
         return state_mapper_test(mode);
         case STATE_BOOTLOADER:
         return state_bootloader(mode);
+        case STATE_BOOTLOADER_ERROR:
+        return state_bootloader_error(mode);
         
         default:
         return state_id;
