@@ -199,7 +199,7 @@ static uint8_t state_system_info(int8_t mode){
                 con_put("   dump whatever ROM info is\n");
                 con_put("   available.\n");
                 con_put("\n");
-                con_put("      ---  Bootloader  ---\n");
+                con_put("       --- Bootloader ---\n");
                 con_put("   A serial bootloader is\n");
                 con_put("   available. ROMs loaded\n");
                 con_put("   this way MUST be able to\n");
@@ -217,7 +217,7 @@ static uint8_t state_system_info(int8_t mode){
                 con_put("   will be needed to perform\n");
                 con_put("   the ROM download.\n");
                 con_put("   Teraterm on windows and\n");
-                con_put("   xs/zs on linux are common\n");
+                con_put("   sz/sx on linux are common\n");
                 con_put("   options.\n");
                 con_put("\n");
                 con_put("      --- Mapper test ---\n");
@@ -241,20 +241,20 @@ static uint8_t state_system_info(int8_t mode){
                 
                 case 4:
                 con_put("         --- About ---\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   -------Placeholder-------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
-                con_put("   ------------ ------------\n");
+                con_put("   Master System BIOS menu\n");
+                con_put("   Developed as a replacement\n");
+                con_put("   BIOS ROM to which I add\n");
+                con_put("   every other feature I find\n");
+                con_put("   useful or interesting.\n");
+                con_put("\n");
+                con_put("   Rule #1 of embedded devel\n");
+                con_put("   is you have to blink an\n");
+                con_put("   LED. Rule #2 should be get\n");
+                con_put("   a serial port ASAP :P\n");
+                con_put("\n");
+                con_put("   Feedback welcome:\n");
+                con_put("    - root@heavydeck.net\n");
+                con_put("    - SMS Power forums\n");
                 break;
             }
             
