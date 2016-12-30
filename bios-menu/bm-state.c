@@ -230,6 +230,12 @@ static uint8_t state_system_info(int8_t mode){
                 case 3:
                 con_put("   determine the available\n");
                 con_put("   capabilities.\n");
+                con_put("\n");
+                con_put("      --- Soft reset ---\n");
+                con_put("   Pressing the PAUSE key\n");
+                con_put("   at any time will reset\n");
+                con_put("   this ROM wo repeating the\n");
+                con_put("   BIOS boot test.\n");
                 con_put("   -->");
                 break;
                 
@@ -241,7 +247,7 @@ static uint8_t state_system_info(int8_t mode){
                 con_put("   ------------ ------------\n");
                 con_put("   ------------ ------------\n");
                 con_put("   ------------ ------------\n");
-                con_put("   --------Placeholder------\n");
+                con_put("   -------Placeholder-------\n");
                 con_put("   ------------ ------------\n");
                 con_put("   ------------ ------------\n");
                 con_put("   ------------ ------------\n");
