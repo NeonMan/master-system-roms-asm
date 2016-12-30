@@ -26,8 +26,8 @@
 #define READ_RETRIES 16
 #define BYTE_RETRIES 250
 
-uint8_t x_buffer[(MAX_UPLOAD_PACKETS * 128)];
-uint8_t frame_buffer[XMODEM_FRAME_SIZE];
+static uint8_t x_buffer[(MAX_UPLOAD_PACKETS * 128)];
+static uint8_t frame_buffer[XMODEM_FRAME_SIZE];
 
 
 #define FRAME_OK   0

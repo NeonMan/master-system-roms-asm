@@ -40,9 +40,9 @@ static void region_info(){
 }
 
 void show_sysinfo(){
-    con_put(" Build info:\n");
+    con_put("  Build info:\n");
     build_info();
     con_put("\n");
-    con_put(" Console info:\n");
+    con_put("   Console info:\n");
     region_info();
 }

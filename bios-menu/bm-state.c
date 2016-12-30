@@ -72,7 +72,7 @@ static uint8_t state_main_menu(int8_t mode){
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 5);
         con_put("Mapper test");
         con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 6);
-        con_put("System info");
+        con_put("Info");
         
         con_gotoxy(3, 23);
         con_put("Build type: ");
@@ -134,15 +134,17 @@ static uint8_t state_main_menu(int8_t mode){
     return STATE_MAIN_MENU;
 }
 
+static int8_t info_current_panel;
+static int8_t info_draw_next;
+#define INFO_PANEL_COUNT 5
+
 static uint8_t state_system_info(int8_t mode){
     if(mode == ON_ENTRY){
-        /* Draw header */
-        con_clear();
-        con_gotoxy(1, TOP_MARGIN + 0);
-        con_put("System info\n\n");
+        set_cursor_limits(17,17);
+        draw_cursor(17);
         
-        /*Dump info*/
-        show_sysinfo();
+        info_draw_next = 1;
+        info_current_panel = -1;
     }
     else if(mode == ON_EXIT){
         
@@ -157,6 +159,99 @@ static uint8_t state_system_info(int8_t mode){
         /*If button 2 is pressed, go back to main menu*/
         if(key == KEY_2){
             return STATE_MAIN_MENU;
+        }
+        else if(key == KEY_1){
+            info_draw_next = 1;
+        }
+        
+        if(info_draw_next){
+            /*Redraw header*/
+            con_clear();
+            con_gotoxy(1, TOP_MARGIN);
+            con_put("Info");
+            draw_cursor(17);
+            
+            /*Print menu options*/
+            con_gotoxy(LEFT_MARGIN + 2, TOP_MARGIN + 2 + 17);
+            con_put("Next");
+            /**/
+            info_draw_next = 0;
+            info_current_panel =
+                ((info_current_panel + 1) >= INFO_PANEL_COUNT) ? 
+                0 :
+                (info_current_panel + 1)
+                ;
+            con_gotoxy(0, TOP_MARGIN + 2 + 0);
+            switch(info_current_panel){
+                default:
+                case 0:
+                show_sysinfo();
+                con_put("\n   -->");
+                break;
+                
+                case 1:
+                con_put("      --- Boot options ---\n");
+                con_put("   Cartridge, Card, and BIOS\n");
+                con_put("   menu have the same options\n");
+                con_put("   that allow booting each\n");
+                con_put("   ROM with or without sum\n");
+                con_put("   checking and an option to\n");
+                con_put("   dump whatever ROM info is\n");
+                con_put("   available.\n");
+                con_put("\n");
+                con_put("      ---  Bootloader  ---\n");
+                con_put("   A serial bootloader is\n");
+                con_put("   available. ROMs loaded\n");
+                con_put("   this way MUST be able to\n");
+                con_put("   run from any RAM address.\n");
+                con_put("   It also requires an UART\n");
+                con_put("   -->");
+                break;
+                
+                case 2:
+                con_put("   transceiver connected on\n");
+                con_put("   the CONTROL 2 port (pinout\n");
+                con_put("   available on bootloader\n");
+                con_put("   menu itself) and on the PC\n");
+                con_put("   an XMODEM server program\n");
+                con_put("   will be needed to perform\n");
+                con_put("   the ROM download.\n");
+                con_put("   Teraterm on windows and\n");
+                con_put("   xs/zs on linux are common\n");
+                con_put("   options.\n");
+                con_put("\n");
+                con_put("      --- Mapper test ---\n");
+                con_put("   This option will check if\n");
+                con_put("   a SEGA mapper is attached\n");
+                con_put("   to this ROM and try to\n");
+                con_put("   -->");
+                break;
+                
+                case 3:
+                con_put("   determine the available\n");
+                con_put("   capabilities.\n");
+                con_put("   -->");
+                break;
+                
+                case 4:
+                con_put("         --- About ---\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   --------Placeholder------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                con_put("   ------------ ------------\n");
+                break;
+            }
+            
         }
     }
     return STATE_SYSTEM_INFO;
@@ -524,6 +619,10 @@ static uint8_t call_state(uint8_t state_id, int8_t mode){
 void bm_state_init(){
     state_current = STATE_NULL;
     state_next    = STATE_INITIAL;
+    
+    /*Initialise states' own static memory*/
+    info_current_panel = -1;
+    info_draw_next = 1;
 }
 
 void bm_state_tick(){
