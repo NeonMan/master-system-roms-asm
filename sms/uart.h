@@ -43,5 +43,7 @@ void    uart_putc(uint8_t c);
  */
 void uart_putc_fast(uint8_t c);
 
+/** Helper macro to make fast reads into buffers.*/
+#define UART_BUFF_GETC(BUFF, IDX) do{ uart_getc(); }while(uart_status != UART_STATUS_OK); BUFF[IDX] = uart_result;
 
 #endif

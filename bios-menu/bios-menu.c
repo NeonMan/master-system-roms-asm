@@ -2,10 +2,21 @@
 #include <sms/sms.h>
 #include <sms/console.h>
 #include <sms/assert.h>
-#include <sms/intv-dummy.h> /*<-- Ignore interrupts*/
+#include <sms/intv-dummy-rst.h> /*<-- Ignore RST interrupts*/
 #include <stdint.h>
 
 #include "bios-menu.h"
+
+/*Reset console on NMI (Pause button)*/
+void nmi(){
+    void (*rst_vector)(void) = (void*)0x0000;
+    rst_vector();
+}
+
+/*Ignore INT1*/
+void int1(){
+    
+}
 
 void delay_loop(){
     volatile uint16_t i;

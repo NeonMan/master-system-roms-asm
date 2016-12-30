@@ -392,7 +392,15 @@ uint8_t state_mapper_test(int8_t mode){
 
 uint8_t state_bootloader(int8_t mode){
     if(mode == ON_ENTRY){
-        xboot();
+        uint8_t rv;
+        rv = xboot_download();
+        if(rv == BOOT_READY){
+            xboot_launch();
+        }
+    }
+    else if(mode == ON_EXIT){
+        con_clear();
+        con_gotoxy(1, TOP_MARGIN + 0);
     }
     return STATE_MAIN_MENU;
 }
