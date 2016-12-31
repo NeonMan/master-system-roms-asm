@@ -1,6 +1,7 @@
 syntax: regexp
 Build\/
 build\/
+doxygen\/
 \/_
 
 \.asm$

@@ -44,8 +44,8 @@
     ; Also acts like a canary mark
 	.org  CRT0_STOP_MARK
 _crt0_canary::
-	.db 0x16, 0xE9
-	.ascii "*chirp**chirp*"
+	;.db 0x16, 0xE9
+	;.ascii "*chirp**chirp*"
     
 	.org	0x0000
     ;Just in case someone loads an untrimmed ROM, set SLOT2
