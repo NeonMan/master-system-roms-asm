@@ -29,7 +29,27 @@ ADD_EXECUTABLE(dataset-or-ff dataset-or-ff.c)
 ADD_DEPENDENCIES(dataset-or-ff crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-or-ff uart vdp console)
 
+ADD_EXECUTABLE(dataset-cp dataset-cp.c)
+ADD_DEPENDENCIES(dataset-cp crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-cp uart vdp console)
+
+ADD_EXECUTABLE(dataset-cp-ff dataset-cp-ff.c)
+ADD_DEPENDENCIES(dataset-cp-ff crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-cp-ff uart vdp console)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(dataset-cp-bin ALL
+        COMMAND makebin -s 57344 -p dataset-cp.ihx dataset-cp-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-cp-raw.sms dataset-cp.sms 49152
+		DEPENDS dataset-cp
+    )
+
+ADD_CUSTOM_TARGET(dataset-cp-ff-bin ALL
+        COMMAND makebin -s 57344 -p dataset-cp-ff.ihx dataset-cp-ff-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-cp-ff-raw.sms dataset-cp-ff.sms 49152
+		DEPENDS dataset-cp-ff
+    )
+    
 ADD_CUSTOM_TARGET(dataset-add-bin ALL
         COMMAND makebin -s 57344 -p dataset-add.ihx dataset-add-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-add-raw.sms dataset-add.sms 49152
