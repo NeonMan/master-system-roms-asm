@@ -70,6 +70,7 @@ static void do_test(){
             uart_putc(',');
             
         }while(input_b < 255);
+        uart_putc('\r');
         uart_putc('\n');
         con_putc('.');
     }while(input_a < 255);
@@ -77,24 +78,24 @@ static void do_test(){
 
 void main(){
     con_init();
-    con_put("Z80 ADD Dataset\n");
-    con_put("Output via Control 2 UART\n\n");
-    con_put("See README.md for more info\n");
+    con_put("Z80 ADD Dataset\r\n");
+    con_put("Output via Control 2 UART\r\n\r\n");
+    con_put("See README.md for more info\r\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing A + B with F = 0x00\n");
-    print("#B increments on this direction [0..255] -->\n");
-    print("#A increments downwards [0..255]\n");
+    print("#Hex value of AF registers after performing A + B with F = 0x00\r\n");
+    print("#B increments on this direction [0..255] -->\r\n");
+    print("#A increments downwards [0..255]\r\n");
     con_putc('.');
     
     /*Send payload*/
     do_test();
     
     /*Send tail through UART*/
-    print("#EOF\n");
+    print("#EOF\r\n");
     
     /*End*/
-    con_put("\nDone!");
+    con_put("\r\nDone!");
     delay();
     
     /*Reboot*/
