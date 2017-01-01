@@ -43,9 +43,9 @@ static void do_test(){
         do{
             input_b++;
             __asm
-            LD HL, #0x0000    ;
+            LD HL, #0x00FF    ;
             PUSH HL           ;
-            POP AF            ;Clear AF
+            POP AF            ;AF <-- 0x00FF
 
             LD HL, #_input_a  ;
             LD A, (HL)        ;
@@ -82,7 +82,7 @@ void main(){
     con_put("See README.md for more info\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing A + B with F = 0x00\n");
+    print("#Hex value of AF registers after performing A + B with F = 0xFF\n");
     print("#B increments on this direction [0..255] -->\n");
     print("#A increments downwards [0..255]\n");
     con_putc('.');
