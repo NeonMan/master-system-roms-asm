@@ -78,9 +78,9 @@ static void do_test(){
 
 void main(){
     con_init();
-    con_put("Z80 ADD Dataset\r\n");
-    con_put("Output via Control 2 UART\r\n\r\n");
-    con_put("See README.md for more info\r\n");
+    con_put("Z80 ADD Dataset\n");
+    con_put("Output via Control 2 UART\n\n");
+    con_put("See README.md for more info\n");
     
     /*Send header through UART*/
     print("#Hex value of AF registers after performing A + B with F = 0x00\r\n");
@@ -95,7 +95,7 @@ void main(){
     print("#EOF\r\n");
     
     /*End*/
-    con_put("\r\nDone!");
+    con_put("\nDone!");
     delay();
     
     /*Reboot*/
