@@ -5,6 +5,14 @@ ENABLE_LANGUAGE(C)
 set(CMAKE_C_FLAGS "-mz80 --std-sdcc89 --xram-size 0x1000 --code-loc 0xc070 --data-loc 0xd800 --no-std-crt0 \"${CMAKE_BINARY_DIR}/sms/crt0-sms-ram.rel\"")
 set(CMAKE_EXE_LINKER_FLAGS "-Wl -w")
 
+ADD_EXECUTABLE(dataset-xor dataset-xor.c)
+ADD_DEPENDENCIES(dataset-xor crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-xor uart vdp console)
+
+ADD_EXECUTABLE(dataset-xor-ff dataset-xor-ff.c)
+ADD_DEPENDENCIES(dataset-xor-ff crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-xor-ff uart vdp console)
+
 ADD_EXECUTABLE(dataset-add dataset-add.c)
 ADD_DEPENDENCIES(dataset-add crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-add uart vdp console)
@@ -46,6 +54,18 @@ ADD_DEPENDENCIES(dataset-sub-ff crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-sub-ff uart vdp console)
 
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(dataset-xor-bin ALL
+        COMMAND makebin -s 57344 -p dataset-xor.ihx dataset-xor-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-xor-raw.sms dataset-xor.sms 49152
+		DEPENDS dataset-xor
+    )
+
+ADD_CUSTOM_TARGET(dataset-xor-ff-bin ALL
+        COMMAND makebin -s 57344 -p dataset-xor-ff.ihx dataset-xor-ff-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-xor-ff-raw.sms dataset-xor-ff.sms 49152
+		DEPENDS dataset-xor-ff
+    )
+    
 ADD_CUSTOM_TARGET(dataset-sub-bin ALL
         COMMAND makebin -s 57344 -p dataset-sub.ihx dataset-sub-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-sub-raw.sms dataset-sub.sms 49152
