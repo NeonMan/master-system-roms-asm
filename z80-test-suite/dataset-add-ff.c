@@ -78,7 +78,7 @@ static void do_test(){
 
 void main(){
     con_init();
-    con_put("Z80 ADD Dataset\n");
+    con_put("Z80 ADD F=FFh Dataset\n");
     con_put("Output via Control 2 UART\n\n");
     con_put("See README.md for more info\n");
     

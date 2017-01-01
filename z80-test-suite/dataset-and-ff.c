@@ -5,7 +5,7 @@
  * And send the results through UART.
  *
  * Inputs: A, B
- * Outputs: (A + B), Flags
+ * Outputs: (A & B), Flags
  */
 #include <sms/uart.h>
 #include <sms/console.h>
@@ -43,9 +43,9 @@ static void do_test(){
         do{
             input_b++;
             __asm
-            LD HL, #0x0000    ;
+            LD HL, #0x00FF    ;
             PUSH HL           ;
-            POP AF            ;Clear AF
+            POP AF            ;AF <-- 0x00FF
 
             LD HL, #_input_a  ;
             LD A, (HL)        ;
@@ -55,7 +55,7 @@ static void do_test(){
 
             ; --- Perform operation ---
 
-            ADD A, B
+            AND A, B
             
             ; --- Copy result to variable --
             PUSH AF
@@ -78,12 +78,12 @@ static void do_test(){
 
 void main(){
     con_init();
-    con_put("Z80 ADD F=00h Dataset\n");
+    con_put("Z80 AND F=FFh Dataset\n");
     con_put("Output via Control 2 UART\n\n");
     con_put("See README.md for more info\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing A + B with F = 0x00\r\n");
+    print("#Hex value of AF registers after performing A & B with F = 0xFF\r\n");
     print("#B increments on this direction [0..255] -->\r\n");
     print("#A increments downwards [0..255]\r\n");
     con_putc('.');
