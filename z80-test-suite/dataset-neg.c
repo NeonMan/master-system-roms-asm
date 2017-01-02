@@ -4,8 +4,8 @@
  *
  * And send the results through UART.
  *
- * Inputs: A, B
- * Outputs: (A xor B), Flags
+ * Inputs: A
+ * Outputs: !A, Flags
  */
 #include <sms/uart.h>
 #include <sms/console.h>
@@ -39,13 +39,13 @@ static void do_test(){
     input_a = 255;
     do{
         input_a++;
-        input_b = 255;
+        input_b = 254; /*Run inner loop once*/
         do{
             input_b++;
             __asm
             LD HL, #0x0000    ;
             PUSH HL           ;
-            POP AF            ;Clear AF
+            POP AF            ;AF <-- 0x0000
 
             LD HL, #_input_a  ;
             LD A, (HL)        ;
@@ -55,7 +55,7 @@ static void do_test(){
 
             ; --- Perform operation ---
 
-            XOR A, B
+            NEG A
             
             ; --- Copy result to variable --
             PUSH AF
@@ -78,13 +78,12 @@ static void do_test(){
 
 void main(){
     con_init();
-    con_put("Z80 XOR F=00h Dataset\n");
+    con_put("Z80 NEG F=00h Dataset\n");
     con_put("Output via Control 2 UART\n\n");
     con_put("See README.md for more info\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing XOR A, B; A XOR B with F = 0x00\r\n");
-    print("#B increments on this direction [0..255] -->\r\n");
+    print("#Hex value of AF registers after performing NEG A; !A with F = 0x00\r\n");
     print("#A increments downwards [0..255]\r\n");
     print("#Commit ID: " COMMIT_ID "\r\n");
     con_putc('.');

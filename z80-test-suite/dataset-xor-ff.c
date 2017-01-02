@@ -83,7 +83,7 @@ void main(){
     con_put("See README.md for more info\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing A XOR B with F = 0xFF\r\n");
+    print("#Hex value of AF registers after performing XOR A, B; A XOR B with F = 0xFF\r\n");
     print("#B increments on this direction [0..255] -->\r\n");
     print("#A increments downwards [0..255]\r\n");
     print("#Commit ID: " COMMIT_ID "\r\n");
