@@ -86,6 +86,7 @@ void main(){
     print("#Hex value of AF registers after performing A & B with F = 0xFF\r\n");
     print("#B increments on this direction [0..255] -->\r\n");
     print("#A increments downwards [0..255]\r\n");
+    print("#Commit ID: " COMMIT_ID "\r\n");
     con_putc('.');
     
     /*Send payload*/

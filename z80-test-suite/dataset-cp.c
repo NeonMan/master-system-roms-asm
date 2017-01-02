@@ -4,8 +4,8 @@
  *
  * And send the results through UART.
  *
- * Inputs: A
- * Outputs: !A, Flags
+ * Inputs: A, B
+ * Outputs: A, Flags
  */
 #include <sms/uart.h>
 #include <sms/console.h>
@@ -39,7 +39,7 @@ static void do_test(){
     input_a = 255;
     do{
         input_a++;
-        input_b = 254; /*Run inner loop once*/
+        input_b = 255; /*Run inner loop once*/
         do{
             input_b++;
             __asm
@@ -55,7 +55,7 @@ static void do_test(){
 
             ; --- Perform operation ---
 
-            CP A
+            CP A, B
             
             ; --- Copy result to variable --
             PUSH AF
@@ -83,8 +83,10 @@ void main(){
     con_put("See README.md for more info\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing !A with F = 0x00\r\n");
+    print("#Hex value of AF registers after performing CP A, B with F = 0x00\r\n");
+    print("#B increments on this direction [0..255] -->\r\n");
     print("#A increments downwards [0..255]\r\n");
+    print("#Commit ID: " COMMIT_ID "\r\n");
     con_putc('.');
     
     /*Send payload*/

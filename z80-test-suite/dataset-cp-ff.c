@@ -55,7 +55,7 @@ static void do_test(){
 
             ; --- Perform operation ---
 
-            CP A
+            CP A, B
             
             ; --- Copy result to variable --
             PUSH AF
@@ -83,8 +83,10 @@ void main(){
     con_put("See README.md for more info\n");
     
     /*Send header through UART*/
-    print("#Hex value of AF registers after performing !A with F = 0xFF\r\n");
+    print("#Hex value of AF registers after performing CP A, B with F = 0xFF\r\n");
+    print("#B increments on this direction [0..255] -->\r\n");
     print("#A increments downwards [0..255]\r\n");
+    print("#Commit ID: " COMMIT_ID "\r\n");
     con_putc('.');
     
     /*Send payload*/
