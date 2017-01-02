@@ -1,11 +1,11 @@
 /**
- * @file  dataset-add.c
- * @brief exhaust the ADD alu operations.
+ * @file  dataset-cp-ff.c
+ * @brief exhaust the CP alu operations.
  *
  * And send the results through UART.
  *
- * Inputs: A
- * Outputs: !A, Flags
+ * Inputs: A, B
+ * Outputs: A, Flags
  */
 #include <sms/uart.h>
 #include <sms/console.h>

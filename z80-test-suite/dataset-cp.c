@@ -1,6 +1,6 @@
 /**
- * @file  dataset-add.c
- * @brief exhaust the ADD alu operations.
+ * @file  dataset-cp.c
+ * @brief exhaust the CP alu operations.
  *
  * And send the results through UART.
  *
