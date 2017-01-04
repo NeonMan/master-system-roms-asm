@@ -21,7 +21,8 @@ ADD_DEFINITIONS(-DPROGRAM_MEDIA=ROM_CARD_SLOT)
 include_directories(${PROJECT_SOURCE_DIR})
 
 # Find python3
-find_package(PythonInterp 3 REQUIRED)
+#find_package(PythonInterp 3 REQUIRED)
+set(PYTHON_EXECUTABLE "C:\\Python36-32\\python.exe")
 
 #uncoment and properly set this param if detection fails.
 #set(PYTHON_EXECUTABLE "C:/Python31/python.exe")

@@ -119,7 +119,7 @@ static void do_test_ones(){
 
 void main(){
     con_init();
-    con_put("Z80 ADD F=00h Dataset\n");
+    con_put("Z80 ADD Dataset\n");
     con_put("Output via Control 2 UART\n\n");
     con_put("See README.md for more info\n");
     
@@ -132,7 +132,7 @@ void main(){
     
     /*Send payload*/
     do_test_zero();
-    print("#Hex value of AF registers after performing ADD A, B; A + B with F = 0xFF\r\n")
+    print("#Hex value of AF registers after performing ADD A, B; A + B with F = 0xFF\r\n");
     do_test_ones();
     
     /*Send tail through UART*/

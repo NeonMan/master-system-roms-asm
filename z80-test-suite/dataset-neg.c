@@ -35,7 +35,7 @@ uint8_t  input_a;
 uint8_t  input_b;
 uint16_t output_af;
 
-static void do_test(){
+static void do_zero(){
     input_a = 255;
     do{
         input_a++;
@@ -76,9 +76,51 @@ static void do_test(){
     }while(input_a < 255);
 }
 
+static void do_test_ones(){
+    input_a = 255;
+    do{
+        input_a++;
+        input_b = 254; /*Run inner loop once*/
+        do{
+            input_b++;
+            __asm
+            LD HL, #0x00FF    ;
+            PUSH HL           ;
+            POP AF            ;AF <-- 0x00FF
+
+            LD HL, #_input_a  ;
+            LD A, (HL)        ;
+                              ;
+            LD HL, #_input_b  ; Get operands
+            LD B, (HL)
+
+            ; --- Perform operation ---
+
+            NEG A
+            
+            ; --- Copy result to variable --
+            PUSH AF
+            POP HL
+            LD (#_output_af), HL
+            
+            __endasm;
+            
+            /*Send result through UART*/
+            print_hex(output_af>>8);
+            print_hex(output_af);
+            uart_putc(',');
+            
+        }while(input_b < 255);
+        uart_putc('\r');
+        uart_putc('\n');
+        con_putc('.');
+    }while(input_a < 255);
+}
+
+
 void main(){
     con_init();
-    con_put("Z80 NEG F=00h Dataset\n");
+    con_put("Z80 NEG Dataset\n");
     con_put("Output via Control 2 UART\n\n");
     con_put("See README.md for more info\n");
     
@@ -89,7 +131,9 @@ void main(){
     con_putc('.');
     
     /*Send payload*/
-    do_test();
+    do_test_zero();
+    print("#Hex value of AF registers after performing NEG A; !A with F = 0xFF\r\n");
+    do_test_ones();
     
     /*Send tail through UART*/
     print("#EOF\r\n");
