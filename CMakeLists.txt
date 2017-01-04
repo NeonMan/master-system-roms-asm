@@ -34,7 +34,7 @@ ADD_SUBDIRECTORY(bios-menu)
 ADD_SUBDIRECTORY(relocatable)
 ADD_SUBDIRECTORY(comp)
 ADD_SUBDIRECTORY(mapper-abuse)
-ADD_SUBDIRECTORY(z80-test-suite)
+ADD_SUBDIRECTORY(z80-dataset)
 
 #ROM "executables" ;)
 ADD_EXECUTABLE(empty empty.c)
