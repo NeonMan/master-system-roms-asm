@@ -35,7 +35,7 @@ uint8_t  input_a;
 uint8_t  input_b;
 uint16_t output_af;
 
-static void do_zero(){
+static void do_test_zero(){
     input_a = 255;
     do{
         input_a++;
@@ -55,7 +55,7 @@ static void do_zero(){
 
             ; --- Perform operation ---
 
-            NEG A
+            NEG 
             
             ; --- Copy result to variable --
             PUSH AF
@@ -96,7 +96,7 @@ static void do_test_ones(){
 
             ; --- Perform operation ---
 
-            NEG A
+            NEG 
             
             ; --- Copy result to variable --
             PUSH AF

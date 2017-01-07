@@ -37,7 +37,17 @@ ADD_EXECUTABLE(dataset-sbc dataset-sbc.c)
 ADD_DEPENDENCIES(dataset-sbc crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-sbc uart vdp console)
 
+ADD_EXECUTABLE(dataset-neg dataset-neg.c)
+ADD_DEPENDENCIES(dataset-neg crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-neg uart vdp console)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(dataset-neg-bin ALL
+        COMMAND makebin -s 57344 -p dataset-neg.ihx dataset-neg-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-neg-raw.sms dataset-neg.sms 49152
+		DEPENDS dataset-neg
+    )
+    
 ADD_CUSTOM_TARGET(dataset-sbc-bin ALL
         COMMAND makebin -s 57344 -p dataset-sbc.ihx dataset-sbc-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-sbc-raw.sms dataset-sbc.sms 49152
