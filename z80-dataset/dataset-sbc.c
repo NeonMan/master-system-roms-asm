@@ -33,11 +33,12 @@ static void print_hex(uint8_t b){
 
 uint8_t  input_a;
 uint8_t  input_b;
+uint16_t initial_af;
 uint16_t output_af;
 
-static void do_test(uint16_t initial_af){
+static void do_test(uint16_t af){
 	/*Use output_af to load the initial af value*/
-	output_af = initial_af;
+	initial_af = af;
     input_a = 255;
     do{
         input_a++;
@@ -45,12 +46,12 @@ static void do_test(uint16_t initial_af){
         do{
             input_b++;
             __asm
-            LD HL, #_output_af ;
-            LD B, (HL)         ;
-			INC HL             ;
-			LD C, (HL)         ;
-			PUSH BC            ;
-            POP AF             ; AF <-- initial_af
+            LD HL, #_initial_af ;
+            LD B, (HL)          ;
+			INC HL              ;
+			LD C, (HL)          ;
+			PUSH BC             ;
+            POP AF              ; AF <-- initial_af
 
             LD HL, #_input_a  ;
             LD A, (HL)        ;
