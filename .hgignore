@@ -9,3 +9,4 @@ doxygen\/
 \.rel
 \.sym
 \.ihx
+z80-dataset\/dataset\-[^\.]*\.h

@@ -96,3 +96,79 @@ ADD_CUSTOM_TARGET(dataset-or-bin ALL
 		DEPENDS dataset-or
     )
 
+# Dataset headers from CSV files
+
+ADD_CUSTOM_TARGET(dataset-header-add ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_add
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-add.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-add.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-adc ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_adc
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-adc.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-adc.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-sub ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_sub
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-sub.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-sub.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-sbc ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_sbc
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-sbc.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-sbc.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-cp ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_cp
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-cp.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-cp.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-and ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_and
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-and.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-and.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-or ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_or
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-or.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-or.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-xor ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_xor
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-xor.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-xor.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-neg ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_neg
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-neg.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-neg.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-headers ALL
+        DEPENDS dataset-header-add
+        DEPENDS dataset-header-adc
+        DEPENDS dataset-header-sub
+        DEPENDS dataset-header-sbc
+        DEPENDS dataset-header-cp
+        DEPENDS dataset-header-and
+        DEPENDS dataset-header-or
+        DEPENDS dataset-header-xor
+        DEPENDS dataset-header-neg
+    )
