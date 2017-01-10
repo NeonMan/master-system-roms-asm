@@ -84,7 +84,7 @@ static void do_test_ones(){
         do{
             input_b++;
             __asm
-            LD HL, #0x0000    ;
+            LD HL, #0x00FF    ;
             PUSH HL           ;
             POP AF            ; AF <-- 0x00FF
 
