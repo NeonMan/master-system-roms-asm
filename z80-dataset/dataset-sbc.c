@@ -37,8 +37,8 @@ uint16_t initial_af;
 uint16_t output_af;
 
 static void do_test(uint16_t af){
-	/*Use output_af to load the initial af value*/
-	initial_af = af;
+    /*Use output_af to load the initial af value*/
+    initial_af = af;
     input_a = 255;
     do{
         input_a++;
@@ -47,10 +47,10 @@ static void do_test(uint16_t af){
             input_b++;
             __asm
             LD HL, #_initial_af ;
+            LD C, (HL)          ;
+            INC HL              ;
             LD B, (HL)          ;
-			INC HL              ;
-			LD C, (HL)          ;
-			PUSH BC             ;
+            PUSH BC             ;
             POP AF              ; AF <-- initial_af
 
             LD HL, #_input_a  ;
@@ -95,19 +95,19 @@ void main(){
     con_putc('.');
     
     /*Send payload*/
-	print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0x00\r\n");
-	do_test(0x0000);
-	
-	print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0x00 + CARRY \r\n");
-	do_test(0x0001);
-	
-	print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0xFF\r\n");
-	do_test(0x00FF);
-	
-	print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0xFF - CARRY\r\n");
-	do_test(0x00FE);
-	
-	
+    print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0x00\r\n");
+    do_test(0x0000);
+    
+    print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0x00 + CARRY \r\n");
+    do_test(0x0001);
+    
+    print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0xFF\r\n");
+    do_test(0x00FF);
+    
+    print("#Hex value of AF registers after performing SBC A, B; A - B with F = 0xFF - CARRY\r\n");
+    do_test(0x00FE);
+    
+    
     /*Send tail through UART*/
     print("#EOF\r\n");
     
