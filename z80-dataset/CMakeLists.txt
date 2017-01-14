@@ -41,7 +41,27 @@ ADD_EXECUTABLE(dataset-neg dataset-neg.c)
 ADD_DEPENDENCIES(dataset-neg crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-neg uart vdp console)
 
+ADD_EXECUTABLE(dataset-inc dataset-inc.c)
+ADD_DEPENDENCIES(dataset-inc crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-inc uart vdp console)
+
+ADD_EXECUTABLE(dataset-dec dataset-dec.c)
+ADD_DEPENDENCIES(dataset-dec crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-dec uart vdp console)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(dataset-inc-bin ALL
+        COMMAND makebin -s 57344 -p dataset-inc.ihx dataset-inc-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-inc-raw.sms dataset-inc.sms 49152
+		DEPENDS dataset-inc
+    )
+	
+ADD_CUSTOM_TARGET(dataset-dec-bin ALL
+        COMMAND makebin -s 57344 -p dataset-dec.ihx dataset-dec-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-dec-raw.sms dataset-dec.sms 49152
+		DEPENDS dataset-dec
+    )
+
 ADD_CUSTOM_TARGET(dataset-neg-bin ALL
         COMMAND makebin -s 57344 -p dataset-neg.ihx dataset-neg-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-neg-raw.sms dataset-neg.sms 49152
@@ -160,6 +180,20 @@ ADD_CUSTOM_TARGET(dataset-header-neg ALL
             ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-neg.csv
             ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-neg.h
     )
+	
+ADD_CUSTOM_TARGET(dataset-header-dec ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_dec
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-dec.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-dec.h
+    )
+	
+ADD_CUSTOM_TARGET(dataset-header-inc ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_inc
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-inc.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-inc.h
+    )
     
 ADD_CUSTOM_TARGET(dataset-headers ALL
         DEPENDS dataset-header-add
@@ -171,4 +205,6 @@ ADD_CUSTOM_TARGET(dataset-headers ALL
         DEPENDS dataset-header-or
         DEPENDS dataset-header-xor
         DEPENDS dataset-header-neg
+		DEPENDS dataset-header-inc
+		DEPENDS dataset-header-dec
     )
