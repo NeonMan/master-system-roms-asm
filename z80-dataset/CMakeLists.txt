@@ -65,7 +65,47 @@ ADD_EXECUTABLE(dataset-rlca dataset-rlca.c)
 ADD_DEPENDENCIES(dataset-rlca crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-rlca uart vdp console)
 
+ADD_EXECUTABLE(dataset-rra dataset-rra.c)
+ADD_DEPENDENCIES(dataset-rra crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rra uart vdp console)
+
+ADD_EXECUTABLE(dataset-rr dataset-rr.c)
+ADD_DEPENDENCIES(dataset-rr crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rr uart vdp console)
+
+ADD_EXECUTABLE(dataset-rrc dataset-rrc.c)
+ADD_DEPENDENCIES(dataset-rrc crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rrc uart vdp console)
+
+ADD_EXECUTABLE(dataset-rrca dataset-rrca.c)
+ADD_DEPENDENCIES(dataset-rrca crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rrca uart vdp console)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(dataset-rrca-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rrca.ihx dataset-rrca-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rrca-raw.sms dataset-rrca.sms 49152
+		DEPENDS dataset-rrca
+    )
+	
+ADD_CUSTOM_TARGET(dataset-rrc-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rrc.ihx dataset-rrc-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rrc-raw.sms dataset-rrc.sms 49152
+		DEPENDS dataset-rrc
+    )
+	
+ADD_CUSTOM_TARGET(dataset-rr-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rr.ihx dataset-rr-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rr-raw.sms dataset-rr.sms 49152
+		DEPENDS dataset-rr
+    )
+	
+ADD_CUSTOM_TARGET(dataset-rra-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rra.ihx dataset-rra-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rra-raw.sms dataset-rra.sms 49152
+		DEPENDS dataset-rra
+    )
+	
 ADD_CUSTOM_TARGET(dataset-rlca-bin ALL
         COMMAND makebin -s 57344 -p dataset-rlca.ihx dataset-rlca-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rlca-raw.sms dataset-rlca.sms 49152
@@ -263,6 +303,34 @@ ADD_CUSTOM_TARGET(dataset-header-rlca ALL
             ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rlca.h
     )
 	
+ADD_CUSTOM_TARGET(dataset-header-rra ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rra
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rra.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rra.h
+    )
+	
+ADD_CUSTOM_TARGET(dataset-header-rr ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rr
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rr.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rr.h
+    )
+	
+ADD_CUSTOM_TARGET(dataset-header-rrc ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rrc
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rrc.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rrc.h
+    )
+    
+ADD_CUSTOM_TARGET(dataset-header-rrca ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rrca
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rrca.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rrca.h
+    )
+	
 ADD_CUSTOM_TARGET(dataset-headers ALL
         DEPENDS dataset-header-add
         DEPENDS dataset-header-adc
@@ -281,4 +349,8 @@ ADD_CUSTOM_TARGET(dataset-headers ALL
 		DEPENDS dataset-header-rl
 		DEPENDS dataset-header-rlc
 		DEPENDS dataset-header-rlca
+		DEPENDS dataset-header-rra
+		DEPENDS dataset-header-rr
+		DEPENDS dataset-header-rrc
+		DEPENDS dataset-header-rrca
     )
