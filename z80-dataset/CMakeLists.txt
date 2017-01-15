@@ -49,7 +49,47 @@ ADD_EXECUTABLE(dataset-dec dataset-dec.c)
 ADD_DEPENDENCIES(dataset-dec crt0-sms-ram)
 TARGET_LINK_LIBRARIES(dataset-dec uart vdp console)
 
+ADD_EXECUTABLE(dataset-rla dataset-rla.c)
+ADD_DEPENDENCIES(dataset-rla crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rla uart vdp console)
+
+ADD_EXECUTABLE(dataset-rl dataset-rl.c)
+ADD_DEPENDENCIES(dataset-rl crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rl uart vdp console)
+
+ADD_EXECUTABLE(dataset-rlc dataset-rlc.c)
+ADD_DEPENDENCIES(dataset-rlc crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rlc uart vdp console)
+
+ADD_EXECUTABLE(dataset-rlca dataset-rlca.c)
+ADD_DEPENDENCIES(dataset-rlca crt0-sms-ram)
+TARGET_LINK_LIBRARIES(dataset-rlca uart vdp console)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(dataset-rlca-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rlca.ihx dataset-rlca-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rlca-raw.sms dataset-rlca.sms 49152
+		DEPENDS dataset-rlca
+    )
+	
+ADD_CUSTOM_TARGET(dataset-rlc-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rlc.ihx dataset-rlc-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rlc-raw.sms dataset-rlc.sms 49152
+		DEPENDS dataset-rlc
+    )
+	
+ADD_CUSTOM_TARGET(dataset-rl-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rl.ihx dataset-rl-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rl-raw.sms dataset-rl.sms 49152
+		DEPENDS dataset-rl
+    )
+	
+ADD_CUSTOM_TARGET(dataset-rla-bin ALL
+        COMMAND makebin -s 57344 -p dataset-rla.ihx dataset-rla-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-rla-raw.sms dataset-rla.sms 49152
+		DEPENDS dataset-rla
+    )
+	
 ADD_CUSTOM_TARGET(dataset-inc-bin ALL
         COMMAND makebin -s 57344 -p dataset-inc.ihx dataset-inc-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-inc-raw.sms dataset-inc.sms 49152
@@ -115,7 +155,7 @@ ADD_CUSTOM_TARGET(dataset-or-bin ALL
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py dataset-or-raw.sms dataset-or.sms 49152
 		DEPENDS dataset-or
     )
-
+	
 # Dataset headers from CSV files
 
 ADD_CUSTOM_TARGET(dataset-header-add ALL
@@ -194,7 +234,35 @@ ADD_CUSTOM_TARGET(dataset-header-inc ALL
             ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-inc.csv
             ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-inc.h
     )
+	
+ADD_CUSTOM_TARGET(dataset-header-rla ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rla
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rla.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rla.h
+    )
+	
+ADD_CUSTOM_TARGET(dataset-header-rl ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rl
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rl.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rl.h
+    )
+	
+ADD_CUSTOM_TARGET(dataset-header-rlc ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rlc
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rlc.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rlc.h
+    )
     
+ADD_CUSTOM_TARGET(dataset-header-rlca ALL
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/csv-to-header.py 
+            z80_dataset_rlca
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rlca.csv
+            ${CMAKE_SOURCE_DIR}/z80-dataset/dataset-rlca.h
+    )
+	
 ADD_CUSTOM_TARGET(dataset-headers ALL
         DEPENDS dataset-header-add
         DEPENDS dataset-header-adc
@@ -205,6 +273,12 @@ ADD_CUSTOM_TARGET(dataset-headers ALL
         DEPENDS dataset-header-or
         DEPENDS dataset-header-xor
         DEPENDS dataset-header-neg
+		
 		DEPENDS dataset-header-inc
 		DEPENDS dataset-header-dec
+		
+		DEPENDS dataset-header-rla
+		DEPENDS dataset-header-rl
+		DEPENDS dataset-header-rlc
+		DEPENDS dataset-header-rlca
     )
