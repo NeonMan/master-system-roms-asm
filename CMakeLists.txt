@@ -80,7 +80,17 @@ ADD_EXECUTABLE(test-mapper-speed test-mapper-speed.c)
 ADD_DEPENDENCIES(test-mapper-speed crt0-sms)
 TARGET_LINK_LIBRARIES(test-mapper-speed sms vdp console)
 
+ADD_EXECUTABLE(test-interrupt test-interrupt.c)
+ADD_DEPENDENCIES(test-interrupt crt0-sms)
+TARGET_LINK_LIBRARIES(test-interrupt sdsc sms)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(test-interrupt-bin ALL
+        COMMAND makebin -s 32768 test-interrupt.ihx test-interrupt.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-interrupt.sms
+		DEPENDS test-interrupt
+    )
+	
 ADD_CUSTOM_TARGET(sample-bin ALL
         COMMAND makebin -s 32768 sample.ihx sample.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py sample.sms
