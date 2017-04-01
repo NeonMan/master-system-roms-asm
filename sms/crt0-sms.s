@@ -85,7 +85,7 @@ nmi_hook:
 	;NMI call code does not fit it INT1 is being used, so we make an extra
 	;jump before performing the call
 	call _nmi
-	reti
+	retn
 	
 	;NMI vector
 	.org	0x66

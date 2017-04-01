@@ -57,7 +57,7 @@ _crt0_canary::
     
 	;NMI vector
 	.org	0x66
-	reti
+	retn
     
 	.ascii "Self-reloacating ROM. Trim all data before the 0xc000 offset"
     .db 0x00
