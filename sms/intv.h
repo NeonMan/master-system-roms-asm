@@ -16,7 +16,6 @@ void rst_18h();
 void rst_20h();
 void rst_28h();
 void rst_30h();
-void rst_38h();
 
 /*NMI vector*/
 void nmi();

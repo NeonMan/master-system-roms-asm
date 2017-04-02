@@ -31,8 +31,4 @@ void rst_30h(){
     
 }
 
-void rst_38h(){
-    
-}
-
 #endif
