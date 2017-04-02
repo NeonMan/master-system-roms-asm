@@ -78,23 +78,13 @@
 	reti
 
 	.org	0x38
-	call _rst_38h
-	reti
-
-nmi_hook:
-	;NMI call code does not fit it INT1 is being used, so we make an extra
-	;jump before performing the call
-	call _nmi
-	retn
-	
-	;NMI vector
-	.org	0x66
-	jr nmi_hook
-	
-	;INT vector
-	.org	0x68
 	call _int1
 	reti
+
+	;NMI vector
+	.org	0x66
+	call _nmi
+	retn
 	
 	.org	0x50
 	.ascii "SMS crt0 V0.1  "
