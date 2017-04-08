@@ -399,3 +399,58 @@ void uart_putc_fast(uint8_t c){
         
     __endasm;
 }
+
+void uart_putc_faster(uint8_t c){
+    (void) c;
+    
+    __asm
+        UART_DOWN = 0xBB
+        UART_UP   = 0xFB
+        IO_PORT   = 0x3F
+        START_DELAY = 45
+        DATA_DELAY  = 49
+        STOP_DELAY  = 52
+        
+		;Read parameters
+        POP HL                ; 10T* ; Save return value
+        DEC SP                ;  6T
+        POP BC                ; 10T
+        DEC SP                ;  6T; Argument byte on B, Stack restored.
+        PUSH HL               ; 11T* ; Restore return value
+		
+        ;Pull line DOWN to send a start bit
+        LD A, #UART_DOWN      ;  7T
+        OUT (#IO_PORT),A      ; 11T
+		;Widen the start bit as needed, use logical analyzer.
+		NOP                   ;  4T
+        
+        ; ----------------------
+        ; --- DATA BIT MACRO ---
+        ; ----------------------
+        .macro sendbit_faster ?ftx_bit_one,?ftx_bit_zero,?ftx_bit
+                RR B               ;  8T ; Move bit to Carry flag
+                JP NC, ftx_bit_zero ; 10T ;
+                JP C,  ftx_bit_one  ; 10T ;
+            ftx_bit_zero:                 ;
+                LD A, #UART_DOWN   ;  7T ;
+                JP ftx_bit          ; 10T ;
+            ftx_bit_one:                  ; Regardless of path taken
+                LD A, #UART_UP     ;  7T ; 17T
+            ftx_bit:
+                OUT (#IO_PORT), A  ; 11T ; Change bit edge
+        .endm
+        
+        sendbit_faster
+        sendbit_faster
+        sendbit_faster
+        sendbit_faster
+        
+        sendbit_faster
+        sendbit_faster
+        sendbit_faster
+        sendbit_faster
+        
+        LD A, #UART_UP     ;  7T
+        OUT (#IO_PORT), A  ; 11T ; Change bit edge
+    __endasm;
+}
