@@ -411,18 +411,18 @@ void uart_putc_faster(uint8_t c){
         DATA_DELAY  = 49
         STOP_DELAY  = 52
         
-		;Read parameters
+        ;Read parameters
         POP HL                ; 10T* ; Save return value
         DEC SP                ;  6T
         POP BC                ; 10T
         DEC SP                ;  6T; Argument byte on B, Stack restored.
         PUSH HL               ; 11T* ; Restore return value
-		
+        
         ;Pull line DOWN to send a start bit
         LD A, #UART_DOWN      ;  7T
         OUT (#IO_PORT),A      ; 11T
-		;Widen the start bit as needed, use logical analyzer.
-		NOP                   ;  4T
+        ;Widen the start bit as needed, use logical analyzer.
+        NOP                   ;  4T
         
         ; ----------------------
         ; --- DATA BIT MACRO ---
