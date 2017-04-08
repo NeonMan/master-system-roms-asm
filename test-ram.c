@@ -48,7 +48,7 @@ void main(){
     /* Check if the pattern is available at the mirror */
     for(i=0; i<SMS_RAM_SIZE; i++){
         if(ram_base[i] != ram_mirror[i]){
-            read_err(ram_base + i);
+            read_err((uint16_t*)(ram_base + i));
         }
     }
     
@@ -61,7 +61,7 @@ void main(){
     /* Check if the pattern is available at the mirror */
     for(i=0; i<SMS_RAM_SIZE; i++){
         if(ram_base[i] != ram_mirror[i]){
-            read_err(ram_base + i);
+            read_err((uint16_t*)(ram_base + i));
         }
     }
     
