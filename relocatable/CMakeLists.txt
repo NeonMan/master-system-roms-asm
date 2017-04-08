@@ -25,7 +25,18 @@ ADD_EXECUTABLE(test-mapper test-mapper.c)
 ADD_DEPENDENCIES(test-mapper crt0-sms-ram)
 TARGET_LINK_LIBRARIES(test-mapper console vdp uart)
 
+ADD_EXECUTABLE(uart-sync uart-sync.c)
+ADD_DEPENDENCIES(uart-sync crt0-sms-ram)
+TARGET_LINK_LIBRARIES(uart-sync console vdp uart)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(uart-sync-bin ALL
+        COMMAND makebin -s 57344 uart-sync.ihx uart-sync-raw.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py uart-sync-raw.sms uart-sync.sms 49152
+		COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py uart-sync.sms 8
+		DEPENDS uart-sync
+    )
+	
 ADD_CUSTOM_TARGET(rel-sample-bin ALL
         COMMAND makebin -s 57344 rel-sample.ihx rel-sample-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py rel-sample-raw.sms rel-sample.sms 49152
