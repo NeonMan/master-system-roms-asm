@@ -4,11 +4,14 @@
 #include <sms/io.h>
 #include <stdint.h>
 
+/*XMODEM boot sequence is on a separate C file*/
+void boot_xmodem();
+
 static const char hello[] = "\nMaster System boot ROM\n";
 
 static void delay_loop(){
     volatile uint16_t i;
-    for(i=0; i<10000; i++){
+    for(i=0; i<60000; i++){
         i = i;
     }
 }
@@ -62,12 +65,6 @@ static void boot(){
     rst_vector();
 }
 
-static void boot_xmodem(){
-    print("  XMODEM........... ");
-    
-    print("Failed\n");
-}
-
 static void boot_ext(){
     /*Enable EXPANSION*/
     io_enable(IO_ENABLE_EXPANSION);
@@ -118,7 +115,6 @@ static void boot_bios(){
 }
 
 void main(){
-    delay_loop();
 #ifdef __CONSOLE_H
     con_init();
 #endif
@@ -129,8 +125,14 @@ void main(){
     /*Deactivate all ROMs*/
     io_set(IO_ENABLE_RAM & IO_ENABLE_PERIPHERAL);
     
-    /*Try booting ROMs*/
+    /*Try booting via XMODEM*/
+    print("  XMODEM........");
+    boot_xmodem(); delay_loop();
+    boot_xmodem(); delay_loop();
     boot_xmodem();
+    print(" Failed\n");
+    
+    /*Try booting ROMs*/
     boot_ext();
     boot_card();
     boot_cart();
@@ -139,6 +141,6 @@ void main(){
     boot_bios();
     
     while(1){
-        
+        /*If you reach this place, you are out of luck. Crash.*/
     }
 }

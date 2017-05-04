@@ -68,7 +68,7 @@ if __name__ == '__main__':
     header_size = 0x4A
   else:
     #Add padding to the ROM to fill 8K
-    buff = buff + bytes("?" * ((8*1024) - len(buff)), 'ASCII')
+    buff = buff + bytes("?" * ((8*1024) - len(buff) - 16), 'ASCII')
     header_location = (8*1024) - 16
     header_size = 0x4A
     
