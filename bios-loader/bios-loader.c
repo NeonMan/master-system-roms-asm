@@ -2,6 +2,7 @@
 /*#include <sms/console.h>*/
 #include <sms/uart.h>
 #include <sms/io.h>
+#include <crc/crc16-xmodem.h>
 #include <stdint.h>
 
 /*XMODEM boot sequence is on a separate C file*/
@@ -34,23 +35,40 @@ static void print(const char* str){
 
 static uint8_t detect_rom(){
     uint8_t* rom = (uint8_t*) 0x0000;
-    uint8_t difference_count;
-    uint8_t i;
     
-    difference_count = 0;
-    for(i=0; i<128; i++){
-        if(rom[0] != rom[1]){
-            difference_count++;
+    /*Read a ROM block twice, test wether the CRC doesn't change*/
+    {
+        uint16_t crc_one, crc_two;
+        crc_one = crc16_xmodem_init();
+        crc_two = crc16_xmodem_init();
+        
+        crc_one = crc16_xmodem_update(crc_one, rom, 256);
+        crc_two = crc16_xmodem_update(crc_two, rom, 256);
+        
+        if(crc_one != crc_two){
+            return 0;
         }
-        rom++;
     }
     
-    if(difference_count>16){
-        return 1;
+    /*Make sure some bytes are different*/
+    {
+        uint8_t i;
+        uint8_t difference_count;
+        difference_count = 0;
+        for(i=0; i<128; i++){
+            if(rom[0] != rom[1]){
+                difference_count++;
+            }
+            rom++;
+        }
+        
+        if(difference_count<16){
+            return 0;
+        }
     }
-    else{
-        return 0;
-    }
+    
+    /*All OK if we reach here*/
+    return 1;
 }
 
 static void boot(){
@@ -126,11 +144,13 @@ void main(){
     io_set(IO_ENABLE_RAM & IO_ENABLE_PERIPHERAL);
     
     /*Try booting via XMODEM*/
-    print("  XMODEM........");
+    print("  XMODEM...........");
+    /*
     boot_xmodem(); delay_loop();
     boot_xmodem(); delay_loop();
     boot_xmodem();
-    print(" Failed\n");
+    */
+    print(" ToDo\n");
     
     /*Try booting ROMs*/
     boot_ext();
