@@ -1,4 +1,5 @@
 project(sms-libs C)
+enable_language(ASM)
 
 #crt0
 #add_custom_command(OUTPUT  crt0-sms.rel
@@ -26,4 +27,5 @@ ADD_LIBRARY(emu-hooks emu-hooks.c emu-hooks.h)
 ADD_LIBRARY(vdp vdp.c vdp.h)
 ADD_LIBRARY(console console.c console.h)
 ADD_LIBRARY(sms sms.h sms.c)
-ADD_LIBRARY(uart uart.c uart.h)
+ADD_LIBRARY(uart uart.c uart.s uart.h)
+
