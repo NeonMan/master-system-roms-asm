@@ -12,5 +12,5 @@ pipelines:
           - apt-get update
           - apt-get -y install sdcc python3 cmake
           - cmake -DCMAKE_TOOLCHAIN_FILE=./Toolchain-sdcc.cmake -G "Unix Makefiles" .
-          - make
+          - make VERBOSE=1
           
