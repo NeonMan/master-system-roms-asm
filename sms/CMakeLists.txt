@@ -27,5 +27,5 @@ ADD_LIBRARY(emu-hooks emu-hooks.c emu-hooks.h)
 ADD_LIBRARY(vdp vdp.c vdp.h)
 ADD_LIBRARY(console console.c console.h)
 ADD_LIBRARY(sms sms.h sms.c)
-ADD_LIBRARY(uart uart.c uart.s uart.h)
+ADD_LIBRARY(uart uart.c _uart.s uart.h)
 
