@@ -16,6 +16,12 @@ make
 cd ..
 goto menu
 
+:build
+cd Build
+make
+cd ..
+goto menu
+
 :dataset
 cd Build
 cd z80-dataset
@@ -31,6 +37,7 @@ goto menu
 :menu
 
 echo.
+echo (B) Build
 echo (R) Rebuild
 echo (D) Build dataset only
 echo (C) Command prompt
@@ -39,6 +46,9 @@ echo (E) Exit
 set /p choice=Option: 
 if '%choice%'=='R' goto start
 if '%choice%'=='r' goto start
+
+if '%choice%'=='B' goto build
+if '%choice%'=='b' goto build
 
 if '%choice%'=='D' goto dataset
 if '%choice%'=='d' goto dataset

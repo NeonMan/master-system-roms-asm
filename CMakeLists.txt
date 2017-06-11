@@ -85,7 +85,17 @@ ADD_EXECUTABLE(test-interrupt test-interrupt.c)
 ADD_DEPENDENCIES(test-interrupt crt0-sms)
 TARGET_LINK_LIBRARIES(test-interrupt sdsc sms)
 
+ADD_EXECUTABLE(test-psg test-psg.c)
+ADD_DEPENDENCIES(test-psg crt0-sms)
+TARGET_LINK_LIBRARIES(test-psg console vdp sdsc sms uart sdsc)
+
 #Make .bin ROMs from the .ihx files
+ADD_CUSTOM_TARGET(test-psg-bin ALL
+        COMMAND makebin -s 32768 test-psg.ihx test-psg.sms
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-psg.sms
+		DEPENDS test-psg
+    )
+	
 ADD_CUSTOM_TARGET(test-interrupt-bin ALL
         COMMAND makebin -s 32768 test-interrupt.ihx test-interrupt.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-interrupt.sms
