@@ -19,28 +19,17 @@
 
 	.area _CODE (REL)
 	.ascii "/noramboot.S"
+	.include /macros.inc/
 
 txt_hello:
-	.ascii "0123456789"
-txt_hello_end:
+	.ascii "------ N0RAM Bootloader ------       "
+	.db 0x00
 	
 	;; Initialize
 init:
 	JP vdp_init
 vdp_init_ret::
-	
-	;;Say hello
-	LD HL, #txt_hello
-	LD B, #txt_hello_end-txt_hello
-loop_hello:
-	LD A, (HL)
-	SUB A, #0x20
-	OUT (#0xBE), A
-	LD A, #0x01
-	OUT (#0xBE), A
-	INC HL
-	DEC B
-	JP NZ, loop_hello
+	puts #txt_hello
 	
 	
 endloop:
