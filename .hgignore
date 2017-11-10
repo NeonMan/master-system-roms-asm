@@ -5,8 +5,13 @@ doxygen\/
 \/_
 
 \.asm$
-\.lst
-\.rel
-\.sym
-\.ihx
+\.lst$
+\.rel$
+\.sym$
+\.ihx$
+\.rst$
+\.lk$
+\.map$
+\.mem$
+\.sms$
 z80-dataset\/dataset\-[^\.]*\.h
