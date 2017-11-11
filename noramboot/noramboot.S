@@ -34,6 +34,14 @@ txt_hello:
 	.ascii "                                "
 	.ascii " Booting in: "
 	.db 0x00
+txt_uart:
+	.ascii "CONTROL 2                       "
+	.ascii "o o o o o--Vcc (5V, Optional)   "
+	.ascii " o o o o                        "
+	.ascii "   | | `---PC TX (SMS RX)       "
+	.ascii "   | `-----Ground               "
+	.ascii "   `-------PC RX (SMS TX)       "
+	.db 0x00
 	
 	;; Initialize
 init:
