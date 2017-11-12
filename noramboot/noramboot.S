@@ -8,9 +8,16 @@
 	.ascii "SDSC"
 	.db 0xff,0xff			; Version (BCD)
 	.db 0xff,0xff,0xff,0xff	; Date DD/MM/YYYY (BCD)
-	.db 0xff,0xff			; Author pointer
-	.db 0xff,0xff			; Name pointer
-	.db 0xff,0xff			; Description pointer
+	.dw #sdsc_author		; Author pointer
+	.dw #sdsc_name			; Name pointer
+	.dw #sdsc_description	; Description pointer
+	
+	;; SEGA header
+	.ascii "TMR SEGA"
+	.db 0xFF, 0xFF			;Reserved bytes
+	.db 0xFF, 0xFF			;Checksum
+	.db 0xFF, 0xFF, 0xFF	;Product code and version
+	.db 0x6c				;Export SEGA, 32K.
 	
 	;;Make NMI RESET the ROM
 	;.org 0x0066
@@ -51,18 +58,32 @@ vdp_init_ret::
 	puts #txt_hello
 	;And a nice countdown
 	delay #0x0300
-	putc #0x33
+	putc #0x33 ;3
 	putc #0x20
 	delay #0x0300
-	putc #0x32
+	putc #0x32 ;2
 	putc #0x20
 	delay #0x0300
-	putc #0x31
+	putc #0x31 ;1
 	putc #0x20
 	delay #0x0300
 	
 endloop:
 	JP endloop
+	
+	;SDSC info
+sdsc_author::
+	.ascii "Heavydeck <root@heavydeck.net>"
+	.db 0x00
+
+sdsc_name::
+	.ascii "N0RAM Bootloader for Master System"
+	.db 0x00
+
+sdsc_description::
+	.ascii "Put a proper description when the program is complete and "
+	.ascii "free rom is not an issue."
+	.db 0x00
 	
 	;End of file
 	.ascii "uwu "
