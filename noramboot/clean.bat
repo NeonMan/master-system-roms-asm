@@ -8,3 +8,5 @@ del *.rst
 del *.sym
 del *.bin
 del *.sms
+del *.bak
+del *.noi
