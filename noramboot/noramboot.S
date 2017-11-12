@@ -20,8 +20,8 @@
 	.db 0x6c				;Export SEGA, 32K.
 	
 	;;Make NMI RESET the ROM
-	;.org 0x0066
-	;JR 0x0000
+	.org 0x0066
+	JR 0x0000
 	
 	;; Entry point
 	.org 0x0000
@@ -83,7 +83,9 @@ vdp_init_ret::
 	
 	;Use UART
 	puts #txt_uart
-	;Jump to XMODEM loader (ToDo)
+	;Jump to XMODEM loader
+	JP xmodem_boot
+xmodem_boot_ret::
 	JR endloop
 	
 	;Use SyncSerial

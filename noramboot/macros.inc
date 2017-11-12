@@ -1,3 +1,92 @@
+	;A <- IXL
+	.macro ld_a_ixl
+		.db 0xDD
+		LD A, L
+	.endm
+	
+	;A <- IXH
+	.macro ld_a_ixh
+		.db 0xDD
+		LD A, H
+	.endm
+	
+	;A <- IYL
+	.macro ld_a_iyl
+		.db 0xFD
+		LD A, L
+	.endm
+	
+	;A <- IYH
+	.macro ld_a_iyh
+		.db 0xFD
+		LD A, H
+	.endm
+	
+	;IXL <- A
+	.macro ld_ixl_a
+		.db 0xDD
+		LD L, A
+	.endm
+	
+	;IXH <- A
+	.macro ld_ixh_a
+		.db 0xDD
+		LD H, A
+	.endm
+	
+	;IYL <- A
+	.macro ld_iyl_a
+		.db 0xFD
+		LD L, A
+	.endm
+	
+	;IYH <- A
+	.macro ld_iyh_a
+		.db 0xFD
+		LD H, A
+	.endm
+	
+	;Load IX into HL
+	.macro ld_hl_ix
+		.db 0xDD ;
+		LD A, H  ; LD A, IXH
+		LD H, A
+		.db 0xDD ;
+		LD A, L  ; LD A, IHL
+		LD L, A
+	.endm
+	
+	;Load IY into HL
+	.macro ld_hl_iy
+		.db 0xFD ;
+		LD A, H  ; LD A, IYH
+		LD H, A
+		.db 0xFD ;
+		LD A, L  ; LD A, IYL
+		LD L, A
+	.endm
+	
+	;Load HL into IX
+	.macro ld_ix_hl
+		LD A, H
+		.db 0xDD ;
+		LD H, A  ; LD IXH, A
+		LD A, L
+		.db 0xDD ;
+		LD L, A  ; LD IXL, A
+	.endm
+	
+	;Load HL into IY
+	.macro ld_iy_hl
+		LD A, H
+		.db 0xFD ;
+		LD H, A  ; LD IYH, A
+		LD A, L
+		.db 0xFD ;
+		LD L, A  ; LD IYL, A
+	.endm
+	
+
 	;configurable delay loop
 	;Uses: HL
 	.macro delay iterations, ?delay_loop, ?delay_inner
