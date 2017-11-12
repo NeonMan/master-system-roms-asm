@@ -17,6 +17,8 @@
 	;Resulting CRC in HL
 	;
 	;Invoking this macro will use ~2K of code.
+	;Not to mention it will do n*256 tests for n bytes.
+	;Yeah, this gona be a bit slow...
 	.macro crc16_xmodem
 		;Calculate next index using A
 		;tbl_idx = ((crc >> 8) ^ *d) & 0xff;

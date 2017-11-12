@@ -32,6 +32,10 @@
 	.ascii "/noramboot.S"
 	.include /macros.inc/
 
+txt_countdown_padding:
+	.ascii "             "
+	.db 0x00
+	
 txt_hello:
 	.ascii "------------------------------  "
 	.ascii "--     N0RAM Bootloader     --  "
@@ -42,12 +46,14 @@ txt_hello:
 	.ascii " Booting in: "
 	.db 0x00
 txt_uart:
-	.ascii "CONTROL 2                       "
-	.ascii "o o o o o--Vcc (5V, Optional)   "
-	.ascii " o o o o                        "
-	.ascii "   | | `---PC TX (SMS RX)       "
-	.ascii "   | `-----Ground               "
-	.ascii "   `-------PC RX (SMS TX)       "
+	.ascii "                                "
+	.ascii "Starting XMODEM transmission.   "
+	.ascii "Check docs for connection and   "
+	.ascii "Usage instructions.             "
+	.db 0x00
+txt_syncserial:
+	.ascii "Protocol barely defined so...   "
+	.ascii "ToDo."
 	.db 0x00
 	
 	;; Initialize
@@ -67,6 +73,23 @@ vdp_init_ret::
 	putc #0x31 ;1
 	putc #0x20
 	delay #0x0300
+	puts #txt_countdown_padding
+	
+	;Read control port 1
+	IN A, (#0xDC)
+	AND A, #0x20 ;Mask button 2
+	;If 1 or 2 are pressed jump to SyncSerial
+	JR Z, use_syncserial
+	
+	;Use UART
+	puts #txt_uart
+	;Jump to XMODEM loader (ToDo)
+	JR endloop
+	
+	;Use SyncSerial
+use_syncserial:
+	puts #txt_syncserial
+	JR endloop
 	
 endloop:
 	JP endloop
