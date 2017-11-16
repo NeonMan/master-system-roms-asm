@@ -109,7 +109,6 @@ sdsc_description::
 	.ascii "Put a proper description when the program is complete and "
 	.ascii "free rom is not an issue."
 	.db 0x00
-	
 	;End of file
 	.ascii "uwu "
 	

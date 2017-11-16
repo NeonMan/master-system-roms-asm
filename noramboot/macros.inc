@@ -1,3 +1,51 @@
+	;A <- B'
+	.macro ld_a_bp
+		EXX
+		LD A, B
+		EXX
+		EX AF, AF'
+	.endm
+
+	;A <- C'
+	.macro ld_a_cp
+		EXX
+		LD A, C
+		EXX
+		EX AF, AF'
+	.endm
+
+	;A <- D'
+	.macro ld_a_dp
+		EXX
+		LD A, D
+		EXX
+		EX AF, AF'
+	.endm
+
+	;A <- E'
+	.macro ld_a_ep
+		EXX
+		LD A, E
+		EXX
+		EX AF, AF'
+	.endm
+
+	;A <- H'
+	.macro ld_a_hp
+		EXX
+		LD A, H
+		EXX
+		EX AF, AF'
+	.endm
+
+	;A <- L'
+	.macro ld_a_lp
+		EXX
+		LD A, L
+		EXX
+		EX AF, AF'
+	.endm
+
 	;A <- IXL
 	.macro ld_a_ixl
 		.db 0xDD
