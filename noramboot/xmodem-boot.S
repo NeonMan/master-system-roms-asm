@@ -19,28 +19,32 @@
 	;                  |                                          `---correct---->[read 128]+---timeout---+
 	;                  |                    /-timeout-\                                     |
 	;                  |<-----[reset packet]<--fail----[check crc]<--------success----------´
-	;                  \--[update packet]<---success--´            
-	
+	;                  \--[update packet]<---success--´
+	;
 	; Registers:
 	;
 	;  A    (General purpose)
 	; BC    current Byte; current paCket.
-	; DE    
+	; DE
 	; HL    (General purpose)
 	;
-	; IX
+	; IX    Current buffer address
 	; IY
-	; 
-	;  A'
-	; BC'
-	; DE'
-	; HL'
+	;
+	;  A'   Let's use
+	; BC'   these for
+	; DE'   unit tests
+	; HL'   >:3
 	
 	.area _CODE (REL)
 	.ascii "/xmodem-boot.S"
 	
 	.include /macros.inc/
 	.include /crc16-xmodem.inc/
+
+; --- Unit test mock functions ---
+
+
 	
 xmodem_boot::
 	;Go back to main routine; Transmission error?
@@ -50,9 +54,13 @@ xmodem_boot::
 state_init:
 	;Prepare variables for the first transfer.
 	;Packet <= 1
+	LD C, #0x01
 	;Byte <= 0
+	LD B, #0x00
 	;Buffer <= RAM_BASE_ADDRESS
-	
+	LD HL, #0xC000    ;Master System RAM base address.
+	ld_ix_hl          ;Store on IX.
+
 	JP state_start_transfer
 	
 state_start_transfer:
@@ -96,6 +104,12 @@ state_check_crc:
 state_ack:
 	;Prepare for next packet
 	;request next packet
+	;Packet <= Packet + 1
+	INC C
+	;Byte <= 0
+	LD B, #0x00
+	;IX should be already pointed towards the next address.
+
 	JP state_wait_soh
 	
 state_wait_soh:
@@ -120,7 +134,19 @@ state_timeout:
 	
 state_nack:
 	;Reset state
+	;IX <= IX - current_byte
+	ld_hl_ix
+	LD A, L
+	SUB A, B
+	LD L, A
+	JP PO, nack_no_underflow
+	DEC H
+	nack_no_underflow:
+	ld_ix_hl
+	;B <= 0x00
+	LD B, #0x00
 	;Request same packet
+	;Don't touch C.
 	JP state_wait_soh
 	
 	.ascii "uwu "
