@@ -19,7 +19,7 @@ xmodem-boot.rel: xmodem-boot.S
 	sdasz80 -l -o -g -s -g xmodem-boot.S
 
 rom: objects
-	-sdcc -o noramboot.ihx -mz80 --no-std-crt0 --code-loc 128 *.rel
+	sdcc -o noramboot.ihx -mz80 --no-std-crt0 --code-loc 128 *.rel
 	makebin -p noramboot.ihx noramboot.sms
 
 clean:

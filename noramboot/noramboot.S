@@ -113,3 +113,18 @@ sdsc_description::
 	;End of file
 	.ascii "uwu "
 	
+
+;Make the compiler quit complaining about _DATA
+.area   _HOME
+.area   _CODE
+.area   _INITIALIZER
+.area   _GSINIT
+.area   _GSFINAL
+
+.area   _DATA
+.area   _INITIALIZED
+.area   _BSEG
+.area   _BSS
+.area   _HEAP
+
+.area   _CODE
