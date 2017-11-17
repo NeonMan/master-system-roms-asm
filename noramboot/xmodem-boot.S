@@ -29,7 +29,8 @@
 	; HL    (General purpose)
 	;
 	; IX    Current buffer address
-	; IY
+	; IY    
+	; SP    
 	;
 	;  A'   Let's use
 	; BC'   these for

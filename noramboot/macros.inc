@@ -6,10 +6,28 @@
 		EX AF, AF'
 	.endm
 
+	;B' <- A
+	.macro ld_bp_a
+		EX AF, AF'
+		EXX
+		LD A, B
+		EXX
+		EX AF, AF'
+	.endm
+
 	;A <- C'
 	.macro ld_a_cp
 		EXX
 		LD A, C
+		EXX
+		EX AF, AF'
+	.endm
+
+	;C' <- A
+	.macro ld_cp_a
+		EX AF, AF'
+		EXX
+		LD C, A
 		EXX
 		EX AF, AF'
 	.endm
@@ -22,10 +40,28 @@
 		EX AF, AF'
 	.endm
 
+	;D' <- A
+	.macro ld_dp_a
+		EX AF, AF'
+		EXX
+		LD D, A
+		EXX
+		EX AF, AF'
+	.endm
+
 	;A <- E'
 	.macro ld_a_ep
 		EXX
 		LD A, E
+		EXX
+		EX AF, AF'
+	.endm
+
+	;E' <- A
+	.macro ld_ep_a
+		EX AF, AF'
+		EXX
+		LD E, A
 		EXX
 		EX AF, AF'
 	.endm
@@ -38,10 +74,28 @@
 		EX AF, AF'
 	.endm
 
+	;H' <- A
+	.macro ld_hp_a
+		EX AF, AF'
+		EXX
+		LD H, A
+		EXX
+		EX AF, AF'
+	.endm
+
 	;A <- L'
 	.macro ld_a_lp
 		EXX
 		LD A, L
+		EXX
+		EX AF, AF'
+	.endm
+
+	;L' <- A
+	.macro ld_lp_a
+		EX AF, AF'
+		EXX
+		LD L, A
 		EXX
 		EX AF, AF'
 	.endm
