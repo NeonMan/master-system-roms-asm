@@ -1,3 +1,12 @@
+	
+	; HL <- SP
+	.macro ld_hl_sp
+		LD HL, #0x00
+		ADD HL, SP
+	.endm
+
+	; --- Accumulator <-> shadow register operations
+
 	;A <- B'
 	.macro ld_a_bp
 		EXX
@@ -100,6 +109,8 @@
 		EX AF, AF'
 	.endm
 
+	; --- Operations between A <-> IXH/IXL/IYH/IYL ---
+
 	;A <- IXL
 	.macro ld_a_ixl
 		.db 0xDD
@@ -147,7 +158,9 @@
 		.db 0xFD
 		LD H, A
 	.endm
-	
+
+	; --- Operations between HL <-> IX/IY ---
+
 	;Load IX into HL
 	.macro ld_hl_ix
 		.db 0xDD ;
