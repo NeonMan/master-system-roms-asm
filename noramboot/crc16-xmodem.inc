@@ -9,6 +9,7 @@
 		LD HL, (#crc_table + (2 * table_index))
 		XOR A, H
 		LD H, A
+		XOR A, A
 		skip_byte:
 	.endm
 
