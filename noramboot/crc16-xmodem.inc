@@ -1,7 +1,8 @@
 
 	;If A is 1 by the time this macro is used, it will calculate
 	;the CRC by using the value at crc_table[index] (16bit)
-	.macro crc16_test_byte, table_index, .?skip_byte
+	;Per macro call 10 Bytes will be used.
+	.macro crc16_test_byte, table_index, ?skip_byte
 		;If A is zero, skip.
 		DEC A
 		JR NZ, skip_byte

@@ -12,7 +12,6 @@
 		EXX
 		LD A, B
 		EXX
-		EX AF, AF'
 	.endm
 
 	;B' <- A
@@ -21,7 +20,6 @@
 		EXX
 		LD A, B
 		EXX
-		EX AF, AF'
 	.endm
 
 	;A <- C'
@@ -29,16 +27,13 @@
 		EXX
 		LD A, C
 		EXX
-		EX AF, AF'
 	.endm
 
 	;C' <- A
 	.macro ld_cp_a
-		EX AF, AF'
 		EXX
 		LD C, A
 		EXX
-		EX AF, AF'
 	.endm
 
 	;A <- D'
@@ -46,16 +41,13 @@
 		EXX
 		LD A, D
 		EXX
-		EX AF, AF'
 	.endm
 
 	;D' <- A
 	.macro ld_dp_a
-		EX AF, AF'
 		EXX
 		LD D, A
 		EXX
-		EX AF, AF'
 	.endm
 
 	;A <- E'
@@ -63,16 +55,13 @@
 		EXX
 		LD A, E
 		EXX
-		EX AF, AF'
 	.endm
 
 	;E' <- A
 	.macro ld_ep_a
-		EX AF, AF'
 		EXX
 		LD E, A
 		EXX
-		EX AF, AF'
 	.endm
 
 	;A <- H'
@@ -80,16 +69,13 @@
 		EXX
 		LD A, H
 		EXX
-		EX AF, AF'
 	.endm
 
 	;H' <- A
 	.macro ld_hp_a
-		EX AF, AF'
 		EXX
 		LD H, A
 		EXX
-		EX AF, AF'
 	.endm
 
 	;A <- L'
@@ -97,16 +83,13 @@
 		EXX
 		LD A, L
 		EXX
-		EX AF, AF'
 	.endm
 
 	;L' <- A
 	.macro ld_lp_a
-		EX AF, AF'
 		EXX
 		LD L, A
 		EXX
-		EX AF, AF'
 	.endm
 
 	; --- Operations between A <-> IXH/IXL/IYH/IYL ---
