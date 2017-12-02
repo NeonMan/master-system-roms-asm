@@ -33,23 +33,23 @@
 	.include /macros.inc/
 
 txt_countdown_padding:
-	.ascii "             "
+	.ascii "			 "
 	.db 0x00
 	
 txt_hello:
 	.ascii "------------------------------  "
-	.ascii "--     N0RAM Bootloader     --  "
+	.ascii "--	 N0RAM Bootloader	 --  "
 	.ascii "------------------------------  "
 	.ascii " Bootloader using UART/XMODEM   "
-	.ascii " Hold 2 to use Sync Serial      "
-	.ascii "                                "
+	.ascii " Hold 2 to use Sync Serial	  "
+	.ascii "								"
 	.ascii " Booting in: "
 	.db 0x00
 txt_uart:
-	.ascii "                                "
+	.ascii "								"
 	.ascii "Starting XMODEM transmission.   "
 	.ascii "Check docs for connection and   "
-	.ascii "Usage instructions.             "
+	.ascii "Usage instructions.			 "
 	.db 0x00
 txt_syncserial:
 	.ascii "Protocol barely defined so...   "

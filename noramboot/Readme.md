@@ -16,12 +16,12 @@ Connect UART transceiver on the CONTROL 2 port as follows. 5V connections is
 most likely not needed unless you need to power up the transceiver from the
 console side (for instance if using a MAX232-based transceiver).
 
-       CONTROL 2
-       o o o o o-- Vcc (5 Volts)
-        o o o o
-          | | `-- RX (PC TX)
-          | `---- Ground
-          `------ TX (PC RX)
+	   CONTROL 2
+	   o o o o o-- Vcc (5 Volts)
+		o o o o
+		  | | `-- RX (PC TX)
+		  | `---- Ground
+		  `------ TX (PC RX)
 
 Once connected and before running the bootloader, prepare the XMODEM transfer
 with the serial port configuration 8/N/1 at ??? bps. XMODEM program must 
@@ -38,17 +38,17 @@ Protocol and helper hardware in development! Pinout most likely will match the
 following diagram. RX/TX are signals from the Master System POV as with the
 UART mode diagram.
 
-       CONTROL 2
-         ,------- RX Data 1 (Nibble mode)
-         | ,------- RX Data 2 (Nibble mode)
-         | | ,--- RX Data 3 (Nibble mode)
-       o o o o o--- Vcc (5 Volts)
-       |o o o o
-       || | | `-- TX Clock
-       || | `------ Ground
-       || `------ TX Data
-       |`---------- RX Clock
-       `--------- RX Data 0 (Serial/Nibble mode)
+	   CONTROL 2
+		 ,------- RX Data 1 (Nibble mode)
+		 | ,------- RX Data 2 (Nibble mode)
+		 | | ,--- RX Data 3 (Nibble mode)
+	   o o o o o--- Vcc (5 Volts)
+	   |o o o o
+	   || | | `-- TX Clock
+	   || | `------ Ground
+	   || `------ TX Data
+	   |`---------- RX Clock
+	   `--------- RX Data 0 (Serial/Nibble mode)
 
 ## Protocol description
 

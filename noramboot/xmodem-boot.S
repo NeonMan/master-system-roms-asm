@@ -12,25 +12,25 @@
 	;  * Expected CRC or Checksum
 	;
 	; State machine:
-	;                  /<---------------------------------------------------------+<----------------------+
-	;                  |                                                          |                       |
-	; >[  Init  ]---[reqest]-->[wait SOH]---yes------->[read idx]-----incorrect---+                       |
-	;                  |<----------/<-------timeout--------´      |                                       |
-	;                  |                                          `---correct---->[read 128]+---timeout---+
-	;                  |                    /-timeout-\                                     |
-	;                  |<-----[reset packet]<--fail----[check crc]<--------success----------´
-	;                  \--[update packet]<---success--´
+	;				  /<---------------------------------------------------------+<----------------------+
+	;				  |														  |					   |
+	; >[  Init  ]---[reqest]-->[wait SOH]---yes------->[read idx]-----incorrect---+					   |
+	;				  |<----------/<-------timeout--------´	  |									   |
+	;				  |										  `---correct---->[read 128]+---timeout---+
+	;				  |					/-timeout-\									 |
+	;				  |<-----[reset packet]<--fail----[check crc]<--------success----------´
+	;				  \--[update packet]<---success--´
 	;
 	; Registers:
 	;
-	;  A    (General purpose)
-	; BC    current Byte; current paCket.
+	;  A	(General purpose)
+	; BC	current Byte; current paCket.
 	; DE
-	; HL    (General purpose)
+	; HL	(General purpose)
 	;
-	; IX    Current buffer address
-	; IY    
-	; SP    
+	; IX	Current buffer address
+	; IY	
+	; SP	
 	;
 	;  A'   Let's use
 	; BC'   these for
@@ -59,8 +59,8 @@ state_init:
 	;Byte <= 0
 	LD B, #0x00
 	;Buffer <= RAM_BASE_ADDRESS
-	LD HL, #0xC000    ;Master System RAM base address.
-	ld_ix_hl          ;Store on IX.
+	LD HL, #0xC000	;Master System RAM base address.
+	ld_ix_hl		  ;Store on IX.
 
 	JP state_start_transfer
 	
