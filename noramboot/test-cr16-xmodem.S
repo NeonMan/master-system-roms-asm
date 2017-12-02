@@ -109,7 +109,7 @@ perform_test:
 		;EX AF, AF ;Move Next byte to shadow regs
 		
 		EXX ;Perform CRC using shadow regs.
-		crc16_xmodem_alt
+		crc16_xmodem
 		EXX
 
 		DEC C
