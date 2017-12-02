@@ -407,6 +407,7 @@
 	.endm
 
 	;Same thing. Byte on A, CRC on HL
+	;232 bytes total. Is also faster, but uses AF' in addition to AF and HL
 	.macro crc16_xmodem_alt
 		;for (i = 0x80; i > 0; i >>= 1)  /*For each bit. MSB first, i is the mask*/
 
