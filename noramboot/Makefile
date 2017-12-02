@@ -1,7 +1,7 @@
 
 all: rom
 
-objects: noramboot.rel vdp.rel font.rel crc16-xmodem.rel xmodem-boot.rel
+objects: noramboot.rel vdp.rel font.rel xmodem-boot.rel
 
 noramboot.rel: noramboot.S
 	sdasz80 -l -o -g -s -g noramboot.S
@@ -11,9 +11,6 @@ vdp.rel: vdp.S
 
 font.rel: font.S
 	sdasz80 -l -o -g -s -g font.S
-
-crc16-xmodem.rel: crc16-xmodem.S
-	sdasz80 -l -o -g -s -g crc16-xmodem.S
 
 xmodem-boot.rel: xmodem-boot.S
 	sdasz80 -l -o -g -s -g xmodem-boot.S
