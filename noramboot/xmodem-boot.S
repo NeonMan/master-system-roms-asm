@@ -43,6 +43,14 @@
 	.include /macros.inc/
 	.include /crc16-xmodem.inc/
 
+; --- Macros, constants and stuff ---
+
+C_NAK = 0x15
+C_ACK = 0x06
+C_SOH = 0x01
+C_EOT = 0x04
+C_CRC = 0x43
+	
 ; --- Unit test mock functions ---
 
 
