@@ -17,4 +17,8 @@ makebin -p noramboot.ihx noramboot.sms
 makebin -p test-crc16-xmodem.ihx test-crc16-xmodem.sms
 makebin -p test-serial.ihx test-serial.sms
 
+python ..\scripts\fix-checksum.py noramboot.sms
+python ..\scripts\fix-checksum.py test-crc16-xmodem.sms
+python ..\scripts\fix-checksum.py test-serial.sms
+
 pause

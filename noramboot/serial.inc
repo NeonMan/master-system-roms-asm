@@ -1,8 +1,84 @@
 
+    UART_DOWN = 0xBB
+    UART_UP   = 0xFB
+    IO_PORT   = 0x3F
+
+	;Waits for one bit width
+	.macro tx_bit_delay
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		NOP
+		;NOP
+		;NOP
+	.endm
+	
+	.macro tx_send_bit ?bit_set ?bit_clr ?bit_end
+		RRCA
+		JR C, bit_set
+		JR NC, bit_clr
+		
+		bit_set:
+		JR NC, bit_end ;<-- This jump always fails. Equalizes bit width
+		EX AF, AF'
+		LD A, #UART_UP
+		JR bit_end
+		
+		bit_clr:
+		JR C, bit_end  ;<-- This jump always fails. Equalizes bit width
+		EX AF, AF'
+		LD A, #UART_DOWN
+		JR bit_end
+		
+		bit_end:
+		OUT (#IO_PORT),A
+		EX AF, AF'
+		tx_bit_delay
+	.endm
+
 	;Sends byte stored on A through serial port.
 	;	Uses: AF
 	.macro serial_write_inner
-		;Dummy macro, yet.
+		;Start bit
+		EX AF, AF'
+		LD A, #UART_DOWN      ;  7T
+		OUT (#IO_PORT),A      ; 11T
+		EX AF, AF'
+		tx_bit_delay
+		
+		;Data bits
+		tx_send_bit
+		tx_send_bit
+		tx_send_bit
+		tx_send_bit
+		
+		tx_send_bit
+		tx_send_bit
+		tx_send_bit
+		tx_send_bit
+		
+		;Stop bit (ignore, just send line up)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		LD A, #UART_UP        ;  7T
+		OUT (#IO_PORT),A      ; 11T
+		
 	.endm
 	
 	

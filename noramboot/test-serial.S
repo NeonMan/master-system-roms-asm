@@ -32,11 +32,22 @@
 	.ascii "/test-crc16-xmodem.S"
 	.include /macros.inc/
 	.include /crc16-xmodem.inc/
+	.include /serial.inc/
 
+	
+	
 txt_hello:
 	.ascii "------------------------------  "
 	.ascii "--   UART serial port test  --  "
 	.ascii "------------------------------  "
+	.db 0x00
+
+txt_dot:
+	.ascii "."
+	.db 0x00
+	
+txt_end:
+	.ascii "!!!"
 	.db 0x00
 
 
@@ -45,11 +56,56 @@ init:
 	LD SP, #0xE000
 	JP vdp_init
 vdp_init_ret::
+
+	
+	;Bring line up
+	;Pull line UP
+	LD A, #UART_UP        ;  7T
+	OUT (#IO_PORT),A      ; 11T
+	
 	;Show some info
 	puts #txt_hello
 
-	JR endloop
+	LD A, #0x00
+	LD B, A
+	LD C, A
+	
+	;B -> number of iterations
+	;C -> current iterations
+	;A -> Dirty, very dirty register.
+	
 
+	
+	
+	outer_loop:
+		puts #txt_dot
+		INC B
+		JP Z, end_text
+		LD A, B
+		LD C, A
+		
+        
+		;Pull line DOWN to send a start bit
+		LD A, #UART_DOWN      ;  7T
+		OUT (#IO_PORT),A      ; 11T
+			
+		bit_loop:
+			BIT #0, 0(IX) ;20 T-States on this instruction alone. With no side effects
+			DEC C
+			JR NZ, bit_loop
+			
+			;Pull line UP
+			LD A, #UART_UP        ;  7T
+			OUT (#IO_PORT),A      ; 11T
+			
+			JR outer_loop
+
+end_text:
+	puts #txt_end
+	
+	LD A, #0x55
+	serial_write
+	
 endloop:
 	JP endloop
 	
