@@ -42,18 +42,18 @@
 	
 	.include /macros.inc/
 	.include /crc16-xmodem.inc/
+	.include /serial.inc/
 
-; --- Macros, constants and stuff ---
-
-C_NAK = 0x15
-C_ACK = 0x06
+	BYTE_SOH=0x00
+	BYTE_CRC=0x00
+	BYTE_ACK=0x00
+	BYTE_NAK=0x00
 C_SOH = 0x01
 C_EOT = 0x04
 C_CRC = 0x43
 	
-; --- Unit test mock functions ---
-
-
+	
+	SMS_RAM_BASE_ADDRESS=0xC000
 	
 xmodem_boot::
 	;Go back to main routine; Transmission error?
@@ -67,30 +67,41 @@ state_init:
 	;Byte <= 0
 	LD B, #0x00
 	;Buffer <= RAM_BASE_ADDRESS
-	LD HL, #0xC000	;Master System RAM base address.
-	ld_ix_hl		  ;Store on IX.
+	LD HL, #SMS_RAM_BASE_ADDRESS
+	
+	ld_ix_hl ;Store on IX.
 
+	;Prepare serial.
+	serial_setup
+	
 	JP state_start_transfer
 	
 state_start_transfer:
 	;Request first packet, CRC mode
-	
+	LD A, #BYTE_CRC ;
+	serial_write    ; Send 'C'
 	JP state_first_soh
 	
 state_first_soh:
 	;Wait for the start of transmission byte.
 	;On success, continue, on timeout go back to start_transfer.
 	
-	JP C, state_read_id
-	JP state_start_transfer
+	serial_read
+	JP NC, state_start_transfer ;On error, restart
+	
+	CP A, #BYTE_SOH
+	JP NZ, state_start_transfer ;If not Start-of-transfer restart.
+	
+	JP state_read_id
 	
 state_read_id:
 	;Wait for the packet ID bytes
 	;On success go to 128b read.
 	;On timeout, wait and re-request packet
+	serial_read
+	JP NC, state_timeout
 	
-	JP C, state_read_payload
-	JP state_timeout
+	JP state_read_payload
 	
 state_read_payload:
 	;Read the 128B packet into memory
@@ -113,6 +124,8 @@ state_check_crc:
 state_ack:
 	;Prepare for next packet
 	;request next packet
+	LD A, #BYTE_ACK
+	serial_write
 	;Packet <= Packet + 1
 	INC C
 	;Byte <= 0
@@ -155,6 +168,8 @@ state_nack:
 	;B <= 0x00
 	LD B, #0x00
 	;Request same packet
+	LD A, #BYTE_NAK
+	serial_write
 	;Don't touch C.
 	JP state_wait_soh
 	
