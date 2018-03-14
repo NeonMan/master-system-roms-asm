@@ -44,26 +44,30 @@ color_line:
 	.db 0x20, 0x20, 0x20
 	.db 0x00
 
+
 asm_main:
 	CALL vdp_init
 	LD SP, #0xDFFF
+	
+	;Print the 7 color bars block.
 	LD D, #0x18
-	txt_loop:
+	screen1_loop:
 		LD HL, #color_line
-		line_loop:
+		line_colors_loop:
 			LD A, (HL)
 			INC HL
 			AND A, A
 			JR Z, line_end
 			LD B, #0x01
 			CALL putc
-			JR line_loop
+			JR line_colors_loop
 		line_end:
 		DEC D
 		LD A, D
 		AND A, A
-		JR NZ, txt_loop
-	txt_end:
+		JR NZ, screen1_loop
+	
+	
 	
 endloop:
 	JP endloop
