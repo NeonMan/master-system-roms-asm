@@ -9,6 +9,8 @@ sdasz80 -l -o -s -g xmodem-boot.S
 sdasz80 -l -o -s -g test-cr16-xmodem.S
 sdasz80 -l -o -s -g test-serial.S
 
+rem --- 128 for normal ROM
+rem --- 49152 for RAM base
 sdcc -o noramboot.ihx -mz80 --no-std-crt0 --code-loc 128 xmodem-boot.rel font.rel vdp.rel noramboot.rel
 sdcc -o test-crc16-xmodem.ihx -mz80 --no-std-crt0 --code-loc 128 font.rel vdp.rel test-cr16-xmodem.rel
 sdcc -o test-serial.ihx -mz80 --no-std-crt0 --code-loc 128 font.rel vdp.rel test-serial.rel
