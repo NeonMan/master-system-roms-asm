@@ -23,7 +23,37 @@
 		BIT #0, 0(IX)
 		BIT #0, 0(IX)
 		
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		BIT #0, 0(IX)
+		;BIT #0, 0(IX)
+		;BIT #0, 0(IX)
+		
 		NOP
+		NOP
+		NOP
+		NOP
+		
+		;NOP
+		;NOP
 		;NOP
 		;NOP
 	.endm
@@ -78,6 +108,7 @@
 		
 		LD A, #UART_UP        ;  7T
 		OUT (#IO_PORT),A      ; 11T
+		tx_bit_delay
 		
 	.endm
 	
@@ -127,7 +158,7 @@
 	;Actual macros that will be called
 	.macro serial_setup
 		;serial_setup
-		serial_setup_sim
+		;serial_setup_sim
 	.endm
 	
 	.macro serial_write
@@ -135,6 +166,6 @@
 	.endm
 	
 	.macro serial_read
-		;serial_read_inner
-		serial_read_sim
+		serial_read_inner
+		;serial_read_sim
 	.endm

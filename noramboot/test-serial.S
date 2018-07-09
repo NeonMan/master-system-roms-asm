@@ -47,7 +47,7 @@ txt_dot:
 	.db 0x00
 	
 txt_end:
-	.ascii "!!!"
+	.ascii "!!! "
 	.db 0x00
 
 
@@ -65,46 +65,18 @@ vdp_init_ret::
 	
 	;Show some info
 	puts #txt_hello
-
-	LD A, #0x00
-	LD B, A
-	LD C, A
-	
-	;B -> number of iterations
-	;C -> current iterations
-	;A -> Dirty, very dirty register.
-	
-
-	
-	
-	outer_loop:
-		puts #txt_dot
-		INC B
-		JP Z, end_text
-		LD A, B
-		LD C, A
-		
-        
-		;Pull line DOWN to send a start bit
-		LD A, #UART_DOWN      ;  7T
-		OUT (#IO_PORT),A      ; 11T
-			
-		bit_loop:
-			BIT #0, 0(IX) ;20 T-States on this instruction alone. With no side effects
-			DEC C
-			JR NZ, bit_loop
-			
-			;Pull line UP
-			LD A, #UART_UP        ;  7T
-			OUT (#IO_PORT),A      ; 11T
-			
-			JR outer_loop
-
-end_text:
-	puts #txt_end
-	
+	puts #txt_end	
 	LD A, #0x55
 	serial_write
+	
+	LD B, #0x00
+test_all:
+	LD A, B
+	serial_write
+	INC B
+	JP NZ, test_all
+	
+	puts #txt_end
 	
 endloop:
 	JP endloop

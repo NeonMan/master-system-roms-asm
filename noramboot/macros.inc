@@ -1,4 +1,20 @@
 	
+	; --- Utility macros
+	
+	; Clear carry flag
+	.macro CLRC ?flag_clr
+		JR NC, flag_clr
+		CCF
+		flag_clr:
+	.endm
+	
+	; Set carry flag
+	.macro SETC ?flag_set
+		JR C, flag_set
+		CCF
+		flag_set:
+	.endm
+	
 	; HL <- SP
 	.macro ld_hl_sp
 		LD HL, #0x00

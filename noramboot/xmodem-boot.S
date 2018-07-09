@@ -12,14 +12,17 @@
 	;  * Expected CRC or Checksum
 	;
 	; State machine:
-	;				  /<---------------------------------------------------------+<----------------------+
-	;				  |														  |					   |
-	; >[  Init  ]---[reqest]-->[wait SOH]---yes------->[read idx]-----incorrect---+					   |
-	;				  |<----------/<-------timeout--------´	  |									   |
-	;				  |										  `---correct---->[read 128]+---timeout---+
-	;				  |					/-timeout-\									 |
-	;				  |<-----[reset packet]<--fail----[check crc]<--------success----------´
-	;				  \--[update packet]<---success--´
+	;                  /<---------------------------------------------------------+<----------------------+
+	;                  |                                                          |                       |
+	; >[  Init  ]---[reqest]-->[wait SOH]---yes------->[read idx]-+---incorrect---+                       |
+	;                  |           |                       |      |                                       |
+	;                  |<--timeout-/<-------timeout--------´      |                                       |
+	;                  |                                          `---correct---->[read 128]-+--timeout---+
+	;                  |                   /<-timeout--\                                     |
+	;                  |                   |           |                                     |
+	;                  |<-----[reset packet]<--fail----[check crc]<--------success-----------´
+	;                  |                               |
+	;                  \--[update packet]<---success---´
 	;
 	; Registers:
 	;
@@ -41,19 +44,19 @@
 	.ascii "/xmodem-boot.S"
 	
 	.include /macros.inc/
-	.include /crc16-xmodem.inc/
+	.include /crc16-xmodem-alt.inc/
 	.include /serial.inc/
 
-	BYTE_SOH=0x00
-	BYTE_CRC=0x00
-	BYTE_ACK=0x00
-	BYTE_NAK=0x00
+	BYTE_SOH=0x01
+	BYTE_EOT=0x04
+	BYTE_CRC=0x43
+	BYTE_ACK=0x06
+	BYTE_NAK=0x15
 	
 	SMS_RAM_BASE_ADDRESS=0xC000
 	
 xmodem_boot::
-	;Go back to main routine; Transmission error?
-	JP xmodem_boot_ret
+	JP state_init
 	
 	;Check the marvelous state machine diagram, the dead trees version.
 state_init:
@@ -62,14 +65,18 @@ state_init:
 	LD C, #0x01
 	;Byte <= 0
 	LD B, #0x00
+	;D <= 0, E <= 0
+	LD D, #0x00
+	LD E, #0x00
 	;Buffer <= RAM_BASE_ADDRESS
 	LD HL, #SMS_RAM_BASE_ADDRESS
-	
-	ld_ix_hl ;Store on IX.
+	ld_ix_hl  ;Store on IX.
+	ld_iy_hl  ;And on IY.
+	LD SP, HL ;And on SP.
 
 	;Prepare serial.
 	serial_setup
-	
+	;Go to transfer
 	JP state_start_transfer
 	
 state_start_transfer:

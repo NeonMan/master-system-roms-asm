@@ -27,8 +27,15 @@
 	.org 0x0000
 	DI
 	JP init
+	
+	;; RAM entry point
+	;.org 0xC000
+	;DI
+	;JP init
 
 	.area _CODE (REL)
+	DI
+	JP init
 	.ascii "/test-crc16-xmodem.S"
 	.include /macros.inc/
 	.include /crc16-xmodem.inc/

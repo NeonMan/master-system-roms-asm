@@ -1,23 +1,23 @@
 
 	;; Imported functions
 
-	.area	_HEADER (ABS)
+	.area    _HEADER (ABS)
 	
 	;; SDSC ROM header
 	.org 0x7fe0
 	.ascii "SDSC"
-	.db 0xff,0xff			; Version (BCD)
-	.db 0xff,0xff,0xff,0xff	; Date DD/MM/YYYY (BCD)
-	.dw #sdsc_author		; Author pointer
-	.dw #sdsc_name			; Name pointer
-	.dw #sdsc_description	; Description pointer
+	.db 0xff,0xff            ; Version (BCD)
+	.db 0xff,0xff,0xff,0xff    ; Date DD/MM/YYYY (BCD)
+	.dw #sdsc_author        ; Author pointer
+	.dw #sdsc_name            ; Name pointer
+	.dw #sdsc_description    ; Description pointer
 	
 	;; SEGA header
 	.ascii "TMR SEGA"
-	.db 0xFF, 0xFF			;Reserved bytes
-	.db 0xFF, 0xFF			;Checksum
-	.db 0xFF, 0xFF, 0xFF	;Product code and version
-	.db 0x6c				;Export SEGA, 32K.
+	.db 0xFF, 0xFF            ;Reserved bytes
+	.db 0xFF, 0xFF            ;Checksum
+	.db 0xFF, 0xFF, 0xFF    ;Product code and version
+	.db 0x6c                ;Export SEGA, 32K.
 	
 	;;Make NMI RESET the ROM
 	.org 0x0066
@@ -33,27 +33,28 @@
 	.include /macros.inc/
 
 txt_countdown_padding:
-	.ascii "			 "
+	.ascii "             "
 	.db 0x00
 	
 txt_hello:
 	.ascii "------------------------------  "
-	.ascii "--	 N0RAM Bootloader	 --  "
+	.ascii "--     N0RAM Bootloader     --  "
 	.ascii "------------------------------  "
 	.ascii " Bootloader using UART/XMODEM   "
-	.ascii " Hold 2 to use Sync Serial	  "
-	.ascii "								"
+	.ascii " Hold 2 to use Sync Serial      "
+	.ascii "                                "
+	.ascii " Check manual for connection    "
+	.ascii " diagrams and further info      "
+	.ascii "                                "
 	.ascii " Booting in: "
 	.db 0x00
 txt_uart:
-	.ascii "								"
-	.ascii "Starting XMODEM transmission.   "
-	.ascii "Check docs for connection and   "
-	.ascii "Usage instructions.			 "
+	.ascii "                                "
+	.ascii " Starting XMODEM transmission   "
 	.db 0x00
 txt_syncserial:
-	.ascii "Protocol barely defined so...   "
-	.ascii "ToDo."
+	.ascii " SyncSerial not implemented!    "
+	.ascii " ToDo.                          "
 	.db 0x00
 	
 	;; Initialize
