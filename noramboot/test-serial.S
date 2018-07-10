@@ -80,8 +80,14 @@ test_all:
 	
 	puts #txt_end
 	
-endloop:
-	JP endloop
+echo_loop:
+	serial_read
+	JR C, echo_byte
+		JP echo_loop
+	echo_byte:
+		serial_write
+		tx_bit_delay
+		JP echo_loop
 	
 	;SDSC info
 sdsc_author::
