@@ -5,57 +5,113 @@
 
 	;Waits for one bit width
 	.macro tx_bit_delay
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
 		
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
 		
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
 		
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
 		
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
 		
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
 		
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		BIT #0, 0(IX)
-		;BIT #0, 0(IX)
-		;BIT #0, 0(IX)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
 		
 		NOP
-		NOP
-		NOP
-		NOP
-		
-		;NOP
-		;NOP
-		;NOP
-		;NOP
 	.endm
 	
 	.macro tx_send_bit ?bit_set ?bit_clr ?bit_end
