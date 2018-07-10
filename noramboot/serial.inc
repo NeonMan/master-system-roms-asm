@@ -1,10 +1,3 @@
-
-    UART_DOWN = 0xBB
-    UART_UP   = 0xFB
-    IO_PORT   = 0x3F
-	
-	READ_PORT = 0xDD
-
 	;Waits for one bit width
 	.macro tx_bit_delay
 		CP (HL)
@@ -116,6 +109,71 @@
 		NOP
 	.endm
 	
+	.macro rx_bit_extra_delay
+		CP (HL)
+		CP (HL)
+		CP (HL)
+	.endm
+	
+	.macro half_bit_delay
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+	.endm
+
+    UART_DOWN = 0xBB
+    UART_UP   = 0xFB
+    IO_PORT   = 0x3F
+	
+	READ_PORT = 0xDD
+	
 	.macro tx_send_bit ?bit_set ?bit_clr ?bit_end
 		RRCA
 		JR C, bit_set
@@ -167,6 +225,16 @@
 		LD A, #UART_UP        ;  7T
 		OUT (#IO_PORT),A      ; 11T
 	.endm
+
+	;Samples a bit, shifts result on B register MSB, waits for a bit
+	;    Uses: AF, D
+	.macro serial_read_bit
+			IN A, (#READ_PORT)
+			RLC A
+			RR D
+			tx_bit_delay
+			rx_bit_extra_delay
+	.endm
 	
 	;Reads byte from serial port.
 	;	On Success:
@@ -182,6 +250,7 @@
 	;	Uses: AF, D
 	.macro serial_read_inner ?start_bit_loop, ?start_bit_success, ?uart_end
 		LD D, #0x00
+		;Try detecting a start bit
 		start_bit_loop:
 			IN A, (#READ_PORT)        ;
 			RLC A                     ; Read line status into Carry bit
@@ -193,10 +262,28 @@
 			XOR A, A                  ; -OR-
 			JP uart_end               ; Timeout; return with error
 		
+		;Start bit detected, time to read a byte.
 		start_bit_success:
-			LD A, #0x55
-			SCF         ;Say we detected a 0x55
-		
+			LD D, #0x00
+			;Wait a whole bit so we get inside the LSB
+			tx_bit_delay
+			;Wait half a bit so we sample near the middle of a bit
+			half_bit_delay
+			
+			serial_read_bit
+			serial_read_bit
+			serial_read_bit
+			serial_read_bit
+			
+			serial_read_bit
+			serial_read_bit
+			serial_read_bit
+			serial_read_bit
+			
+			;We shall be lying above the STOP bit
+			;Load result on A and return success
+			LD A, D
+			SCF
 		uart_end:
 	.endm
 	
