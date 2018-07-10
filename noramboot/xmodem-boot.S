@@ -76,6 +76,8 @@ state_init:
 
 	;Prepare serial.
 	serial_setup
+	;Say we are ready
+	putc #0x21
 	;Go to transfer
 	JP state_start_transfer
 	
@@ -102,19 +104,41 @@ state_read_id:
 	;On success go to 128b read.
 	;On timeout, wait and re-request packet
 	serial_read
+	serial_read
 	JP NC, state_timeout
 	
-	JP state_read_payload
+	;Negated packet ID *should* be on `A`
+	NEG  ;Get real packet ID
+	CP C ;Compare against expected packet
+	JP Z, state_read_payload ;On success, goto next state
+	
+	;On error, timeout
+	JP state_timeout
 	
 state_read_payload:
 	;Read the 128B packet into memory
 	;On success, check CRC
 	;On timeout, wait and re-request
+	LD B, #128
+	next_payload_byte:
+		serial_read           ;Read byte.
+		JP NC, state_timeout  ;On error, re-request
+		LD 0(IX), A          ;
+		INC IX               ;Copy byte to RAM
+		DEC B
+	JP NZ, next_payload_byte  ;Get next byte
 	
-	JP C, state_check_crc
-	JP state_timeout
+	;JP state_check_crc
 	
 state_check_crc:
+	;read CRC bytes
+	serial_read
+	JP NC, state_timeout  ;On error, re-request
+	LD B, A
+	serial_read
+	JP NC, state_timeout  ;On error, re-request
+	LD C, A
+	
 	;Check integrity.
 	;On success, ACK
 	;On error, NACK
@@ -151,13 +175,15 @@ state_wait_soh:
 state_chainload:
 	;Jump to ram base adress
 	;JP RAM_BASE_ADDRESS
-	
+	JP state_chainload
 	; --- Error states ---
 state_timeout:
 	;Wait enough time for a packet to pass, then retry
 	JP state_nack
 	
 state_nack:
+	JP state_init
+	
 	;Reset state
 	;IX <= IX - current_byte
 	ld_hl_ix

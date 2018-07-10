@@ -254,11 +254,12 @@
 		start_bit_loop:
 			IN A, (#READ_PORT)        ;
 			RLC A                     ; Read line status into Carry bit
-			
 			JR NC, start_bit_success  ; If low, try reading byte
 			
+			CP (HL)                   ;
+			CP (HL)                   ; Add some delay
 			DEC D                     ;
-			JR NZ, start_bit_loop     ; Otherwise retry 
+			JR NZ, start_bit_loop     ; And retry 
 			XOR A, A                  ; -OR-
 			JP uart_end               ; Timeout; return with error
 		
