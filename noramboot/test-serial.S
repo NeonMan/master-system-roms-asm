@@ -95,11 +95,13 @@ sdsc_author::
 	.db 0x00
 
 sdsc_name::
-	.ascii "Test the software serial port."
+	.ascii "Serial port test."
 	.db 0x00
 
 sdsc_description::
-	.ascii "Just that."
+	.ascii "Prints all bytes from 0x00 to 0xFF "
+	.ascii "then keeps echoing anything on the "
+	.ascii "RX line into the TX line."
 	.db 0x00
 	;End of file
 	.ascii "uwu "
