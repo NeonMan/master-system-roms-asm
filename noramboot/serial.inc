@@ -164,8 +164,6 @@
 		
 		LD A, #UART_UP        ;  7T
 		OUT (#IO_PORT),A      ; 11T
-		tx_bit_delay
-		
 	.endm
 	
 	

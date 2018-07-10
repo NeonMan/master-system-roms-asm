@@ -68,11 +68,13 @@ vdp_init_ret::
 	puts #txt_end	
 	LD A, #0x55
 	serial_write
+	tx_bit_delay ;Add stop bit since we will send multiple Bytes.
 	
 	LD B, #0x00
 test_all:
 	LD A, B
 	serial_write
+	tx_bit_delay ;Add stop bit since we will send multiple Bytes.
 	INC B
 	JP NZ, test_all
 	
