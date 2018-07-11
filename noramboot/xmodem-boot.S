@@ -104,12 +104,13 @@ state_read_id:
 	;On success go to 128b read.
 	;On timeout, wait and re-request packet
 	serial_read
+	JP NC, state_timeout
 	serial_read
 	JP NC, state_timeout
 	
 	;Negated packet ID *should* be on `A`
-	NEG  ;Get real packet ID
-	CP C ;Compare against expected packet
+	XOR A, #0xFF  ;Get real packet ID
+	CP A, C       ;Compare against expected packet
 	JP Z, state_read_payload ;On success, goto next state
 	
 	;On error, timeout
@@ -123,12 +124,11 @@ state_read_payload:
 	next_payload_byte:
 		serial_read           ;Read byte.
 		JP NC, state_timeout  ;On error, re-request
-		LD 0(IX), A          ;
-		INC IX               ;Copy byte to RAM
+		LD 0(IX), A           ;
+		INC IX                ;Copy byte to RAM
 		DEC B
 	JP NZ, next_payload_byte  ;Get next byte
-	
-	;JP state_check_crc
+	JP state_check_crc
 	
 state_check_crc:
 	;read CRC bytes
@@ -201,5 +201,27 @@ state_nack:
 	serial_write
 	;Don't touch C.
 	JP state_wait_soh
+	
+	
+state_error_one:
+putc #0x31
+JP state_error
+
+state_error_two:
+putc #0x32
+JP state_error
+
+state_error_three:
+putc #0x33
+JP state_error
+
+state_error_four:
+putc #0x34
+JP state_error
+
+state_error:
+JP state_error
+	
+	
 	
 	.ascii "uwu "

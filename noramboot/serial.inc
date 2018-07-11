@@ -226,7 +226,7 @@
 		OUT (#IO_PORT),A      ; 11T
 	.endm
 
-	;Samples a bit, shifts result on B register MSB, waits for a bit
+	;Samples a bit, shifts result on D register MSB, waits for a bit
 	;    Uses: AF, D
 	.macro serial_read_bit
 			IN A, (#READ_PORT)
