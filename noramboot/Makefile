@@ -16,8 +16,9 @@ xmodem-boot.rel: xmodem-boot.S
 	sdasz80 -l -o -g -s -g xmodem-boot.S
 
 rom: objects
-	sdcc -o noramboot.ihx -mz80 --no-std-crt0 --code-loc 128 *.rel
+	sdcc -o noramboot.ihx -mz80 --no-std-crt0 --code-loc 128 --no-peep --no-peep-return *.rel
 	makebin -p noramboot.ihx noramboot.sms
+	python3 ../scripts/fix-checksum.py noramboot.sms
 
 clean:
 	-rm *.rel

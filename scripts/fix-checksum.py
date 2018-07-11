@@ -26,6 +26,7 @@
 # Region       0.5B
 # ROM size     0.5B
 
+import os
 import sys
 
 USAGE = '''\
@@ -44,12 +45,14 @@ if __name__ == '__main__':
   mode = "32"
   try:
     mode = sys.argv[2]
-    print("Forcing checksum mode:", mode)
   except:
     pass
+  print("Checksum mode: %sKB" % mode)
   buff = None
   
   with open(path_in, 'rb') as f:
+    f_size = os.stat(path_in).st_size
+    print("ROM size: %dKB (%dB)" % (int(round(f_size/1024.0)), int(f_size)))
     buff = f.read()
     f.close()
   
@@ -72,7 +75,7 @@ if __name__ == '__main__':
     header_location = (8*1024) - 16
     header_size = 0x4A
     
-  
+    
   sum = 0
   
   if mode == '8':
