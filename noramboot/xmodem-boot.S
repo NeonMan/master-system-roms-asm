@@ -219,6 +219,16 @@ state_wait_soh:
 	JP state_read_id
 	
 state_chainload:
+	;Everything is ready! send a few ACKs back and boot
+	LD D, #5
+	ack_loop:
+		LD A, #BYTE_ACK
+		serial_write
+		tx_bit_delay
+		tx_bit_delay
+		DEC D
+	JP NZ, ack_loop
+		
 	;Jump to ram base adress
 	JP ram_base_address
 	.db 0xC3, 0x00, 0xC0
