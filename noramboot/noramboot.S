@@ -27,6 +27,10 @@
 	.org 0x0000
 	DI
 	JP init
+	
+	;; RAM base address
+	.org 0xC000
+ram_base_address::
 
 	.area _CODE (REL)
 	.ascii "/noramboot.S"

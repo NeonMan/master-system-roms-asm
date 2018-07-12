@@ -200,15 +200,15 @@ state_wait_soh:
 	;Wait for a packet start
 	serial_read
 	JP NC, state_timeout
-	;If SOH, check it would fit
-	CP A, #BYTE_SOH
-	JR test_max_packet
 	;If EOT, chainload.
 	CP A, #BYTE_EOT
 	JP Z, state_chainload
 	
+	;If SOH, check it would fit
+	CP A, #BYTE_SOH
+	JP NZ, state_error_four ;state_timeout
+	
 	;Check if this packet is above 64
-	test_max_packet:
 	LD A, C
 	SUB A, #65 ; IF result is positive (or zero) is too big
 	AND A, #0x80
@@ -220,10 +220,12 @@ state_wait_soh:
 	
 state_chainload:
 	;Jump to ram base adress
-	;JP RAM_BASE_ADDRESS
-	;JP state_chainload
-	JP state_error_one
-	; --- Error states ---
+	JP ram_base_address
+	.db 0xC3, 0x00, 0xC0
+	
+; --------------------
+; --- Error states ---
+; --------------------
 	
 state_is_too_big:
 	JP state_error_two

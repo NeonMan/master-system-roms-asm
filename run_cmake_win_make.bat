@@ -1,7 +1,7 @@
 @echo off
 
 rem Make sure NMake is available on the PATH
-set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin
+set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin;C:\Program Files (x86)\GnuWin32\bin
 
 goto menu
 
