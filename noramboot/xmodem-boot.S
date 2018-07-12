@@ -44,7 +44,7 @@
 	.ascii "/xmodem-boot.S"
 	
 	.include /macros.inc/
-	.include /crc16-xmodem-alt.inc/
+	.include /crc16-xmodem.inc/
 	.include /serial.inc/
 
 	BYTE_SOH=0x01
@@ -70,9 +70,9 @@ state_init:
 	LD E, #0x00
 	;Buffer <= RAM_BASE_ADDRESS
 	LD HL, #SMS_RAM_BASE_ADDRESS
-	ld_ix_hl  ;Store on IX.
-	ld_iy_hl  ;And on IY.
-	LD SP, HL ;And on SP.
+	LD IX, #SMS_RAM_BASE_ADDRESS
+	LD IY, #SMS_RAM_BASE_ADDRESS
+	LD SP, #SMS_RAM_BASE_ADDRESS
 
 	;Prepare serial.
 	serial_setup
@@ -134,54 +134,106 @@ state_check_crc:
 	;read CRC bytes
 	serial_read
 	JP NC, state_timeout  ;On error, re-request
-	LD B, A
+	LD H, A
 	serial_read
 	JP NC, state_timeout  ;On error, re-request
-	LD C, A
+	LD L, A
 	
 	;Check integrity.
-	;On success, ACK
-	;On error, NACK
+	; DE will hold hold the packet CRC (Copied from current HL)
+	; HL will hold the calculated CRC
+	; B is temporary free, since it is always Zero at this point
+	; IX holds the next packet base address
+	; IY holds the previous packet base address
 	
-	crc16_xmodem
+	;First, restore IX to its previous value
+	AND A, A ; Clear carry
+	LD DE, #-128
+	ADD IX,DE
 	
-	JP C, state_ack
-	JP state_nack
+	;Copy CRC value back to DE
+	LD D, H
+	LD E, L
+	
+	;Init CRC
+	LD HL, #0x0000
+	;For each byte
+	LD B, #128
+	crc_loop:
+		LD A, 0(IX)
+		crc16_xmodem
+		;Next CRC on HL
+		INC IX
+		DEC B
+	JP NZ, crc_loop
+	
+	;Packet CRC on HL
+	;Expected CRC on DE
+	LD A, D
+	CP A, H
+	JP NZ, state_nack
+	LD A, E
+	CP A, L
+	JP NZ, state_nack
+	JP state_ack
 
 state_ack:
 	;Prepare for next packet
+	;Packet <= Packet + 1
+	INC C
+	
+	;Print a dot every 4 packets
+	LD A, C
+	AND A, #0x03
+	JP NZ, no_dot_for_you
+		putc #0x2E
+	no_dot_for_you:
+	
+	;IX should be already pointed towards the next address.
 	;request next packet
 	LD A, #BYTE_ACK
 	serial_write
-	;Packet <= Packet + 1
-	INC C
-	;Byte <= 0
-	LD B, #0x00
-	;IX should be already pointed towards the next address.
 
 	JP state_wait_soh
 	
 state_wait_soh:
-	;Wait for a transfer start
-	;On success, get id
-	;On timeout, re-request
-	;On Eond of Transmission, Boot.
-	;Note: Needs argument to see if it needs send an ACK or NACK
-	JP C, state_read_id
-	JP state_ack
-	JP state_nack
-	JP state_chainload
+	;Wait for a packet start
+	serial_read
+	JP NC, state_timeout
+	;If SOH, check it would fit
+	CP A, #BYTE_SOH
+	JR test_max_packet
+	;If EOT, chainload.
+	CP A, #BYTE_EOT
+	JP Z, state_chainload
+	
+	;Check if this packet is above 64
+	test_max_packet:
+	LD A, C
+	SUB A, #65 ; IF result is positive (or zero) is too big
+	AND A, #0x80
+	JP Z, state_is_too_big
+	
+	
+	;On success, jump to state_read_id and continue cycle.
+	JP state_read_id
 	
 state_chainload:
 	;Jump to ram base adress
 	;JP RAM_BASE_ADDRESS
-	JP state_chainload
+	;JP state_chainload
+	JP state_error_one
 	; --- Error states ---
+	
+state_is_too_big:
+	JP state_error_two
+
 state_timeout:
 	;Wait enough time for a packet to pass, then retry
 	JP state_nack
 	
 state_nack:
+	JP state_error_four
 	JP state_init
 	
 	;Reset state
@@ -205,6 +257,23 @@ state_nack:
 	
 state_error_one:
 putc #0x31
+;Dump CRC
+;	LD A, D
+;	serial_write
+;	tx_bit_delay
+;	LD A, E
+;	serial_write
+;	tx_bit_delay
+;	tx_bit_delay
+;Dump the 128 bytes pointed by IY
+;LD B, #128
+;dump_loop:
+;	LD A, 0(IY)
+;	INC IY
+;	serial_write
+;	tx_bit_delay
+;	DEC B
+;	JP NZ, dump_loop
 JP state_error
 
 state_error_two:

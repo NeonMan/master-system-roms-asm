@@ -247,24 +247,29 @@
 	;	Error codes:
 	;		0: Timeout
 	;
-	;	Uses: AF, D
+	;	Uses: AF, HL'
 	.macro serial_read_inner ?start_bit_loop, ?start_bit_success, ?uart_end
-		LD D, #0x00
+		EXX
+		LD HL, #0x07FF ;Retry count
 		;Try detecting a start bit
 		start_bit_loop:
 			IN A, (#READ_PORT)        ;
 			RLC A                     ; Read line status into Carry bit
 			JR NC, start_bit_success  ; If low, try reading byte
 			
-			CP (HL)                   ;
-			CP (HL)                   ; Add some delay
-			DEC D                     ;
-			JR NZ, start_bit_loop     ; And retry 
-			XOR A, A                  ; -OR-
-			JP uart_end               ; Timeout; return with error
+			DEC HL                    ;
+			LD A, H                   ;
+			AND A, A                  ;
+			JR NZ, start_bit_loop     ; H is zero, so is A
+			CP A, L                   ; If L is then nonzero
+			JR NZ, start_bit_loop     ; Retry 
+		EXX
+		XOR A, A                  ; Otherwise
+		JP uart_end               ; Timeout; return with error
 		
 		;Start bit detected, time to read a byte.
 		start_bit_success:
+			EXX
 			LD D, #0x00
 			;Wait a whole bit so we get inside the LSB
 			tx_bit_delay
