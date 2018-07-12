@@ -42,23 +42,34 @@ txt_countdown_padding:
 	
 txt_hello:
 	.ascii "------------------------------  "
-	.ascii "--     N0RAM Bootloader     --  "
+	.ascii "-- N0RAM  XMODEM Bootloader --  "
+	.ascii "--            heavydeck.net --  "
 	.ascii "------------------------------  "
-	.ascii " Bootloader using UART/XMODEM   "
-	.ascii " Hold 2 to use Sync Serial      "
+	.ascii " Connect UART transceiver on    "
+	.ascii " the CONTROL 2 port as shown    "
 	.ascii "                                "
-	.ascii " Check manual for connection    "
-	.ascii " diagrams and further info      "
+	.ascii " CONTROL 2     Serial config    "
+	.ascii " o o o o o     4800bps 8/N/1    "
+	.ascii "  o o o o                       "
+	.ascii "    | | `-- RX (PC TX)          "
+	.ascii "    | `---- Ground              "
+	.ascii "    `------ TX (PC RX)          "
 	.ascii "                                "
 	.ascii " Booting in: "
 	.db 0x00
 txt_uart:
 	.ascii "                                "
-	.ascii " Starting XMODEM transmission   "
+	.ascii " Starting XMODEM transmission    " ;<-- Extra ' ' intentional.
 	.db 0x00
-txt_syncserial:
-	.ascii " SyncSerial not implemented!    "
-	.ascii " ToDo.                          "
+txt_shitpost:
+	.ascii "                                "
+	.ascii "      *purr*                    "
+	.ascii "              |\__/,|   (`\     "
+	.ascii "   *purr*     |_ _  |.--.) )    "
+	.ascii "              ( T   )     /     "
+	.ascii "             (((^_(((/(((_>     "
+	.ascii "                                "
+	.ascii " Press [PAUSE] to pet the cat   "
 	.db 0x00
 	
 	;; Initialize
@@ -83,8 +94,8 @@ vdp_init_ret::
 	;Read control port 1
 	IN A, (#0xDC)
 	AND A, #0x20 ;Mask button 2
-	;If 1 or 2 are pressed jump to SyncSerial
-	JR Z, use_syncserial
+	;If 1 or 2 are pressed jump to Shitpost
+	JR Z, use_shitpost
 	
 	;Use UART
 	puts #txt_uart
@@ -93,9 +104,9 @@ vdp_init_ret::
 xmodem_boot_ret::
 	JR endloop
 	
-	;Use SyncSerial
-use_syncserial:
-	puts #txt_syncserial
+	;Show some shitpost
+use_shitpost:
+	puts #txt_shitpost
 	JR endloop
 	
 endloop:

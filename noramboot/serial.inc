@@ -247,7 +247,7 @@
 	;	Error codes:
 	;		0: Timeout
 	;
-	;	Uses: AF, HL'
+	;	Uses: AF, D, HL'
 	.macro serial_read_inner ?start_bit_loop, ?start_bit_success, ?uart_end
 		EXX
 		LD HL, #0x07FF ;Retry count

@@ -54,6 +54,18 @@
 	BYTE_NAK=0x15
 	
 	SMS_RAM_BASE_ADDRESS=0xC000
+
+str_transfer_timed_out:
+	.ascii "                              "
+	.ascii " Timeout! Reset the console     "
+	.ascii " pressing the [PAUSE] button    "
+	.db 0x00
+str_transfer_ok:
+	.ascii " OK!"
+	.db 0x00
+str_transfer_too_big:
+	.ascii " ERR!"
+	.db 0x00
 	
 xmodem_boot::
 	JP state_init
@@ -77,16 +89,31 @@ state_init:
 	;Prepare serial.
 	serial_setup
 	;Say we are ready
-	putc #0x21
+	putc #0x21 ; <-- Print a '!' char
+	
+	;Use E' for retry count
+	;EXX
+	LD E, #32
+	;EXX
+	
 	;Go to transfer
 	JP state_start_transfer
 	
 state_start_transfer:
+	;Check timeout
+	;EXX
+	DEC E
+	;EXX
+	JP Z, state_timed_out
 	;Request first packet, CRC mode
 	LD A, #BYTE_CRC ;
 	serial_write    ; Send 'C'
 	JP state_first_soh
-	
+
+state_timed_out:
+	puts #str_transfer_timed_out
+	JP state_error
+
 state_first_soh:
 	;Wait for the start of transmission byte.
 	;On success, continue, on timeout go back to start_transfer.
@@ -228,7 +255,8 @@ state_chainload:
 		tx_bit_delay
 		DEC D
 	JP NZ, ack_loop
-		
+	;Say OK!
+	puts #str_transfer_ok
 	;Jump to ram base adress
 	JP ram_base_address
 	.db 0xC3, 0x00, 0xC0
@@ -238,8 +266,9 @@ state_chainload:
 ; --------------------
 	
 state_is_too_big:
-	JP state_error_two
-
+	puts #str_transfer_too_big
+	JP state_error
+	
 state_timeout:
 	;Wait enough time for a packet to pass, then retry
 	JP state_nack
@@ -269,23 +298,6 @@ state_nack:
 	
 state_error_one:
 putc #0x31
-;Dump CRC
-;	LD A, D
-;	serial_write
-;	tx_bit_delay
-;	LD A, E
-;	serial_write
-;	tx_bit_delay
-;	tx_bit_delay
-;Dump the 128 bytes pointed by IY
-;LD B, #128
-;dump_loop:
-;	LD A, 0(IY)
-;	INC IY
-;	serial_write
-;	tx_bit_delay
-;	DEC B
-;	JP NZ, dump_loop
 JP state_error
 
 state_error_two:
