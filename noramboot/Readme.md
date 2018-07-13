@@ -25,9 +25,13 @@ Once connected and before running the bootloader, prepare the XMODEM transfer
 with the serial port configuration 8/N/1 at 4800 bps. XMODEM program must 
 support CRC mode since the bootloader won't accept the original SUM mode.
 
+At any time the ROM can be reset by pressing the [PAUSE] button.
+
 At the end of the transmission the ROM will be immediatly chainloaded.
 
 # Feedback
 
 Feel free to drop a line at `root@heavydeck.net` for feedback or anything that
-crosses your mind.
+crosses your mind. More projects and stuff at my site! [heavydeck.net][site]
+
+[site]: http://heavydeck.net/
