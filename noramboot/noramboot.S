@@ -118,12 +118,15 @@ sdsc_author::
 	.db 0x00
 
 sdsc_name::
-	.ascii "N0RAM Bootloader for Master System"
+	.ascii "N0RAM -- XMODEM Bootloader for Master System"
 	.db 0x00
 
 sdsc_description::
-	.ascii "Put a proper description when the program is complete and "
-	.ascii "free rom is not an issue."
+	.ascii "A program to easily upload a program on the SEGA Master "
+	.ascii "System without a need to flash any EPROM. This program "
+	.ascii "can load a binary of up to 8KB (All the SMS ROM) using "
+	.ascii "the XMODEM protocol. ROMs shall be prepared to run from "
+	.ascii "RAM base address 0xC000 instead of the regular 0x0000."
 	.db 0x00
 	;End of file
 	.ascii "uwu "
