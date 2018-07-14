@@ -7,9 +7,9 @@
 	.org 0x7fe0
 	.ascii "SDSC"
 	.db 0xff,0xff            ; Version (BCD)
-	.db 0xff,0xff,0xff,0xff    ; Date DD/MM/YYYY (BCD)
-	.dw #sdsc_author        ; Author pointer
-	.dw #sdsc_name            ; Name pointer
+	.db 0xff,0xff,0xff,0xff  ; Date DD/MM/YYYY (BCD)
+	.dw #sdsc_author         ; Author pointer
+	.dw #sdsc_name           ; Name pointer
 	.dw #sdsc_description    ; Description pointer
 	
 	;; SEGA header
@@ -43,7 +43,7 @@ txt_countdown_padding:
 txt_hello:
 	.ascii "------------------------------  "
 	.ascii "-- N0RAM  XMODEM Bootloader --  "
-	.ascii "--            heavydeck.net --  "
+	.ascii "-- V1.0       heavydeck.net --  "
 	.ascii "------------------------------  "
 	.ascii " Connect UART transceiver on    "
 	.ascii " the CONTROL 2 port as shown    "
@@ -51,9 +51,9 @@ txt_hello:
 	.ascii " CONTROL 2     Serial config    "
 	.ascii " o o o o o     4800bps 8/N/1    "
 	.ascii "  o o o o                       "
-	.ascii "    | | `-- RX (PC TX)          "
+	.ascii "    | | `-- TX (PC RX)          "
 	.ascii "    | `---- Ground              "
-	.ascii "    `------ TX (PC RX)          "
+	.ascii "    `------ RX (PC TX)          "
 	.ascii "                                "
 	.ascii " Booting in: "
 	.db 0x00
