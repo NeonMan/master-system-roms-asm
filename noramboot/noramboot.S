@@ -42,32 +42,21 @@ txt_countdown_padding:
 	
 txt_hello:
 	;Horizontal bar
-	.db 0x82, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-	.db 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-	.db 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-	.db 0x80, 0x80, 0x80, 0x80, 0x80, 0x83, 0x20, 0x20
-	
-	.db 0x81
-	.ascii   " N0RAM    XMODEM Bootloader "
-	.db 0x81, 0x20, 0x20
-	
-	.db 0x81
-	.ascii   " V1.1         heavydeck.net "
-	.db 0x81, 0x20, 0x20
-	;Horizontal bar
-	.db 0x84, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-	.db 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-	.db 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
-	.db 0x80, 0x80, 0x80, 0x80, 0x80, 0x85, 0x20, 0x20
+	.ascii "{~~~~~~~~~~~~~~~~~~~~~~~~~~~~}  "
+	.ascii "| N0RAM    XMODEM Bootloader |  "
+	.ascii "| V1.1         heavydeck.net |  "
+	.ascii "[~~~~~~~~~~~~~~~~~~~~~~~~~~~~]  "
+
+
 	.ascii " Connect UART transceiver on    "
 	.ascii " the CONTROL 2 port as shown    "
 	.ascii "                                "
 	.ascii " CONTROL 2     Serial config    "
 	.ascii " o o o o o     9600bps 8/N/1    "
 	.ascii "  o o o o                       "
-	.ascii "    | | `-- TX (PC RX)          "
-	.ascii "    | `---- Ground              "
-	.ascii "    `------ RX (PC TX)          "
+	.ascii "    | | [~~ TX (PC RX)          "
+	.ascii "    | [~~~~ Ground              "
+	.ascii "    [~~~~~~ RX (PC TX)          "
 	.ascii "                                "
 	.ascii " Booting in: "
 	.db 0x00
@@ -83,7 +72,7 @@ txt_shitpost:
 	.ascii "              ( T   )     /     "
 	.ascii "             (((^_(((/(((_>     "
 	.ascii "                                "
-	.ascii " Press [PAUSE] to pet the cat   "
+	.ascii " Press <PAUSE> to pet the cat   "
 	.db 0x00
 	
 	;; Initialize

@@ -58,7 +58,7 @@
 str_transfer_timed_out:
 	.ascii "                              "
 	.ascii " Timeout! Reset the console     "
-	.ascii " pressing the [PAUSE] button    "
+	.ascii " pressing the <PAUSE> button    "
 	.db 0x00
 str_transfer_ok:
 	.ascii " OK!"
