@@ -52,7 +52,7 @@ txt_hello:
 	.db 0x81, 0x20, 0x20
 	
 	.db 0x81
-	.ascii   " V1.0         heavydeck.net "
+	.ascii   " V1.1         heavydeck.net "
 	.db 0x81, 0x20, 0x20
 	;Horizontal bar
 	.db 0x84, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
@@ -63,7 +63,7 @@ txt_hello:
 	.ascii " the CONTROL 2 port as shown    "
 	.ascii "                                "
 	.ascii " CONTROL 2     Serial config    "
-	.ascii " o o o o o     4800bps 8/N/1    "
+	.ascii " o o o o o     9600bps 8/N/1    "
 	.ascii "  o o o o                       "
 	.ascii "    | | `-- TX (PC RX)          "
 	.ascii "    | `---- Ground              "

@@ -1,110 +1,110 @@
 	;Waits for one bit width
 	.macro tx_bit_delay
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		;CP (HL)
+		;CP (HL) ;7*10 70T
+		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		
 		NOP
 	.endm
@@ -113,57 +113,58 @@
 		CP (HL)
 		CP (HL)
 		CP (HL)
+		NOP
 	.endm
 	
 	.macro half_bit_delay
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
-		CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+		
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
+		;CP (HL)
 		CP (HL)
 		CP (HL)
 	.endm
@@ -229,9 +230,18 @@
 	;Samples a bit, shifts result on D register MSB, waits for a bit
 	;    Uses: AF, D
 	.macro serial_read_bit
-			IN A, (#READ_PORT)
-			RLC A
-			RR D
+			IN A, (#READ_PORT) ; 11T
+			RLC A              ; 8T
+			RR D               ; 8T  -> 
+			NOP
+			NOP
+			
+			; Sampling test code
+			;LD A, #UART_DOWN  ; 7T
+			;OUT (#IO_PORT),A  ; 11T
+			;LD A, #UART_UP    ; 7T
+			;OUT (#IO_PORT),A  ; 11T  -> 36T
+			
 			tx_bit_delay
 			rx_bit_extra_delay
 	.endm

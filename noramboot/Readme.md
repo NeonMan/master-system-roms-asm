@@ -22,7 +22,7 @@ console side (for instance if using a MAX232-based transceiver).
           `------ Console RX (PC TX)
 
 Once connected and before running the bootloader, prepare the XMODEM transfer
-with the serial port configuration 8/N/1 at 4800 bps. XMODEM program must 
+with the serial port configuration 8/N/1 at 9600 bps. XMODEM program must 
 support CRC mode since the bootloader won't accept the original SUM mode.
 
 At any time the ROM can be reset by pressing the [PAUSE] button.
