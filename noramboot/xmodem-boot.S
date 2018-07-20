@@ -58,7 +58,7 @@
 str_transfer_timed_out:
 	.ascii "                              "
 	.ascii " Timeout! Reset the console     "
-	.ascii " pressing the <PAUSE> button    "
+	.ascii " pressing the <RESET> button    "
 	.db 0x00
 str_transfer_ok:
 	.ascii " OK!"
@@ -313,7 +313,8 @@ putc #0x34
 JP state_error
 
 state_error:
-JP state_error
+;Go back to the main routine
+JP xmodem_boot_ret
 	
 	
 	

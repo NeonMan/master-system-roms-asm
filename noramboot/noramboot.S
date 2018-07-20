@@ -72,11 +72,21 @@ txt_shitpost:
 	.ascii "              ( T   )     /     "
 	.ascii "             (((^_(((/(((_>     "
 	.ascii "                                "
-	.ascii " Press <PAUSE> to pet the cat   "
+	.ascii " Press <RESET> to pet the cat   "
 	.db 0x00
 	
 	;; Initialize
 init:
+	;Put mapper in a known state
+	LD HL, #0xFFFC
+	LD (HL), #0x00
+	INC HL
+	LD (HL), #0x00
+	INC HL
+	LD (HL), #0x01
+	INC HL
+	LD (HL), #0x02
+	;Prepare VDP
 	JP vdp_init
 vdp_init_ret::
 	;Show some info
@@ -113,6 +123,11 @@ use_shitpost:
 	JR endloop
 	
 endloop:
+	;If RESET button is pressed, jump to 0x0000
+	IN A, (#0xDD)
+	AND A, #0x10
+	JP Z, #0x0000
+	;Otherwise, wait.
 	JP endloop
 	
 	;SDSC info
