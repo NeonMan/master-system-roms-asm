@@ -104,7 +104,7 @@
 		;CP (HL)
 		;CP (HL)
 		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		
 		NOP
 	.endm
@@ -187,7 +187,6 @@
 		JR bit_end
 		
 		bit_clr:
-		JR C, bit_end  ;<-- This jump always fails. Equalizes bit width
 		EX AF, AF'
 		LD A, #UART_DOWN
 		JR bit_end
