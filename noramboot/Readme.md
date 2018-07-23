@@ -39,5 +39,10 @@ windows, on windows 10 using an off-the-shelf 5V USB-to-UART converter.
 Feel free to drop a line at `root@heavydeck.net` for feedback or anything that
 crosses your mind. More projects and stuff at my site! [heavydeck.net][site]
 
+# Version history
+
+* `V1.0` Working transmission, 4800bps
+* `V1.1` Performance upgrade to 9600bps
+
 [tt]: https://ttssh2.osdn.jp/index.html.en
 [site]: http://heavydeck.net/
