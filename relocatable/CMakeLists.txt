@@ -55,7 +55,7 @@ ADD_CUSTOM_TARGET(xmdump-bin ALL
         COMMAND makebin -p -s 57344 xmdump.ihx xmdump-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py xmdump-raw.sms xmdump.sms 49152
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py xmdump-raw.sms 8
-		DEPENDS simple-bios
+		DEPENDS xmdump
     )
 
 ADD_CUSTOM_TARGET(test-canary-bin ALL
@@ -64,7 +64,7 @@ ADD_CUSTOM_TARGET(test-canary-bin ALL
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/fix-checksum.py test-canary-raw.sms 8
 		DEPENDS test-canary
     )
-    
+
 ADD_CUSTOM_TARGET(test-mapper-bin ALL
         COMMAND makebin -p -s 57344 test-mapper.ihx test-mapper-raw.sms
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/trim.py test-mapper-raw.sms test-mapper.sms 49152
