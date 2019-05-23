@@ -242,13 +242,10 @@ state_wait_soh:
 	CP A, #BYTE_SOH
 	JP NZ, state_error_four ;state_timeout
 	
-	;Check if this packet is 64 or below
+	;Check if this packet is 64 + 128 (192) or below
 	LD A, C
-	CP  A, #65          ; IF underflow happens, packet <= 64, it is a RAM packet
-	JP P, state_read_id ; So we jump to read_id
-        ;VRAM holds 128 packets (16K) so we check if we are past 64+128
-	CP A,  #192         ; IF underflow happens, packet < 192
-	JP P, state_read_id ; So we jump to read_id
+	CP  A, #193          ; IF Carry, packet <= 192
+	JP  C, state_read_id ; So we jump to read_id
 	JP state_error_one  ; Otherwise error
 	
 state_chainload:
