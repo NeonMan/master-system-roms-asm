@@ -24,6 +24,8 @@
 			RL H ;Bit 1 ^ 0  (don'f flip)
 			RL H ;Bit 0 ^ 0  (don'f flip)
 
+			RL H ;Shift LSB stored in C
+
 			;XOR L with 0010 0001
 			RL L ;Bit 7 ^ 0 (don't flip)
 			RL L ;Bit 6 ^ 0 (don't flip)
@@ -36,6 +38,9 @@
 			RL L ;Bit 1 ^ 0 (don't flip)
 			RL L ;Bit 0 ^ 1 (flip with CCF)
 			CCF
+
+			RL L ;Shift LSB stored in C
+
 			JR end_bit
 
 		;else
