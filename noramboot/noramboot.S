@@ -44,13 +44,9 @@ txt_hello:
 	;Horizontal bar
 	.ascii "{~~~~~~~~~~~~~~~~~~~~~~~~~~~~}  "
 	.ascii "| N0RAM    XMODEM Bootloader |  "
-	.ascii "| V1.1         heavydeck.net |  "
+	.ascii "| V1.2         heavydeck.net |  "
 	.ascii "[~~~~~~~~~~~~~~~~~~~~~~~~~~~~]  "
 
-
-	.ascii " Connect UART transceiver on    "
-	.ascii " the CONTROL 2 port as shown    "
-	.ascii "                                "
 	.ascii " CONTROL 2     Serial config    "
 	.ascii " o o o o o     9600bps 8/N/1    "
 	.ascii "  o o o o                       "
@@ -58,7 +54,9 @@ txt_hello:
 	.ascii "    | [~~~~ Ground              "
 	.ascii "    [~~~~~~ RX (PC TX)          "
 	.ascii "                                "
-	.ascii " Booting in: "
+	.ascii "This bootloader also does VRAM  "
+	.ascii "upload. Check README for info.  "
+	.ascii "Booting in: "
 	.db 0x00
 txt_uart:
 	.ascii "                                "
@@ -144,7 +142,11 @@ sdsc_description::
 	.ascii "System without a need to flash any EPROM. This program "
 	.ascii "can load a binary of up to 8KB (All the SMS ROM) using "
 	.ascii "the XMODEM protocol. ROMs shall be prepared to run from "
-	.ascii "RAM base address 0xC000 instead of the regular 0x0000."
+	.ascii "RAM base address 0xC000 instead of the regular 0x0000. "
+	.ascii "As of V1.2 the bootloader will upload to VRAM all ROM "
+	.ascii "data past the 8K mark up to 16K of VRAM data, allowing "
+	.ascii "the preload of VDP data before booting, saving RAM on "
+	.ascii "the bootloadable program. Max upload size is 24K."
 	.db 0x00
 	;End of file
 	.ascii "uwu "

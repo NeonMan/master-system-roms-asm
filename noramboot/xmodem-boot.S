@@ -32,7 +32,7 @@
 	; HL	(General purpose)
 	;
 	; IX	Current buffer address
-	; IY	
+	; IY	Current VDP address
 	; SP	
 	;
 	;  A'   Let's use
@@ -83,7 +83,7 @@ state_init:
 	;Buffer <= RAM_BASE_ADDRESS
 	LD HL, #SMS_RAM_BASE_ADDRESS
 	LD IX, #SMS_RAM_BASE_ADDRESS
-	LD IY, #SMS_RAM_BASE_ADDRESS
+	LD IY, #0x0000
 	LD SP, #SMS_RAM_BASE_ADDRESS
 
 	;Prepare serial.
@@ -149,11 +149,35 @@ state_read_payload:
 	;On timeout, wait and re-request
 	LD B, #128
 	next_payload_byte:
+
+	;If packet is below 64, write to RAM
+	LD A, C
+	SUB A, #64           ;Packet 64 prepares for VDP loading
+	JP Z, init_vdp_load  ;then goes straight to byte load.
+	JP NC, next_vdp_byte ;A positive result means a VDP packet
+	;JP next_ram_byte     ;Otherwise, is a RAM byte
+
+	next_ram_byte:
 		serial_read           ;Read byte.
 		JP NC, state_timeout  ;On error, re-request
 		LD 0(IX), A           ;
 		INC IX                ;Copy byte to RAM
-		DEC B
+		JP byte_read_end
+
+	init_vdp_load:
+		; --- ToDo: Initialize VDP/CRAM ---
+
+		;Fall down and read packet
+	next_vdp_byte:
+		serial_read           ;Read byte.
+		JP NC, state_timeout  ;On error, re-request
+		; --- ToDo; Copy to VDP ---
+
+		INC IY
+		JP byte_read_end
+
+	byte_read_end:
+	DEC B
 	JP NZ, next_payload_byte  ;Get next byte
 	JP state_check_crc
 	
@@ -170,9 +194,38 @@ state_check_crc:
 	; DE will hold hold the packet CRC (Copied from current HL)
 	; HL will hold the calculated CRC
 	; B is temporary free, since it is always Zero at this point
-	; IX holds the next packet base address
-	; IY holds the previous packet base address
+	; IX holds the next RAM packet base address
+	; IY holds the next VDP VRAM packet base address
 	
+	;Check if we are a RAM or a VDP packet
+	LD A, C
+	SUB A, #64
+	JP Z,  check_vdp_crc
+	JP NC, check_vdp_crc
+	JP C,  check_ram_crc
+
+	; --- Check packet from VDP VRAM ---
+	check_vdp_crc:
+	;Get VDP address. DE <= (IY - 128)
+	ld_a_iyh
+	LD D, A
+	ld_a_iyl
+	SUB A, #128
+	LD E, A
+	JR NC, no_vdp_carry
+	DEC D
+	no_vdp_carry:
+	;DE contains the packet base address on VDP VRAM
+
+	; [ ToDo ]
+
+	check_vdp_success:
+	JP state_ack ; <-- Make a VDP ack state if somehow easier
+	check_vdp_failure:
+	JP state_nack ; <-- Make a VDP nack state if somehow easier
+
+	; --- Check packet from RAM ---
+	check_ram_crc:
 	;First, restore IX to its previous value
 	AND A, A ; Clear carry
 	LD DE, #-128
@@ -209,7 +262,13 @@ state_ack:
 	;Packet <= Packet + 1
 	INC C
 	
-	;Print a dot every 4 packets
+	;Print a dot every 4 RAM packets
+	;(no echo on VDP packets, obviously)
+	LD A, C               ;
+	SUB A, #64            ;
+	JP Z, no_dot_for_you  ; Check if it is a VDP packet
+	JP NC, no_dot_for_you ; Skip dot if it is.
+
 	LD A, C
 	AND A, #0x03
 	JP NZ, no_dot_for_you
@@ -235,9 +294,12 @@ state_wait_soh:
 	CP A, #BYTE_SOH
 	JP NZ, state_error_four ;state_timeout
 	
-	;Check if this packet is above 64
+	;Check if this packet is above 192
+	;    Program RAM is 8K -> 64 Packets
+	;    VRAM is 16K -> 128 Packets
+	;Total 192 Packets
 	LD A, C
-	SUB A, #65 ; IF result is positive (or zero) is too big
+	SUB A, #192 ; IF result is positive (or zero) is too big
 	AND A, #0x80
 	JP Z, state_is_too_big
 	
