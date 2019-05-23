@@ -181,9 +181,18 @@ state_read_payload_vdp:
 	next_vdp_byte:
 		serial_read           ;Read byte.
 		JP NC, state_timeout  ;On error, re-request
-		; --- ToDo --- Copy byte to VRAM
+		OUT (#0xBE), A
 		DEC B
 	JP NZ, next_vdp_byte ;Get next byte
+	;Increment IY by 128
+	ld_a_iyl
+	ADD A, #128
+	ld_iyl_a
+	ld_a_iyh
+	JR NC, vdp_addr_no_carry
+	INC A
+	vdp_addr_no_carry:
+	ld_iyh_a
 	JP state_check_crc_vdp
 
 state_check_crc:
