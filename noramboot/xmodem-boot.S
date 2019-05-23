@@ -32,7 +32,7 @@
 	; HL	(General purpose)
 	;
 	; IX	Current buffer address
-	; IY	
+	; IY	Current VDP address
 	; SP	
 	;
 	;  A'   Let's use
@@ -138,8 +138,12 @@ state_read_id:
 	;Negated packet ID *should* be on `A`
 	XOR A, #0xFF  ;Get real packet ID
 	CP A, C       ;Compare against expected packet
-	JP Z, state_read_payload ;On success, goto next state
-	
+	JP NZ, state_timeout ; On error, timeout
+
+	is_vdp  ;Test wether it is a VDP packet
+	JP NC, state_read_payload     ; Write to RAM
+	JP  C, state_read_payload_vdp ; Write to VDP VRAM
+
 	;On error, timeout
 	JP state_timeout
 	
@@ -204,6 +208,9 @@ state_check_crc:
 	JP NZ, state_nack
 	JP state_ack
 
+state_read_payload_vdp:
+	JP state_error_two
+
 state_ack:
 	;Prepare for next packet
 	;Packet <= Packet + 1
@@ -235,15 +242,14 @@ state_wait_soh:
 	CP A, #BYTE_SOH
 	JP NZ, state_error_four ;state_timeout
 	
-	;Check if this packet is above 64
+	;Check if this packet is 64 or below
 	LD A, C
-	SUB A, #65 ; IF result is positive (or zero) is too big
-	AND A, #0x80
-	JP Z, state_is_too_big
-	
-	
-	;On success, jump to state_read_id and continue cycle.
-	JP state_read_id
+	CP  A, #65          ; IF underflow happens, packet <= 64, it is a RAM packet
+	JP P, state_read_id ; So we jump to read_id
+        ;VRAM holds 128 packets (16K) so we check if we are past 64+128
+	CP A,  #192         ; IF underflow happens, packet < 192
+	JP P, state_read_id ; So we jump to read_id
+	JP state_error_one  ; Otherwise error
 	
 state_chainload:
 	;Everything is ready! send a few ACKs back and boot

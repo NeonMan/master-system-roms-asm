@@ -281,3 +281,20 @@
 		JR ch_loop
 	ch_end:
 	.endm
+
+	;Sets Carry flag if current packet is to be
+	;written on VDP VRAM instead of RAM
+	.macro is_vdp, ?test_fail, ?test_end
+		;Check if this packet is 64 or below
+		LD A, C
+		CP A, #65           ; IF underflow happens, packet <= 64, it is a RAM packet
+		JP P, test_fail     ; So we return NCarry
+
+		;Otherwise, fall down and return Carry
+		AND A, A
+		CCF
+		JR test_end
+	test_fail:
+		AND A, A
+	test_end:
+	.endm
