@@ -83,7 +83,7 @@ state_init:
 	;Buffer <= RAM_BASE_ADDRESS
 	LD HL, #SMS_RAM_BASE_ADDRESS
 	LD IX, #SMS_RAM_BASE_ADDRESS
-	LD IY, #SMS_RAM_BASE_ADDRESS
+	LD IY, #0x0000 ; Base VRAM address
 	LD SP, #SMS_RAM_BASE_ADDRESS
 
 	;Prepare serial.
@@ -160,7 +160,25 @@ state_read_payload:
 		DEC B
 	JP NZ, next_payload_byte  ;Get next byte
 	JP state_check_crc
+
+state_read_payload_vdp:
+	;Read the 128B packet into VRAM
+	;On success, check CRC (VDP mode)
+	;On timeout, wait and re-request
+
+	;Set VRAM base address from IY
 	
+	
+	;Read packet
+	LD B, #128
+	next_vdp_byte:
+		serial_read           ;Read byte.
+		JP NC, state_timeout  ;On error, re-request
+		; --- ToDo --- Copy byte to VRAM
+		DEC B
+	JP NZ, next_vdp_byte ;Get next byte
+	JP state_check_crc_vdp
+
 state_check_crc:
 	;read CRC bytes
 	serial_read
@@ -208,14 +226,26 @@ state_check_crc:
 	JP NZ, state_nack
 	JP state_ack
 
-state_read_payload_vdp:
-	JP state_error_two
+state_check_crc_vdp:
+	;read CRC bytes
+	serial_read
+	JP NC, state_timeout  ;On error, re-request
+	LD H, A
+	serial_read
+	JP NC, state_timeout  ;On error, re-request
+	LD L, A
+
+	JP state_ack
+	;JP state_error_three
 
 state_ack:
 	;Prepare for next packet
 	;Packet <= Packet + 1
 	INC C
-	
+
+	;If a VDP packet, no dot.
+	is_vdp
+	JP C, no_dot_for_you
 	;Print a dot every 4 packets
 	LD A, C
 	AND A, #0x03
