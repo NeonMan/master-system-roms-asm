@@ -209,7 +209,6 @@ state_check_crc:
 	; HL will hold the calculated CRC
 	; B is temporary free, since it is always Zero at this point
 	; IX holds the next packet base address
-	; IY holds the previous packet base address
 	
 	;First, restore IX to its previous value
 	AND A, A ; Clear carry
@@ -250,6 +249,25 @@ state_check_crc_vdp:
 	serial_read
 	JP NC, state_timeout  ;On error, re-request
 	LD L, A
+
+	;Check integrity.
+	; DE will hold hold the packet CRC (Copied from current HL)
+	; HL will hold the calculated CRC
+	; B is temporary free, since it is always Zero at this point
+	; IY holds the next packet VDP VRAM address
+
+	;Restore IY to last packet base address
+	LD DE, #-128
+	ADD IY, DE
+
+	; ToDo --- Set VDP address
+	LD D, H  ; Copy packet CRC to DE
+	LD E, L  ;
+	; ToDo --- Read packet and check CRC
+
+	;Restore IY to next packet base address
+	LD DE, #128
+	ADD IY, DE
 
 	JP state_ack
 	;JP state_error_three
