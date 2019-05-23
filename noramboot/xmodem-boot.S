@@ -167,7 +167,14 @@ state_read_payload_vdp:
 	;On timeout, wait and re-request
 
 	;Set VRAM base address from IY
-	
+        ; ADDR_LOW (8bit)
+	ld_a_iyl
+	OUT (#0xBF), A
+	; CMD (2) ADDR_H (6)
+	ld_a_iyh
+	AND A, #0x3F ;Trim the top 2 bits
+	OR  A, #0x40 ;Send command #1
+	OUT (#0xBF), A
 	
 	;Read packet
 	LD B, #128
@@ -288,7 +295,9 @@ state_chainload:
 		tx_bit_delay
 		DEC D
 	JP NZ, ack_loop
-	;Say OK!
+	;Say OK! (If not VDP)
+	is_vdp
+	JP C, ram_base_address
 	puts #str_transfer_ok
 	;Jump to ram base adress
 	JP ram_base_address
