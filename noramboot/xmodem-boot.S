@@ -17,12 +17,12 @@
 	; >[  Init  ]---[reqest]-->[wait SOH]---yes------->[read idx]-+---incorrect---+                       |
 	;                  |           |                       |      |                                       |
 	;                  |<--timeout-/<-------timeout--------´      |                                       |
-	;                  |                                          `---correct---->[read 128]-+--timeout---+
+	;                  |                                          `---correct--->[read 128*]-+--timeout---+
 	;                  |                   /<-timeout--\                                     |
 	;                  |                   |           |                                     |
-	;                  |<-----[reset packet]<--fail----[check crc]<--------success-----------´
+	;                  |<-----[reset packet]<--fail----[check crc*]<-------success-----------´
 	;                  |                               |
-	;                  \--[update packet]<---success---´
+	;                  \--[update packet]<---success---´     Note* Variant states for RAM/VRAM addresses.
 	;
 	; Registers:
 	;
@@ -33,7 +33,7 @@
 	;
 	; IX	Current buffer address
 	; IY	Current VDP address
-	; SP	
+	; SP
 	;
 	;  A'   Let's use
 	; BC'   these for
@@ -384,7 +384,5 @@ JP state_error
 state_error:
 ;Go back to the main routine
 JP xmodem_boot_ret
-	
-	
-	
+
 	.ascii "uwu "
