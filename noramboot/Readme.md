@@ -34,6 +34,26 @@ At the end of the transmission the ROM will be immediatly chainloaded.
 Any XMODEM-CRC sofware should work, This ROM has been tested with [Teraterm][tt]
 windows, on windows 10 using an off-the-shelf 5V USB-to-UART converter.
 
+# ROM sizes and VRAM uploading
+
+On an XMODEM transmission, the first 8K of data will be loaded at the RAM
+base address `0xC000` and, if available, any further packets up to 16KB of
+additional data will be stored on the VDP VRAM, giving a maximum upload
+size of 24KB.
+
+    
+# Upload file format
+    
+    Offset   Description
+    0x0000 +-------------+
+           | Program ROM |
+    0x1FFF +-------------+  <-- Up to 8K loaded to RAM
+    0x2000 +-------------+  <-- If >8K, data is loaded to VRAM
+           |             |
+           |  VRAM data  |
+           |             |
+    0x5FFF +-------------+  <-- Up to a maximum of 24K
+
 # Feedback
 
 Feel free to drop a line at `root@heavydeck.net` for feedback or anything that
@@ -43,6 +63,7 @@ crosses your mind. More projects and stuff at my site! [heavydeck.net][site]
 
 * `V1.0` Working transmission, 4800bps
 * `V1.1` Performance upgrade to 9600bps
+* `V1.2` Added support for VRAM uploads
 
 [tt]: https://ttssh2.osdn.jp/index.html.en
 [site]: http://heavydeck.net/
