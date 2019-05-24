@@ -252,20 +252,61 @@ state_check_crc_vdp:
 	; IY holds the next packet VDP VRAM address
 
 	;Restore IY to last packet base address
-	LD DE, #-128
-	ADD IY, DE
+	ld_a_iyl
+	AND A, A
+	JR Z, iy_dec_carry
+	;IYL is 128, so we clear it.
+	;IYH remains the same
+	XOR A, A
+	ld_iyl_a
+	JR iy_dec_end
+	;IYL is zero, so we make it 128
+	;IYH is decremented by one
+	iy_dec_carry:
+	LD A, #128
+	ld_iyl_a
+	ld_a_iyh
+	DEC A
+	ld_iyh_a
+	iy_dec_end:
 
-	; ToDo --- Set VDP address
+	;Set VRAM base address from IY
+        ; ADDR_LOW (8bit)
+	ld_a_iyl
+	OUT (#0xBF), A
+	; CMD (2) ADDR_H (6)
+	ld_a_iyh
+	AND A, #0x3F ;Trim the top 2 bits
+	OR  A, #0x40 ;Send command #1
+	OUT (#0xBF), A
+
 	LD D, H  ; Copy packet CRC to DE
 	LD E, L  ;
-	; ToDo --- Read packet and check CRC
 
+	;Initialize CRC calculation
+	LD B, #128
+	LD HL, #0x0000
+	crc_vdp_loop:
+		vdp_delay
+		IN A, (#0xBE)
+		crc16_xmodem
+		DEC B
+	JP NZ, crc_vdp_loop
+
+	;Compare BC and HL
+	LD A, D
+	CP A, H
+	JP NZ, state_nack
+	LD A, E
+	CP A, L
+	JP NZ, state_nack
+
+	;On success
 	;Restore IY to next packet base address
 	LD DE, #128
 	ADD IY, DE
 
 	JP state_ack
-	;JP state_error_three
 
 state_ack:
 	;Prepare for next packet
@@ -282,7 +323,7 @@ state_ack:
 		putc #0x2E
 	no_dot_for_you:
 	
-	;IX should be already pointed towards the next address.
+	;IX/IY should be already pointed towards the next address.
 	;request next packet
 	LD A, #BYTE_ACK
 	serial_write
@@ -299,13 +340,13 @@ state_wait_soh:
 	
 	;If SOH, check it would fit
 	CP A, #BYTE_SOH
-	JP NZ, state_error_four ;state_timeout
+	JP NZ, state_ysod ;state_timeout
 	
 	;Check if this packet is 64 + 128 (192) or below
 	LD A, C
 	CP  A, #193          ; IF Carry, packet <= 192
 	JP  C, state_read_id ; So we jump to read_id
-	JP state_error_one  ; Otherwise error
+	JP state_rsod ; Otherwise error
 	
 state_chainload:
 	;Everything is ready! send a few ACKs back and boot
@@ -338,7 +379,7 @@ state_timeout:
 	JP state_nack
 	
 state_nack:
-	JP state_error_four
+	JP state_bsod
 	JP state_init
 	
 	;Reset state
@@ -360,20 +401,20 @@ state_nack:
 	JP state_wait_soh
 	
 	
-state_error_one:
-putc #0x31
+state_bsod:
+clear_cram #0x30 ; <- Blue screen
 JP state_error
 
-state_error_two:
-putc #0x32
+state_gsod:
+clear_cram #0x0C ; <- Green screen
 JP state_error
 
-state_error_three:
-putc #0x33
+state_rsod:
+clear_cram #0x03 ; <- Red screen
 JP state_error
 
-state_error_four:
-putc #0x34
+state_ysod:
+clear_cram #0x0F ; <- Yellow screen
 JP state_error
 
 state_error:

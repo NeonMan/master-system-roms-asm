@@ -222,10 +222,27 @@
 
 	;Small delay between VDP writes.
 	.macro vdp_delay ?delay
-	LD A, #0x0F
+	LD A, #0x02
 	delay:
 		DEC A
 		JP NZ, delay
+	.endm
+
+	;Set CRAM color
+	;Used for error codes
+	.macro clear_cram color, ?cram_loop
+		LD A, #0x00
+		OUT (#0xBF), A
+		vdp_delay
+		LD A, #0xC0
+		OUT (#0xBF), A
+		LD B, #32
+		cram_loop:
+			vdp_delay
+			LD A, #color
+			OUT (#0xBE), A
+		DEC B
+		JP NZ, cram_loop
 	.endm
 
 	;Writes a single char.

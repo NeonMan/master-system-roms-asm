@@ -123,7 +123,7 @@ xmodem_boot_ret::
 	;Show some shitpost (all regs free)
 use_shitpost:
 	;Print SDSC info on serial port then print cute cat
-	LD D, #2 ;Expect 2 nulls before exitting
+	LD D, #3 ;Expect 3 nulls before exitting
 	LD HL, #sdsc_name
 	info_loop:
 		LD A, (HL)
@@ -134,9 +134,11 @@ use_shitpost:
 		;Otherwise add an \r\n instead of \0
 		LD A, #0x0D
 		serial_write
+		tx_bit_delay
 		LD A, #0x0A
 		normal_char:
 		serial_write
+		tx_bit_delay
 		INC HL
 	JP info_loop
 	info_end:
