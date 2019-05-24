@@ -28,7 +28,7 @@
 	;
 	;  A	(General purpose)
 	; BC	current Byte; current paCket.
-	; DE
+	; DE    (Used for IX/IY adjustments, could be freed using undoc opcodes)
 	; HL	(General purpose)
 	;
 	; IX	Current buffer address
@@ -185,14 +185,9 @@ state_read_payload_vdp:
 		DEC B
 	JP NZ, next_vdp_byte ;Get next byte
 	;Increment IY by 128
-	ld_a_iyl
-	ADD A, #128
-	ld_iyl_a
-	ld_a_iyh
-	JR NC, vdp_addr_no_carry
-	INC A
-	vdp_addr_no_carry:
-	ld_iyh_a
+	LD  DE, #128
+	ADD IY, DE
+
 	JP state_check_crc_vdp
 
 state_check_crc:

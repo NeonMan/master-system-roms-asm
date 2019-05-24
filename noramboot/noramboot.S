@@ -25,6 +25,7 @@
 	
 	;; Entry point
 	.org 0x0000
+reset_vector:
 	DI
 	JP init
 	
@@ -115,7 +116,9 @@ vdp_init_ret::
 	;Jump to XMODEM loader
 	JP xmodem_boot
 xmodem_boot_ret::
-	JR endloop
+	; Use one of these as an action on XMODEM failure
+	JR endloop      ; <-- Ask user to manually Reset
+	;JP reset_vector ; <-- Reset without asking
 	
 	;Show some shitpost
 use_shitpost:
