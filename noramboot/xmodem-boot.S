@@ -230,10 +230,10 @@ state_check_crc:
 	;Expected CRC on DE
 	LD A, D
 	CP A, H
-	JP NZ, state_nack
+	JP NZ, state_crc_nack
 	LD A, E
 	CP A, L
-	JP NZ, state_nack
+	JP NZ, state_crc_nack
 	JP state_ack
 
 state_check_crc_vdp:
@@ -296,10 +296,10 @@ state_check_crc_vdp:
 	;Compare BC and HL
 	LD A, D
 	CP A, H
-	JP NZ, state_nack
+	JP NZ, state_crc_nack
 	LD A, E
 	CP A, L
-	JP NZ, state_nack
+	JP NZ, state_crc_nack
 
 	;On success
 	;Restore IY to next packet base address
@@ -378,20 +378,39 @@ state_timeout:
 	;Wait enough time for a packet to pass, then retry
 	JP state_nack
 	
+state_crc_nack:
+	;Same as state nack but B is always 128
+	LD B, #128
 state_nack:
-	JP state_bsod
-	JP state_init
-	
-	;Reset state
+	;If packet is VDP, restore IY, otherwise restore IX
+	is_vdp
+	JP C, restore_vdp
+
+	;Reset state (RAM)
 	;IX <= IX - current_byte
 	ld_hl_ix
 	LD A, L
 	SUB A, B
 	LD L, A
-	JP PO, nack_no_underflow
+	JP NC, nack_ix_no_carry
 	DEC H
-	nack_no_underflow:
+	nack_ix_no_carry:
 	ld_ix_hl
+	JP send_nack_char
+	
+	;Reset state (VDP)
+	;IY <= IY - current_byte
+	restore_vdp:
+	ld_hl_iy
+	LD A, L
+	SUB A, B
+	LD L, A
+	JP NC, nack_iy_no_carry
+	DEC H
+	nack_iy_no_carry:
+	ld_iy_hl
+
+	send_nack_char:
 	;B <= 0x00
 	LD B, #0x00
 	;Request same packet
@@ -399,8 +418,7 @@ state_nack:
 	serial_write
 	;Don't touch C.
 	JP state_wait_soh
-	
-	
+
 state_bsod:
 clear_cram #0x30 ; <- Blue screen
 JP state_error
