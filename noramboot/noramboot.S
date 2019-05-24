@@ -36,6 +36,7 @@ ram_base_address::
 	.area _CODE (REL)
 	.ascii "/noramboot.S"
 	.include /macros.inc/
+	.include /serial.inc/
 
 txt_countdown_padding:
 	.ascii "             "
@@ -115,11 +116,31 @@ vdp_init_ret::
 	JP xmodem_boot
 xmodem_boot_ret::
 	; Use one of these as an action on XMODEM failure
-	JR endloop      ; <-- Ask user to manually Reset
+	JP endloop      ; <-- Ask user to manually Reset
 	;JP reset_vector ; <-- Reset without asking
 	
-	;Show some shitpost
+
+	;Show some shitpost (all regs free)
 use_shitpost:
+	;Print SDSC info on serial port then print cute cat
+	LD D, #2 ;Expect 2 nulls before exitting
+	LD HL, #sdsc_name
+	info_loop:
+		LD A, (HL)
+		CP A, #0x00
+		JP NZ, normal_char
+		DEC D
+		JP Z, info_end ; On third null, finish.
+		;Otherwise add an \r\n instead of \0
+		LD A, #0x0D
+		serial_write
+		LD A, #0x0A
+		normal_char:
+		serial_write
+		INC HL
+	JP info_loop
+	info_end:
+	;Print cute cat
 	puts #txt_shitpost
 	JR endloop
 	
@@ -132,24 +153,30 @@ endloop:
 	JP endloop
 	
 	;SDSC info
-sdsc_author::
-	.ascii "Heavydeck <root@heavydeck.net>"
-	.db 0x00
-
 sdsc_name::
 	.ascii "N0RAM -- XMODEM Bootloader for Master System"
 	.db 0x00
 
+sdsc_author::
+	.ascii "J.Luis <root@heavydeck.net>"
+	.db 0x00
+
 sdsc_description::
-	.ascii "A program to easily upload a program on the SEGA Master "
-	.ascii "System without a need to flash any EPROM. This program "
-	.ascii "can load a binary of up to 8KB (All the SMS ROM) using "
-	.ascii "the XMODEM protocol. ROMs shall be prepared to run from "
-	.ascii "RAM base address 0xC000 instead of the regular 0x0000. "
-	.ascii "As of V1.2 the bootloader will upload to VRAM all ROM "
-	.ascii "data past the 8K mark up to 16K of VRAM data, allowing "
-	.ascii "the preload of VDP data before booting, saving RAM on "
-	.ascii "the bootloadable program. Max upload size is 24K."
+	.ascii "A program to easily upload a program on the SEGA Master\r\n"
+	.ascii "System without a need to flash any EPROM. This program\r\n"
+	.ascii "can load a binary of up to 24KB (8K RAM + 16K VRAM) using\r\n"
+	.ascii "the XMODEM protocol. Executable code shall be prepared to\r\n"
+	.ascii "run from RAM base address 0xC000 and use up to 8K of\r\n"
+	.ascii "combined Program/RAM memory. Any data transmitted past\r\n"
+	.ascii "the initial 8K will be saved on the VDP VRAM up to a max\r\n"
+	.ascii "of 16 additional KB, allowing the preload of VDP data\r\n"
+	.ascii "before booting.\r\n"
+	.ascii "\r\n"
+	.ascii "Check README for additional info. Source code and sample\r\n"
+	.ascii "bootloadable ROMS available at:\r\n"
+	.ascii "https://bitbucket.org/Heavydeck/master-system-roms/\r\n"
+	.ascii "Released under the MIT license, see COPYING for the\r\n"
+	.ascii "complete licensing text."
 	.db 0x00
 	;End of file
 	.ascii "uwu "
