@@ -168,12 +168,13 @@ state_read_payload_vdp:
 
 	;Set VRAM base address from IY
         ; ADDR_LOW (8bit)
+	IN A, (#0xBF)
 	ld_a_iyl
 	OUT (#0xBF), A
 	; CMD (2) ADDR_H (6)
 	ld_a_iyh
 	AND A, #0x3F ;Trim the top 2 bits
-	OR  A, #0x40 ;Send command #1
+	;OR  A, #0x40 ;Send command #1
 	OUT (#0xBF), A
 	
 	;Read packet
@@ -277,7 +278,7 @@ state_check_crc_vdp:
 	; CMD (2) ADDR_H (6)
 	ld_a_iyh
 	AND A, #0x3F ;Trim the top 2 bits
-	OR  A, #0x40 ;Send command #1
+	;OR  A, #0x40 ;Send command #1
 	OUT (#0xBF), A
 
 	LD D, H  ; Copy packet CRC to DE

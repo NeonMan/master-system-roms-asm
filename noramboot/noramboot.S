@@ -21,6 +21,7 @@
 	
 	;;Make NMI RESET the ROM
 	.org 0x0066
+nmi_vector:
 	JR 0x0000
 	
 	;; Entry point
@@ -28,7 +29,36 @@
 reset_vector:
 	DI
 	JP init
-	
+
+	.org 0x0008
+rst_08:
+	JR 0x0000
+
+	.org 0x0010
+rst_10:
+	JR 0x0000
+
+	.org 0x0018
+rst_18:
+	JR 0x0000
+
+	.org 0x0020
+rst_20:
+	JR 0x0000
+
+	.org 0x0028
+rst_28:
+	JR 0x0000
+
+	.org 0x0030
+rst_30:
+	JR 0x0000
+
+	.org 0x0038
+int_vector:
+rst_38:
+	JR 0x0000
+
 	;; RAM base address
 	.org 0xC000
 ram_base_address::
