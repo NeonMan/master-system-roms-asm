@@ -1,172 +1,90 @@
-	;Waits for one bit width
+;CP	;Waits for one bit width
 	.macro tx_bit_delay
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		;CP (HL)
-		;CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
-		
-		NOP
+		NOP     ;7*4 +4 32T
+		; Total --> 312T
 	.endm
 	
 	.macro rx_bit_extra_delay
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		NOP
+		NOP     ;3*7 +4 25T
 	.endm
 	
 	.macro half_bit_delay
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*10 70T
-		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
+		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL)
 		CP (HL) ;7*10 70T
 		
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
-		;CP (HL)
 		CP (HL)
-		CP (HL)
+		CP (HL) ;7*2  14T
+		; Total --> 154T
 	.endm
 
     UART_DOWN = 0xBB
