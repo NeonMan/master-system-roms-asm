@@ -19,5 +19,7 @@ clean:
 	-rm *.lst
 	-rm *.ihx
 	-rm *.noi
+
+mrproper: clean
 	-rm *.sms
 
