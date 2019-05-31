@@ -92,20 +92,62 @@ main:
 	LD BC, #0x2000 ;8K
 	LDIR
 
-	;ToDo --- Load 16K into VRAM
+	;Test the RAM
+	LD DE, #0xC000
+	LD HL, #0x2000
+	LD BC, #0x2000 ;8K
+	ram_test_loop:
+		LD A, (DE)
+		CP A, (HL)
+		JR NZ, ram_error
+		INC DE
+		INC HL
+		DEC BC
+	LD A, B              ;
+	OR A, C              ;
+	JR NZ, ram_test_loop ;If not finished, Loop.
+
+
+	;Load data into VRAM
 	;ToDo --- Initialize VDP
-	LD BC, #0x4000 ;16K
+	LD BC, #0x4000  ;16K
+	;LD HL, #0x4000 ;<-- HL pointing to 0x4000 already
 	vram_loop:
 		;(VRAM) <- (HL) ToDo
 		INC HL
 		DEC BC
 	LD A, B          ;
-	AND A, A         ;
-	JR NZ, vram_loop ;
-	LD A, C          ;
-	AND A, A         ;
-	JR NZ, vram_loop ; If we didn't finish, loop.
+	OR A, C          ;
+	JR NZ, vram_loop ;If we didn't finish, loop.
+
+	;Test VRAM data
+	LD BC, #0x4000  ;16K
+	LD HL, #0x4000
+	;ToDo --- Initialize VDP
+	vram_test_loop:
+		LD A, (HL) ;A <-- (VRAM) ToDo
+		CP A, (HL)
+		JR NZ, vram_error
+		INC HL
+		DEC BC
+	LD A, B               ;
+	OR A, C               ;
+	JR NZ, vram_test_loop ;If not finished, loop.
+
+	;Chainload to RAM
 	JP     0xC000 ;Jump to loaded stuff.
+
+ram_error:
+	;ToDo -- Show a Blu Screen Of Death
+	JR error_loop
+
+vram_error:
+	;ToDo -- Show a Red Screen Of Death
+	JR error_loop
+
+error_loop:
+	;Loop forever~
+	JR error_loop
 
 sdsc_name::
 	.ascii "RAMload -- Helper ROM to test RAM-Loadable ROMs."
