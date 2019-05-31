@@ -50,7 +50,7 @@ if [ $PADDING_SIZE -gt 0 ]
 then
   SEEK_ADDR=`stat "$LOADER_ROM" --format=%s 2>/dev/null`
   SEEK_ADDR=`expr $SEEK_ADDR + $ROM_SIZE`
-  dd if=/dev/zero of="$OUT_FILE" bs=1 count=$PADDING_SIZE seek=$SEEK_ADDR 2>/dev/null
+  cat /dev/zero | tr '\0' '\377' | dd of="$OUT_FILE" bs=1 count=$PADDING_SIZE seek=$SEEK_ADDR 2>/dev/null
 fi
 
 #Append VRAM if needed
