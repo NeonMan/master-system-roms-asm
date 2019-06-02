@@ -109,11 +109,17 @@ main:
 
 
 	;Load data into VRAM
-	;ToDo --- Initialize VDP
 	LD BC, #0x4000  ;16K
 	;LD HL, #0x4000 ;<-- HL pointing to 0x4000 already
+	IN A, (#0xBF)
+	LD A, #0x00
+	OUT (#0xBF), A
+	LD A, #0x40
+	OUT (#0xBF), A
 	vram_loop:
 		;(VRAM) <- (HL) ToDo
+		LD A, (HL)
+		OUT (#0xBE), A
 		INC HL
 		DEC BC
 	LD A, B          ;
@@ -124,8 +130,16 @@ main:
 	LD BC, #0x4000  ;16K
 	LD HL, #0x4000
 	;ToDo --- Initialize VDP
+	IN A, (#0xBF)
+	LD A, #0x00
+	OUT (#0xBF), A
+	LD A, #0x00 ;Instead of 0x40
+	OUT (#0xBF), A
+	CP (HL)
+	CP (HL)
+	CP (HL)
 	vram_test_loop:
-		LD A, (HL) ;A <-- (VRAM) ToDo
+		IN A, (#0xBE) ;A <-- (VRAM) ToDo
 		CP A, (HL)
 		JR NZ, vram_error
 		INC HL
