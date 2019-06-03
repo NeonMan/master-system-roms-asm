@@ -1,3 +1,8 @@
+;Sets VDP address for a given XMODEM packet.
+;Args:
+;  - packet  Packet index (Max val: 127)
+;  - cmd     Command (Valid cases: 0x00, 0x40, 0x80, 0xC0)
+;Uses: AF
 .macro set_vram_packet_addr packet, cmd
 	IN A, (#0xBF)  ;Clear VDP
 
