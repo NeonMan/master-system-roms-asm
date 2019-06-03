@@ -118,7 +118,7 @@ main:
 		vram_loop_inner:
 			;(VRAM) <- (HL)
 			LD A, (HL)
-			OUT (#0xBE), A
+			OUT (#VDP_DATA_PORT), A
 			INC HL
 			DEC B
 			JR NZ, vram_loop_inner
@@ -134,7 +134,7 @@ main:
 		set_vram_packet_addr C, #0x00
 		LD B, #128
 		vram_test_loop_inner:
-			IN A, (#0xBE) ;A <-- (VRAM)
+			IN A, (#VDP_DATA_PORT) ;A <-- (VRAM)
 			CP A, (HL)
 			JR NZ, vram_error
 			INC HL

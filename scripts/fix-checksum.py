@@ -30,7 +30,8 @@ import os
 import sys
 
 USAGE = '''\
-Usage: fix-checksum.py INPUT_FILE \
+Usage: fix-checksum.py INPUT_FILE [HEADER_POSITION]
+Where HEADER_POSITION can be 8, 16, 32 (default)\
 '''
 
 # ------------

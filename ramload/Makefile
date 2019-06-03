@@ -3,8 +3,8 @@ all: ramload.ihx
 
 objects: ramload.rel
 
-ramload.rel: ramload.S
-	sdasz80 -l -o -g -s -g $^
+ramload.rel: ramload.S vdp.inc
+	sdasz80 -l -o -g -s -y -w $<
 
 ramload.ihx: objects
 	sdcc -o ramload.ihx -mz80 --no-std-crt0 --code-loc 64 --no-peep --no-peep-return *.rel
