@@ -67,7 +67,7 @@ ram_base_address::
 	.area _CODE (REL)
 	.ascii "/ramload.S"
 ;	.include /macros.inc/
-;	.include /pic.inc/
+	.include /vdp.inc/
 
 init:
 	;Set mapper registers
@@ -84,7 +84,6 @@ init:
 main:
 	;This ROM when compiled will be 8K in size, so every data past the
 	;8K mark will be loaded into RAM base address then jump to it.
-	; --- ToDo --- Load the 16K data past the 16K mark into VRAM
 
 	;Load 8K of data into RAM
 	LD DE, #0xC000
@@ -109,43 +108,41 @@ main:
 
 
 	;Load data into VRAM
-	LD BC, #0x4000  ;16K
-	;LD HL, #0x4000 ;<-- HL pointing to 0x4000 already
-	IN A, (#0xBF)
-	LD A, #0x00
-	OUT (#0xBF), A
-	LD A, #0x40
-	OUT (#0xBF), A
+	LD C, #0 ;Counter to 127 packets (128Byte each, therefore 16K in total)
+	LD HL, #0x4000 ;<-- HL pointing to 0x4000 already
+
+	;Simulate the way N0RAM loads data in 128Byte chunks
 	vram_loop:
-		;(VRAM) <- (HL) ToDo
-		LD A, (HL)
-		OUT (#0xBE), A
-		INC HL
-		DEC BC
-	LD A, B          ;
-	OR A, C          ;
+		set_vram_packet_addr C, #0x40
+		LD B, #128 ;128 bytes per packet
+		vram_loop_inner:
+			;(VRAM) <- (HL)
+			LD A, (HL)
+			OUT (#0xBE), A
+			INC HL
+			DEC B
+			JR NZ, vram_loop_inner
+		INC C
+		LD A, C
+		CP A, #128
 	JR NZ, vram_loop ;If we didn't finish, loop.
 
 	;Test VRAM data
-	LD BC, #0x4000  ;16K
+	LD C, #0x00  ; (same as vram loo; Counter from 0 to 128)
 	LD HL, #0x4000
-	;ToDo --- Initialize VDP
-	IN A, (#0xBF)
-	LD A, #0x00
-	OUT (#0xBF), A
-	LD A, #0x00 ;Instead of 0x40
-	OUT (#0xBF), A
-	CP (HL)
-	CP (HL)
-	CP (HL)
 	vram_test_loop:
-		IN A, (#0xBE) ;A <-- (VRAM) ToDo
-		CP A, (HL)
-		JR NZ, vram_error
-		INC HL
-		DEC BC
-	LD A, B               ;
-	OR A, C               ;
+		set_vram_packet_addr C, #0x00
+		LD B, #128
+		vram_test_loop_inner:
+			IN A, (#0xBE) ;A <-- (VRAM)
+			CP A, (HL)
+			JR NZ, vram_error
+			INC HL
+			DEC B
+		JR NZ, vram_test_loop_inner
+	INC C
+	LD A, C
+	CP A, #128
 	JR NZ, vram_test_loop ;If not finished, loop.
 
 	;Chainload to RAM
