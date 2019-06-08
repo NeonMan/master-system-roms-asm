@@ -66,7 +66,7 @@ ram_base_address::
 ; --- Regular ROM addresses begin here ---
 	.area _CODE (REL)
 	.ascii "/ramload.S"
-;	.include /macros.inc/
+	.include /macros.inc/
 ;	.include /pic.inc/
 
 init:
@@ -85,6 +85,9 @@ main:
 	;This ROM when compiled will be 8K in size, so every data past the
 	;8K mark will be loaded into RAM base address then jump to it.
 	; --- ToDo --- Load the 16K data past the 16K mark into VRAM
+
+	;Make agreen screen
+	clear_cram #0x08
 
 	;Load 8K of data into RAM
 	LD DE, #0xC000
@@ -129,15 +132,15 @@ main:
 	;Test VRAM data
 	LD BC, #0x4000  ;16K
 	LD HL, #0x4000
-	;ToDo --- Initialize VDP
+	;Initialize VDP, read at address 0x0000
 	IN A, (#0xBF)
 	LD A, #0x00
 	OUT (#0xBF), A
 	LD A, #0x00 ;Instead of 0x40
 	OUT (#0xBF), A
-	CP (HL)
-	CP (HL)
-	CP (HL)
+	CP (HL) ;
+	CP (HL) ;
+	CP (HL) ; Some delay
 	vram_test_loop:
 		IN A, (#0xBE) ;A <-- (VRAM) ToDo
 		CP A, (HL)
@@ -149,14 +152,16 @@ main:
 	JR NZ, vram_test_loop ;If not finished, loop.
 
 	;Chainload to RAM
-	JP     0xC000 ;Jump to loaded stuff.
+	JP 0xC000 ;Jump to loaded stuff.
 
 ram_error:
-	;ToDo -- Show a Blu Screen Of Death
+	;Show a Blu Screen Of Death
+	clear_cram #0x30
 	JR error_loop
 
 vram_error:
-	;ToDo -- Show a Red Screen Of Death
+	;Show a Red Screen Of Death
+	clear_cram #0x03
 	JR error_loop
 
 error_loop:

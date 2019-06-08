@@ -230,6 +230,7 @@
 
 	;Set CRAM color
 	;Used for error codes
+	;Uses: A, B
 	.macro clear_cram color, ?cram_loop
 		LD A, #0x00
 		OUT (#0xBF), A
@@ -242,7 +243,7 @@
 			LD A, #color
 			OUT (#0xBE), A
 		DEC B
-		JP NZ, cram_loop
+		JR NZ, cram_loop
 	.endm
 
 	;Writes a single char.
