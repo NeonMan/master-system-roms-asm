@@ -166,16 +166,10 @@ state_read_payload_vdp:
 	;On success, check CRC (VDP mode)
 	;On timeout, wait and re-request
 
-	;Set VRAM base address from IY
-        ; ADDR_LOW (8bit)
-	IN A, (#0xBF)
-	ld_a_iyl
-	OUT (#0xBF), A
-	; CMD (2) ADDR_H (6)
-	ld_a_iyh
-	AND A, #0x3F ;Trim the top 2 bits
-	;OR  A, #0x40 ;Send command #1
-	OUT (#0xBF), A
+	;Set VRAM address for writing
+	LD  A, C
+	SUB A, #65
+	set_vram_packet_addr A, #0x40
 	
 	;Read packet
 	LD B, #128
@@ -252,34 +246,9 @@ state_check_crc_vdp:
 	; B is temporary free, since it is always Zero at this point
 	; IY holds the next packet VDP VRAM address
 
-	;Restore IY to last packet base address
-	ld_a_iyl
-	AND A, A
-	JR Z, iy_dec_carry
-	;IYL is 128, so we clear it.
-	;IYH remains the same
-	XOR A, A
-	ld_iyl_a
-	JR iy_dec_end
-	;IYL is zero, so we make it 128
-	;IYH is decremented by one
-	iy_dec_carry:
-	LD A, #128
-	ld_iyl_a
-	ld_a_iyh
-	DEC A
-	ld_iyh_a
-	iy_dec_end:
-
-	;Set VRAM base address from IY
-        ; ADDR_LOW (8bit)
-	ld_a_iyl
-	OUT (#0xBF), A
-	; CMD (2) ADDR_H (6)
-	ld_a_iyh
-	AND A, #0x3F ;Trim the top 2 bits
-	;OR  A, #0x40 ;Send command #1
-	OUT (#0xBF), A
+	LD  A, C
+	SUB A, #65
+	set_vram_packet_addr A, #0x00
 
 	LD D, H  ; Copy packet CRC to DE
 	LD E, L  ;
@@ -322,13 +291,23 @@ state_ack:
 	AND A, #0x03
 	JP NZ, no_dot_for_you
 		putc #0x2E
+	
 	no_dot_for_you:
+
+	;If packet is exactly 64
+	;Clear CRAM to green
+	LD A, C
+	CP A, #64
+	JP NZ, no_cram_clear ; Otherwise go to SOH
+	clear_cram #0x08 ; <- Green screen
+	no_cram_clear:
 	
 	;IX/IY should be already pointed towards the next address.
 	;request next packet
 	LD A, #BYTE_ACK
 	serial_write
 
+	
 	JP state_wait_soh
 	
 state_wait_soh:
@@ -425,7 +404,7 @@ clear_cram #0x30 ; <- Blue screen
 JP state_error
 
 state_gsod:
-clear_cram #0x0C ; <- Green screen
+clear_cram #0x08 ; <- Green screen
 JP state_error
 
 state_rsod:
