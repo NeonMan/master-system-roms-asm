@@ -41,6 +41,16 @@ base address `0xC000` and, if available, any further packets up to 16KB of
 additional data will be stored on the VDP VRAM, giving a maximum upload
 size of 24KB.
 
+# Error codes
+
+Since the bootloader can't touch VRAM once the upload to VRAM starts, status
+is represented by whole-color "screens of death" each one meaning:
+
+| Colour | Meaning                              |
+| ------ | ------------------------------------ |
+| Green  | VRAM upload is going correctly       |
+| Red    | ERROR: ROM upload way too big (>24K) |
+| Yellow | ERROR: Unrecoverable comm error      |
     
 # Upload file format
     

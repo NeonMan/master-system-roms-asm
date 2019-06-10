@@ -180,7 +180,8 @@ endloop:
 	;If RESET button is pressed, jump to 0x0000
 	IN A, (#0xDD)
 	AND A, #0x10
-	JP Z, #0x0000
+	JP Z, #0x0000   ;Regular mode  (don't reset by default)
+;	JP NZ, #0x0000  ;Bootloop mode (reset by default
 	;Otherwise, wait.
 	JP endloop
 	
