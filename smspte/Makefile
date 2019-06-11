@@ -12,6 +12,7 @@ smspte.rel: smspte.S
 rom: objects
 	sdcc -o smspte.ihx -mz80 --no-std-crt0 --code-loc 128 *.rel
 	makebin -p smspte.ihx smspte.sms
+	python3 ../scripts/fix-checksum.py smspte.sms
 
 clean:
 	-rm *.rel
