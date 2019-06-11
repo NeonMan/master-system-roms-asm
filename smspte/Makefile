@@ -1,7 +1,10 @@
 
 all: rom
 
-objects: smspte.rel
+objects: smspte.rel font.rel
+
+font.rel:
+	sdasz80 -l -o -g -s -g font.S
 
 smspte.rel: smspte.S
 	sdasz80 -l -o -g -s -g smspte.S

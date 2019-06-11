@@ -30,7 +30,6 @@
 
 	.area _CODE (REL)
 	.ascii "/smspte.S"
-	;.include /macros.inc/
 
 color_line:
 	.db 0x20
