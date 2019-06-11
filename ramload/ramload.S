@@ -143,6 +143,10 @@ main:
 		set_vram_packet_addr C, #0x00
 		LD B, #128
 		vram_test_loop_inner:
+			CP (HL) ;
+			CP (HL) ;
+			CP (HL) ;
+			CP (HL) ; Some delay
 			IN A, (#VDP_DATA_PORT) ;A <-- (VRAM)
 			CP A, (HL)
 			JR NZ, vram_error
