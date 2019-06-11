@@ -10,6 +10,7 @@ nyan.rel: nyan.S nyan_anim.inc
 nyan.ihx: objects
 	sdcc $(includedirs) -o nyan.ihx -mz80 --no-std-crt0 --code-loc 64 --no-peep --no-peep-return *.rel
 	makebin -s 65536 -p nyan.ihx nyan.sms
+	../scripts/make_bootable.py nyan.sms nyan.boot.sms
 
 clean:
 	-rm *.rel
