@@ -47,6 +47,7 @@
 	.include /crc16-xmodem.inc/
 	.include /serial.inc/
 	.include /xmodem.inc/
+	.include /vdp.inc/
 
 	BYTE_SOH=0x01
 	BYTE_EOT=0x04

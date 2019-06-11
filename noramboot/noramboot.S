@@ -67,6 +67,7 @@ ram_base_address::
 	.ascii "/noramboot.S"
 	.include /macros.inc/
 	.include /serial.inc/
+	.include /vdp.inc/
 
 txt_countdown_padding:
 	.ascii "             "

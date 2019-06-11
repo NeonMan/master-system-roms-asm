@@ -1,4 +1,5 @@
-includedirs = -I../include/
+#Add noramboot as well since it 'emulates' XMODEM loads
+includedirs = -I../include/ -I../noramboot/
 
 all: ramload.ihx
 

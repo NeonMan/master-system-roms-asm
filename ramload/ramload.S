@@ -66,8 +66,10 @@ ram_base_address::
 ; --- Regular ROM addresses begin here ---
 	.area _CODE (REL)
 	.ascii "/ramload.S"
-	.include /macros_.inc/
+	.include /macros.inc/
 	.include /vdp.inc/
+	;Used to emulate the way XMODEM writes to VDP
+	.include /xmodem.inc/
 
 init:
 	;Set mapper registers
