@@ -17,3 +17,9 @@ Contents
     ├── /scripts          ;Helper scripts (python 3)
     ├── /smspte           ;SMPTE color bars
     └── README.md         ;This file ;)
+
+License
+-------
+
+Unless noted otherwise, source code is licensed under the MIT license.
+See COPYING for the full text of the license.
