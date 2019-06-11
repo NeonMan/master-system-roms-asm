@@ -32,7 +32,7 @@
 	; HL	(General purpose)
 	;
 	; IX	Current buffer address
-	; IY	Current VDP address
+	; IY
 	; SP
 	;
 	;  A'   Let's use
@@ -182,10 +182,6 @@ state_read_payload_vdp:
 		OUT (#0xBE), A
 		DEC B
 	JP NZ, next_vdp_byte ;Get next byte
-	;Increment IY by 128
-	LD  DE, #128
-	ADD IY, DE
-
 	JP state_check_crc_vdp
 
 state_check_crc:
@@ -247,7 +243,6 @@ state_check_crc_vdp:
 	; DE will hold hold the packet CRC (Copied from current HL)
 	; HL will hold the calculated CRC
 	; B is temporary free, since it is always Zero at this point
-	; IY holds the next packet VDP VRAM address
 
 	LD  A, C
 	SUB A, #65
@@ -383,16 +378,8 @@ state_nack:
 	JP send_nack_char
 	
 	;Reset state (VDP)
-	;IY <= IY - current_byte
 	restore_vdp:
-	ld_hl_iy
-	LD A, L
-	SUB A, B
-	LD L, A
-	JP NC, nack_iy_no_carry
-	DEC H
-	nack_iy_no_carry:
-	ld_iy_hl
+	;Nothing to do
 
 	send_nack_char:
 	;B <= 0x00
