@@ -1,13 +1,14 @@
+includedirs = -I../include/
 
 all: ramload.ihx
 
 objects: ramload.rel
 
-ramload.rel: ramload.S vdp.inc
-	sdasz80 -l -o -g -s -y -w $<
+ramload.rel: ramload.S
+	sdasz80 $(includedirs) -l -o -g -s -y -w $<
 
 ramload.ihx: objects
-	sdcc -o ramload.ihx -mz80 --no-std-crt0 --code-loc 64 --no-peep --no-peep-return *.rel
+	sdcc $(includedirs) -o ramload.ihx -mz80 --no-std-crt0 --code-loc 64 --no-peep --no-peep-return *.rel
 	makebin -p ramload.ihx ramload.sms
 	python3 ../scripts/fix-checksum.py ramload.sms 8
 
