@@ -171,7 +171,8 @@ state_read_payload_vdp:
 	;Set VRAM address for writing
 	LD  A, C
 	SUB A, #65
-	set_vram_packet_addr A, #0x40
+	LD  D, A   ;Copy relative packet address somewhere *not* `A`
+	set_vram_packet_addr D, #0x40
 	
 	;Read packet
 	LD B, #128
@@ -250,7 +251,8 @@ state_check_crc_vdp:
 
 	LD  A, C
 	SUB A, #65
-	set_vram_packet_addr A, #0x00
+	LD  D, A   ;Copy relative packet address somewhere *not* `A`
+	set_vram_packet_addr D, #0x00
 
 	LD D, H  ; Copy packet CRC to DE
 	LD E, L  ;
