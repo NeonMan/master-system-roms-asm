@@ -16,6 +16,7 @@ Contents
     ├── /ramload          ;Make bootloader ROMs usable on regular cartridges
     ├── /scripts          ;Helper scripts (python 3)
     ├── /smspte           ;SMPTE color bars
+    ├── /nyan             ;A sample ROM for N0RAMboot V1.2 (or above) using VRAM preload
     └── README.md         ;This file ;)
 
 License
