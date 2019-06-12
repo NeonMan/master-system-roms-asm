@@ -298,7 +298,7 @@ state_ack:
 	LD A, C
 	CP A, #64
 	JP NZ, no_cram_clear ; Otherwise go to SOH
-	clear_cram #0x08 ; <- Green screen
+	clear_cram #0x04 ; <- Green screen
 	no_cram_clear:
 	
 	;IX/IY should be already pointed towards the next address.
