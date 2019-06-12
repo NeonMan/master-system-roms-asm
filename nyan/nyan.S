@@ -15,23 +15,40 @@
 ; --- Regular ROM addresses begin here ---
 	.org #0xC000
 	DI
-	;Restore VDP config (ToDo)
+	;Put registers into a known state
+	LD SP, #0xDFF0 ;SP on RAM top
+
+	;Restore VDP registers
+	IN A, (#0xBF)
+	LD HL, #vdp_regs
+	LD B, #vdp_regs_end-vdp_regs
+	reg_loop:
+		LD A, (HL)
+		OUT (#0xBF), A
+		INC HL
+	DEC B
+	JP NZ, reg_loop
 
 	; Restore CRAM
 	LD A, #0x00
 	OUT (#0xBF), A
 	LD A, #0xC0
 	OUT (#0xBF), A
-	LD B, #32
+	LD B, #cram_data_end-cram_data ;32Bytes
 	LD HL, #cram_data
 	cram_loop:
-		vdp_delay
 		LD A, (HL)
 		OUT (#0xBE), A
 		INC HL
 	DEC B
 	JR NZ, cram_loop
-	
+
+	; Enable VDP
+	LD A, #0b11000000
+	OUT (#0xBF), A
+	LD A, #0x81
+	OUT (#0xBF), A
+
 	; --- Loop forever ---
 	end_loop:
 	JR end_loop
@@ -39,6 +56,18 @@
 	cram_data:
 	mnyan_palette
 	cram_data_end:
+
+	vdp_regs:
+	.db 0b00100100, 0x80
+	.db 0b10000000, 0x81
+	.db 15  , 0x82
+	.db 127 , 0x85
+	.db 0   , 0x86
+	.db 0x00, 0x87
+	.db 0x08, 0x88
+	.db 0x00, 0x89
+	.db 0xff, 0x8a
+	vdp_regs_end:
 
 ; --- The last bytes of the ROM ---
 	.org #0xDFF0
