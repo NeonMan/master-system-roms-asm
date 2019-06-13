@@ -41,7 +41,7 @@
 	; HL'   >:3
 	
 	.area _CODE (REL)
-	.ascii "/xmodem-boot.S"
+	.ascii "<xmodem-boot.S>"
 	
 	.include /macros.inc/
 	.include /crc16-xmodem.inc/
@@ -410,4 +410,4 @@ state_error:
 ;Go back to the main routine
 JP xmodem_boot_ret
 
-	.ascii "uwu "
+	.ascii "</xmodem-boot.S>"

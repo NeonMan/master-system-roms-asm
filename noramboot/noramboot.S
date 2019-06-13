@@ -64,7 +64,7 @@ rst_38:
 ram_base_address::
 
 	.area _CODE (REL)
-	.ascii "/noramboot.S"
+	.ascii "<noramboot.S>"
 	.include /macros.inc/
 	.include /serial.inc/
 	.include /vdp.inc/
@@ -178,11 +178,21 @@ use_shitpost:
 	JR endloop
 	
 endloop:
-	;If RESET button is pressed, jump to 0x0000
+	;XMODEM failed, next option is trying to chainload
+	;some other media (External/Card/Cartridge).
+	;This option requires some RAM to work but, we don't
+	;need RAM to be free anymore since upload failed, so
+	;we setup the Stack to be used. ;)
+	LD SP, #0xDFF0
+	;and CALL the chainloader
+	CALL chainload
+
+	;If chainloader fails, reset the bootloader.
+	;If RESET button is (not)pressed, jump to 0x0000
 	IN A, (#0xDD)
 	AND A, #0x10
-	JP Z, #0x0000   ;Regular mode  (don't reset by default)
-;	JP NZ, #0x0000  ;Bootloop mode (reset by default
+	JP Z, #0x0000   ;Regular mode  (reset when RESET is pressed)
+;	JP NZ, #0x0000  ;Bootloop mode (reset unless RESET is pressed)
 	;Otherwise, wait.
 	JP endloop
 	
@@ -213,7 +223,7 @@ sdsc_description::
 	.ascii "complete licensing text."
 	.db 0x00
 	;End of file
-	.ascii "uwu "
+	.ascii "</noramboot.S>"
 	
 
 ;Make the compiler quit complaining about _DATA

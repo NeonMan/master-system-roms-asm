@@ -1,5 +1,6 @@
 	;Per-bit CRC update function.
 	;For use by crc16_xmodem
+	;Size: 51 Bytes
 	.macro crc16_xmodem_bit ?bit_set, ?bit_clr, ?end_bit, ?flip_bits
 		;if (c & i)
 		RLCA

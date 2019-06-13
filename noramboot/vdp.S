@@ -1,6 +1,6 @@
 
 	.area	_CODE (REL)
-	.ascii "/vdp.S"
+	.ascii "<vdp.S>"
 	
 initial_registers:
 	.db 0b00100100, 0x80
@@ -97,4 +97,4 @@ vdp_init::
 	JP vdp_init_ret
 
 	;End of file mark
-	.ascii "uwu "
+	.ascii "</vdp.S>"
