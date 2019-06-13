@@ -19,7 +19,7 @@
 	;Will set Carry flag if two SLOT1 Reads were the same
 	;Uses: AF, HL, BC, DE
 	;
-	.macro test_read, ?crc_loop_first, ?crc_loop_second, ?crc_bit_loop_first, ?crc_bit_loop_second, ?rv_err, ?rv_end
+	.macro test_read, ?crc_loop_first, ?crc_loop_second, ?crc_bit_loop_first, ?crc_bit_loop_second, ?diff_loop, ?no_diff, ?rv_err, ?rv_end
 		LD HL, #0x0000
 		LD BC, #0x0000 ; Test 256B (B=0)
 		LD DE, #0x0000 ; Initial CRC
@@ -65,6 +65,27 @@
 		CP A, E
 		JR NZ, rv_err
 
+		;Reads have suceeded in being equal, but now we need to know
+		;If there are any substantial differences along the first 256b
+		LD HL, #0x0000
+		LD BC, #0x0000 ; Test 256B (B=0)
+		LD A, (HL)
+		diff_loop:
+			INC HL
+			CP A, (HL)
+			JR Z, no_diff
+			INC C ; Counted a difference
+			no_diff:
+			LD A, (HL)
+		DEC B
+		JR NZ, diff_loop
+
+		;Set an arbitrary number of differences on the first 256Byes
+		LD A, #16
+		SUB A, C
+		JR NC, rv_err
+
+		;Return success
 		AND A, A
 		CCF
 		JR rv_end
