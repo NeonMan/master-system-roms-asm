@@ -189,12 +189,13 @@ endloop:
 
 	;If chainloader fails, reset the bootloader.
 	;If RESET button is (not)pressed, jump to 0x0000
-	IN A, (#0xDD)
-	AND A, #0x10
-	JP Z, #0x0000   ;Regular mode  (reset when RESET is pressed)
-;	JP NZ, #0x0000  ;Bootloop mode (reset unless RESET is pressed)
+	endloop_inner:
+		IN A, (#0xDD)
+		AND A, #0x10
+		JP Z, #0x0000   ;Regular mode  (reset when RESET is pressed)
+;		JP NZ, #0x0000  ;Bootloop mode (reset unless RESET is pressed)
 	;Otherwise, wait.
-	JP endloop
+	JP endloop_inner
 	
 	;SDSC info
 sdsc_name::

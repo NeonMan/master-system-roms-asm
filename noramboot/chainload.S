@@ -113,7 +113,7 @@
 	chainloader_signature_end:
 
 	chainload::
-	; --- Copy loader_blob to SP ---
+	; --- Copy loader_blob to stack via SP ---
 	LD BC, #loader_blob_end - loader_blob
 	LD HL, #loader_blob_end - 1
 	blob_copy_loop:
@@ -133,7 +133,14 @@
 	ADD HL, SP
 	EX DE, HL
 
-	; --- Copy signature on SP ---
+;	; --- Copy loader blob below #0xD000
+;	LD DE, #0xCFFF
+;	LD HL, #loader_blob_end - 1
+;	LD BC, #loader_blob_end - loader_blob
+;	LDDR
+;	INC DE ;Adjust pointer by one byte
+
+	; --- Copy signature on stack via SP ---
 	LD B, #chainloader_signature_end - chainloader_signature
 	LD HL, #chainloader_signature_end - 1
 	sig_copy_loop:
@@ -155,13 +162,13 @@
 	;       [ Return Address   ]
 
 	;Jump to loader blob
-	EX DE, HL ;
+;	JP loader_blob ; Uncomment for testing on Emulicious debugger
 	PUSH DE   ; Put loader address on the stack
 	RET       ; "Jump" to loader address.
 
 	blob_return:
 	;We need to fix the stack to return back to N0RAM, so we perform SP <= SP - (All the stuff in the stack)
-	LD HL, #0x0000 - ((loader_blob_end - loader_blob) - (chainloader_signature_end - chainloader_signature))
+	LD HL, #((loader_blob_end - loader_blob) + (chainloader_signature_end - chainloader_signature))
 	ADD HL, SP
 	LD SP, HL
 	RET
