@@ -84,19 +84,16 @@ txt_hello:
 	.ascii "    [~~~~~~ RX (PC TX)          "
 	.ascii "                                "
 	.ascii " Check README for usage info.   "
-	.ascii " upload. Check README for info  "
-	.ascii " Starting transfer...           "
-	.db 0x00
-txt_uart:
 	.ascii "                                "
-	.ascii " RAM: "
-	;Draw empty progressbar, 23 chars, Line 16 (15)
+	;Draw empty progressbar, 18 chars, Line 16 (15)
+	.ascii "     RAM:"
 		.db #130
-		.db #128, #128, #128, #128, #128, #128, #128
-		.db #128, #128, #128, #128, #128, #128, #128
-		.db #128, #128, #128, #128, #128, #128, #128
+		.db #128, #128, #128, #128, #128, #128
+		.db #128, #128, #128, #128, #128, #128
+		.db #128, #128, #128, #128, #128, #128
 		.db #131
-	.ascii "   "
+		.ascii "   "
+	.ascii " Retries: 0000h                 "
 	.db 0x00
 
 	;; Initialize
@@ -121,8 +118,6 @@ vdp_init_ret::
 	delay #0x0300
 	delay #0x0300
 
-	;Use UART
-	puts #txt_uart
 	;Jump to XMODEM loader
 	JP xmodem_boot
 xmodem_boot_ret::

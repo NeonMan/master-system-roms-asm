@@ -58,15 +58,9 @@
 	SMS_RAM_BASE_ADDRESS=0xC000
 
 str_transfer_timed_out:
-	.ascii "                              "
+	.ascii "                               " ; <- Padding; ToDo fix size for empty progressbar
 	.ascii " Timeout! Reset the console     "
 	.ascii " pressing the <RESET> button    "
-	.db 0x00
-str_transfer_ok:
-	.ascii " OK!"
-	.db 0x00
-str_transfer_too_big:
-	.ascii " ERR!"
 	.db 0x00
 	
 xmodem_boot::
@@ -344,10 +338,6 @@ state_chainload:
 ; --------------------
 ; --- Error states ---
 ; --------------------
-	
-state_is_too_big:
-	puts #str_transfer_too_big
-	JP state_error
 	
 state_timeout:
 	;Wait enough time for a packet to pass, then retry
