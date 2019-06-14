@@ -1,5 +1,75 @@
-;CP	;Waits for one bit width
-	.macro tx_bit_delay
+	;Waits for one bit width (19200bps, 143T)
+	;  Note: the TX/RX code has overhead which
+	;  has been subtracted from this bith width
+	.macro tx_bit_delay_19200
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+
+		NOP     ;4T
+	.endm
+
+
+	;Waits for one bit width (14400bps, 192.67T)
+	;  Note: the TX/RX code has overhead which
+	;  has been subtracted from this bith width
+	.macro tx_bit_delay_14400
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*7  49T
+
+		NOP     ;4 T
+	.endm
+
+
+	;Waits for one bit width (9600bps)
+	;  Note: the TX/RX code has overhead which
+	;  has been subtracted from this bith width
+	.macro tx_bit_delay_9600
 		CP (HL)
 		CP (HL)
 		CP (HL)
@@ -51,15 +121,39 @@
 		NOP     ;7*4 +4 32T
 		; Total --> 312T
 	.endm
-	
-	.macro rx_bit_extra_delay
+
+	.macro half_bit_delay_19200
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		NOP     ;3*7 +4 25T
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+	.endm
+
+	.macro half_bit_delay_14400
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*10 70T
+
+		CP (HL)
+		CP (HL)
+		CP (HL) ;7*3  21T
+			; --> 91T
 	.endm
 	
-	.macro half_bit_delay
+	.macro half_bit_delay_9600
 		CP (HL)
 		CP (HL)
 		CP (HL)
@@ -87,12 +181,41 @@
 		; Total --> 154T
 	.endm
 
+	; --- Select baudrate ---
+
+	;Bit width
+	.macro tx_bit_delay
+		tx_bit_delay_9600
+	.endm
+
+	;Half bit width
+	;  While half a bit period would aim to sample at the
+	;  middle of a bit, making this macro shorter might allow
+	;  some extra leeway on the stop bit at higher bitrates.
+	.macro half_bit_delay
+		half_bit_delay_9600
+	.endm
+
+
+
+	;Correct the Overhead between RX/TX routines
+	;62T - 36T = 26T
+	.macro rx_bit_extra_delay
+		CP (HL)
+		CP (HL)
+		CP (HL)
+		NOP     ;3*7 +4 25T
+	.endm
+	
     UART_DOWN = 0xBB
     UART_UP   = 0xFB
     IO_PORT   = 0x3F
 	
 	READ_PORT = 0xDD
 	
+	;Send a single bit.
+	;This will add an overhead of 62 T-States
+	;	Uses: AF, AF'
 	.macro tx_send_bit ?bit_set ?bit_clr ?bit_end
 		RRCA
 		JR C, bit_set
@@ -116,7 +239,7 @@
 	.endm
 
 	;Sends byte stored on A through serial port.
-	;	Uses: AF
+	;	Uses: AF, AF'
 	.macro serial_write_inner
 		;Start bit
 		EX AF, AF'
@@ -149,9 +272,9 @@
 	.macro serial_read_bit
 			IN A, (#READ_PORT) ; 11T
 			RLC A              ; 8T
-			RR D               ; 8T  -> 
-			NOP
-			NOP
+			RR D               ; 8T
+			NOP                ; 4T
+			NOP                ; 4T -> 36T
 			
 			; Sampling test code
 			;LD A, #UART_DOWN  ; 7T
@@ -185,14 +308,12 @@
 			JR NC, start_bit_success  ; If low, try reading byte
 			
 			DEC HL                    ;
-			LD A, H                   ;
-			AND A, A                  ;
-			JR NZ, start_bit_loop     ; H is zero, so is A
-			CP A, L                   ; If L is then nonzero
-			JR NZ, start_bit_loop     ; Retry 
+			LD A, H                   ; H is zero, so is A
+			OR A, L                   ; If L is then nonzero
+			JR NZ, start_bit_loop     ; Retry
 		EXX
-		XOR A, A                  ; Otherwise
-		JP uart_end               ; Timeout; return with error
+		XOR A, A                  ; Otherwise:
+		JP uart_end               ; Return error, (Clear C)
 		
 		;Start bit detected, time to read a byte.
 		start_bit_success:
@@ -215,8 +336,9 @@
 			
 			;We shall be lying above the STOP bit
 			;Load result on A and return success
+			XOR A, A
+			CCF
 			LD A, D
-			SCF
 		uart_end:
 	.endm
 	
