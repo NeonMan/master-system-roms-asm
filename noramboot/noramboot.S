@@ -69,15 +69,11 @@ ram_base_address::
 	.include /serial.inc/
 	.include /vdp.inc/
 
-txt_countdown_padding:
-	.ascii "             "
-	.db 0x00
-	
 txt_hello:
 	;Horizontal bar
 	.ascii "{~~~~~~~~~~~~~~~~~~~~~~~~~~~~}  "
 	.ascii "| N0RAM    XMODEM Bootloader |  "
-	.ascii "| V1.2         heavydeck.net |  "
+	.ascii "| V1.3         heavydeck.net |  "
 	.ascii "[~~~~~~~~~~~~~~~~~~~~~~~~~~~~]  "
 
 	.ascii " CONTROL 2     Serial config    "
@@ -87,25 +83,22 @@ txt_hello:
 	.ascii "    | [~~~~ Ground              "
 	.ascii "    [~~~~~~ RX (PC TX)          "
 	.ascii "                                "
-	.ascii " This bootloader can do VRAM    "
+	.ascii " Check README for usage info.   "
 	.ascii " upload. Check README for info  "
-	.ascii " Booting in: "
+	.ascii " Starting transfer...           "
 	.db 0x00
 txt_uart:
 	.ascii "                                "
-	.ascii " Starting XMODEM transmission    " ;<-- Extra ' ' intentional.
+	.ascii " RAM: "
+	;Draw empty progressbar, 23 chars, Line 16 (15)
+		.db #130
+		.db #128, #128, #128, #128, #128, #128, #128
+		.db #128, #128, #128, #128, #128, #128, #128
+		.db #128, #128, #128, #128, #128, #128, #128
+		.db #131
+	.ascii "   "
 	.db 0x00
-txt_shitpost:
-	.ascii "                                "
-	.ascii "      *purr*                    "
-	.ascii "              |\__/,|   (`\     "
-	.ascii "   *purr*     |_ _  |.--.) )    "
-	.ascii "              ( T   )     /     "
-	.ascii "             (((^_(((/(((_>     "
-	.ascii "                                "
-	.ascii " Press <RESET> to pet the cat   "
-	.db 0x00
-	
+
 	;; Initialize
 init:
 	;Put mapper in a known state
@@ -124,23 +117,10 @@ vdp_init_ret::
 	puts #txt_hello
 	;And a nice countdown
 	delay #0x0300
-	putc #0x33 ;3
-	putc #0x20
 	delay #0x0300
-	putc #0x32 ;2
-	putc #0x20
 	delay #0x0300
-	putc #0x31 ;1
-	putc #0x20
 	delay #0x0300
-	puts #txt_countdown_padding
-	
-	;Read control port 1
-	IN A, (#0xDC)
-	AND A, #0x20 ;Mask button 2
-	;If 1 or 2 are pressed jump to Shitpost
-	JR Z, use_shitpost
-	
+
 	;Use UART
 	puts #txt_uart
 	;Jump to XMODEM loader
@@ -149,34 +129,7 @@ xmodem_boot_ret::
 	; Use one of these as an action on XMODEM failure
 	JP endloop      ; <-- Ask user to manually Reset
 	;JP reset_vector ; <-- Reset without asking
-	
 
-	;Show some shitpost (all regs free)
-use_shitpost:
-	;Print SDSC info on serial port then print cute cat
-	LD D, #3 ;Expect 3 nulls before exitting
-	LD HL, #sdsc_name
-	info_loop:
-		LD A, (HL)
-		CP A, #0x00
-		JP NZ, normal_char
-		DEC D
-		JP Z, info_end ; On third null, finish.
-		;Otherwise add an \r\n instead of \0
-		LD A, #0x0D
-		serial_write
-		tx_bit_delay
-		LD A, #0x0A
-		normal_char:
-		serial_write
-		tx_bit_delay
-		INC HL
-	JP info_loop
-	info_end:
-	;Print cute cat
-	puts #txt_shitpost
-	JR endloop
-	
 endloop:
 	;XMODEM failed, next option is trying to chainload
 	;some other media (External/Card/Cartridge).

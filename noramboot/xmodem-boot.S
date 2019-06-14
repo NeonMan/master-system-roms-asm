@@ -90,9 +90,9 @@ state_init:
 
 	;Prepare serial.
 	serial_setup
-	;Say we are ready
-	putc #0x21 ; <-- Print a '!' char
-	
+
+	;ToDo, put VDP pointer at the progressbar Start.
+
 	;Use E' for retry count
 	;EXX
 	LD E, #32
@@ -289,7 +289,7 @@ state_ack:
 	LD A, C
 	AND A, #0x03
 	JP NZ, no_dot_for_you
-		putc #0x2E
+		putc #129 ; Progressbar "Fill" character
 	
 	no_dot_for_you:
 
@@ -337,10 +337,6 @@ state_chainload:
 		tx_bit_delay
 		DEC D
 	JP NZ, ack_loop
-	;Say OK! (If not VDP)
-	is_vdp
-	JP C, ram_base_address
-	puts #str_transfer_ok
 	;Jump to ram base adress
 	JP ram_base_address
 	.db 0xC3, 0x00, 0xC0
