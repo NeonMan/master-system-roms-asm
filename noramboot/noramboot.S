@@ -77,7 +77,7 @@ txt_hello:
 	.ascii "[~~~~~~~~~~~~~~~~~~~~~~~~~~~~]  "
 
 	.ascii " CONTROL 2     Serial config    "
-	.ascii " o o o o o     9600bps 8/N/1    "
+	.ascii " o o o o o     ?????bps 8/N/1   "
 	.ascii "  o o o o                       "
 	.ascii "    | | [~~ TX (PC RX)          "
 	.ascii "    | [~~~~ Ground              "
