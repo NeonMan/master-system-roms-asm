@@ -17,9 +17,9 @@
 
 	echo_loop:
 	CALL read
-	JP NC, echo_loop
+	JR NC, echo_loop
 	CALL write
-	JP echo_loop
+	JR echo_loop
 	.ascii "END MAIN"
 
 read:

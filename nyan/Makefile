@@ -28,4 +28,4 @@ mrproper: clean
 
 #Make an emulator/cartridge friendly ROM from the bootable ROM
 selfboot: nyan.ihx
-	cat ../ramload/ramload.sms nyan.boot.sms > nyan.selfboot.sms
+	cat ../selfboot/selfboot.sms nyan.boot.sms > nyan.selfboot.sms

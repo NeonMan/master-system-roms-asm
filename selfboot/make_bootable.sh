@@ -4,7 +4,7 @@
 #get ramload.sms location
 if [ -z "$LOADER_ROM" ]
 then
-  LOADER_ROM=ramload.sms
+  LOADER_ROM=selfboot.sms
 fi
 
 #Get ROM segment size

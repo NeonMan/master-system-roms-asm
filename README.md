@@ -15,8 +15,8 @@ Contents
     ├── /include          ;Common assembler includes
     ├── /noramboot        ;Zero RAM usage Bootloader
     ├── /nyan             ;A sample ROM for N0RAMboot V1.2 (or above) using VRAM preload
-    ├── /ramload          ;Make bootloader ROMs usable on regular cartridges
     ├── /scripts          ;Helper scripts (python 3)
+    ├── /selfboot         ;Make bootloader ROMs usable on regular cartridges
     ├── /smspte           ;SMPTE color bars
     └── README.md         ;This file ;)
 

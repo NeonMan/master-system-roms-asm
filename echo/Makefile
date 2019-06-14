@@ -28,5 +28,5 @@ mrproper: clean
 
 #Make an emulator/cartridge friendly ROM from the bootable ROM
 selfboot: echo.ihx
-	cat ../ramload/ramload.sms echo.boot.sms > echo.selfboot.sms
+	cat ../selfboot/selfboot.sms echo.boot.sms > echo.selfboot.sms
 	../scripts/pad-selfboot.sh echo.selfboot.sms
