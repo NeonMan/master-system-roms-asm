@@ -27,5 +27,5 @@ mrproper: clean
 # --- Additional targets ---
 
 #Make an emulator/cartridge friendly ROM from the bootable ROM
-ramload: nyan.ihx
-	cat ../ramload/ramload.sms nyan.boot.sms > nyan.ramload.sms
+selfboot: nyan.ihx
+	cat ../ramload/ramload.sms nyan.boot.sms > nyan.selfboot.sms
