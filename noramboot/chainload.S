@@ -202,6 +202,9 @@
 	;  The stack looks like this:
 	; SP -> [ Loader signature ]
 	loader_blob:
+	;Prepare HL to backup the value of port 0x3E
+	LD HL, #0xC000
+
 	;First, check if we are skipping autodetection because th
 	;user is pressing the CONTROL 1 D-Pad
 	IN A, (#0xDC) ;
@@ -242,8 +245,9 @@
 	load_cartridge:
 	LD A, #ENABLE_CARTRIDGE
 	OUT (#0x3E), A
+
 	write_info_and_reset:
-	;ToDo Write BIOS info for comaptibility info
+	LD (HL), A
 	JP 0x0000 ;And reset console
 
 	;Media autodetection.
@@ -255,6 +259,7 @@
 
 	;EXT port load
 	LD A, #ENABLE_EXT
+	LD (HL), A
 	OUT (#0x3E), A
 	test_read
 	JR NC, skip_ext
@@ -265,6 +270,7 @@
 
 	;CARD load
 	LD A, #ENABLE_CARD
+	LD (HL), A
 	OUT (#0x3E), A
 	test_read
 	JR NC, skip_card
@@ -275,6 +281,7 @@
 
 	;CARTRIDGE port load
 	LD A, #ENABLE_CARTRIDGE
+	LD (HL), A
 	OUT (#0x3E), A
 	test_read
 	JR NC, skip_cartridge

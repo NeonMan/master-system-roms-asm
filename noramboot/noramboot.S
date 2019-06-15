@@ -144,7 +144,7 @@ endloop:
 	;we setup the Stack to be used. ;)
 	LD SP, #0xDFF0
 	;and CALL the chainloader
-	CALL chainload
+	;CALL chainload
 
 	;If chainloader fails, reset the bootloader.
 	;If RESET button is (not)pressed, jump to 0x0000
