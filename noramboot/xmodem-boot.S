@@ -61,13 +61,25 @@
 str_transfer_timed_out:
 	.ascii " Timeout! Reset the console     "
 	.ascii " pressing the <RESET> button    "
-	.db 0x00
+	.db #0x00
+
+str_alignment_error:
+	;If alignment checks fail, for CRC tables.
+	.ascii " [BUG!] Alignment error!        "
+	.db #0x00
 	
 xmodem_boot::
 	JP state_init
-	
+
 	;Check the marvelous state machine diagram, the dead trees version.
 state_init:
+	;Perform alignment checks since linker
+	;seems to be ignoring some .org directives
+;	LD HL, #crc16_xmodem_table_base
+;	LD A, L
+;	AND A, A
+;	JP NZ, state_error_alignment
+
 	;Prepare variables for the first transfer.
 	;Packet <= 1
 	LD C, #0x01
@@ -105,11 +117,6 @@ state_start_transfer:
 	LD A, #BYTE_CRC ;
 	serial_write    ; Send 'C'
 	JP state_first_soh
-
-state_timed_out:
-	set_vram_addr #0x3C, #0xFF   ;<-- Point to a line near the bottom
-	puts #str_transfer_timed_out
-	JP state_error
 
 state_first_soh:
 	;Wait for the start of transmission byte.
@@ -339,6 +346,17 @@ state_chainload:
 ; --------------------
 ; --- Error states ---
 ; --------------------
+
+state_error_alignment:
+	set_vram_addr #0x3C, #0xFF   ;<-- Point to a line near the bottom
+	puts #str_alignment_error
+	JP state_error
+
+state_timed_out:
+	set_vram_addr #0x3C, #0xFF   ;<-- Point to a line near the bottom
+	puts #str_transfer_timed_out
+	JP state_error
+
 	
 state_timeout:
 	;Wait enough time for a packet to pass, then retry
@@ -415,7 +433,7 @@ JP xmodem_boot_ret
 .ascii "PAD!PAD!PAD!PAD!"
 .ascii "PAD!PAD!PAD!PAD!"
 .ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
+.ascii "CRC!PAD!CRC!PAD!"
 .ascii "PAD!CRC!PAD!CRC!" ;<-- Linker ignores my alignment !!
 crc16_xmodem_table_base:
 ;crc16_xmodem_table_lo

@@ -5,19 +5,19 @@ all: rom
 objects: noramboot.rel vdp.rel font.rel xmodem-boot.rel chainload.rel
 
 noramboot.rel: noramboot.S
-	sdasz80 $(includedirs) -l -o -g -s -g noramboot.S
+	sdasz80 $(includedirs) -l -o -g -s noramboot.S
 
 vdp.rel: vdp.S
-	sdasz80 $(includedirs) -l -o -g -s -g vdp.S
+	sdasz80 $(includedirs) -l -o -g -s vdp.S
 
 font.rel: font.S
-	sdasz80 $(includedirs) -l -o -g -s -g font.S
+	sdasz80 $(includedirs) -l -o -g -s font.S
 
 xmodem-boot.rel: xmodem-boot.S
-	sdasz80 $(includedirs) -l -o -g -s -g xmodem-boot.S
+	sdasz80 $(includedirs) -l -o -g -s xmodem-boot.S
 
 chainload.rel: chainload.S
-	sdasz80 $(includedirs) -l -o -g -s -g chainload.S
+	sdasz80 $(includedirs) -l -o -g -s chainload.S
 
 
 rom: objects
