@@ -44,8 +44,8 @@
 	.ascii "<xmodem-boot.S>"
 	
 	.include /macros.inc/
-	;.include /crc16-xmodem.inc/
-	.include /crc16-xmodem-tbl.inc/
+	.include /crc16-xmodem.inc/
+;	.include /crc16-xmodem-tbl.inc/
 	.include /serial.inc/
 	.include /xmodem.inc/
 	.include /vdp.inc/
@@ -418,5 +418,5 @@ JP xmodem_boot_ret
 .ascii "PAD!PAD!PAD!PAD!"
 .ascii "PAD!CRC!PAD!CRC!" ;<-- Linker ignores my alignment !!
 crc16_xmodem_table_base:
-crc16_xmodem_table_lo
-crc16_xmodem_table_hi
+;crc16_xmodem_table_lo
+;crc16_xmodem_table_hi
