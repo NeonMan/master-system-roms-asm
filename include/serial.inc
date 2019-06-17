@@ -60,9 +60,9 @@
 		CP (HL)
 		CP (HL)
 		CP (HL)
-		CP (HL) ;7*7  49T
+		;CP (HL) ;7*7  49T
+		;NOP
 
-		NOP     ;4 T
 	.endm
 
 
@@ -185,7 +185,7 @@
 
 	;Bit width
 	.macro tx_bit_delay
-		tx_bit_delay_9600
+		tx_bit_delay_14400
 	.endm
 
 	;Half bit width
@@ -193,7 +193,7 @@
 	;  middle of a bit, making this macro shorter might allow
 	;  some extra leeway on the stop bit at higher bitrates.
 	.macro half_bit_delay
-		half_bit_delay_9600
+		half_bit_delay_14400
 	.endm
 
 
