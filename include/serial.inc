@@ -187,7 +187,7 @@
 
 	;Bit width
 	.macro tx_bit_delay
-		tx_bit_delay_19200
+		tx_bit_delay_14400
 	.endm
 
 	;Half bit width
@@ -195,7 +195,7 @@
 	;  middle of a bit, making this macro shorter might allow
 	;  some extra leeway on the stop bit at higher bitrates.
 	.macro half_bit_delay
-		half_bit_delay_19200
+		half_bit_delay_14400
 	.endm
 
 
