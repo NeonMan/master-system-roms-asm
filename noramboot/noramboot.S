@@ -77,7 +77,7 @@ txt_hello:
 	.ascii "[~~~~~~~~~~~~~~~~~~~~~~~~~~~~]  "
 
 	.ascii " CONTROL 2     Serial config    "
-	.ascii " o o o o o     ?????bps 8/N/1   "
+	.ascii " o o o o o     14400bps 8/N/1   "
 	.ascii "  o o o o                       "
 	.ascii "    | | [~~ TX (PC RX)          "
 	.ascii "    | [~~~~ Ground              "
@@ -88,12 +88,14 @@ txt_hello:
 	;Draw empty progressbar, 18 chars, Line 16 (15)
 	.ascii "     RAM:"
 		.db #130
-		.db #128, #128, #128, #128, #128, #128
-		.db #128, #128, #128, #128, #128, #128
-		.db #128, #128, #128, #128, #128, #128
+		.db #128, #128, #128, #128
+		.db #128, #128, #128, #128
+		.db #128, #128, #128, #128
+		.db #128, #128, #128
 		.db #131
-		.ascii "   "
-	.ascii " ----                           " ; <-- To add retry count later
+		.ascii "      "
+;	.ascii "                                " ; <-- To add retry count later
+	.ascii " Retries: 0000h                 "
 	.db 0x00
 
 	;; Initialize
@@ -112,11 +114,11 @@ init:
 vdp_init_ret::
 	;Show some info
 	puts #txt_hello
+
+	set_vram_addr #0x3B, #0x53
+
 	;And a nice countdown
-	delay #0x0300
-	delay #0x0300
-	delay #0x0300
-	delay #0x0300
+	delay #0x0600
 
 	;Jump to XMODEM loader
 	JP xmodem_boot

@@ -106,7 +106,7 @@ state_start_transfer:
 	JP state_first_soh
 
 state_timed_out:
-	set_vram_addr #0x3C, #0xFF
+	set_vram_addr #0x3C, #0xFF   ;<-- Point to a line near the bottom
 	puts #str_transfer_timed_out
 	JP state_error
 
