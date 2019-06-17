@@ -93,7 +93,7 @@ txt_hello:
 		.db #128, #128, #128, #128, #128, #128
 		.db #131
 		.ascii "   "
-	.ascii " Retries: 0000h                 "
+	.ascii " ----                           " ; <-- To add retry count later
 	.db 0x00
 
 	;; Initialize

@@ -44,14 +44,15 @@ VDP_DATA_PORT    = 0xBE
 	;Line 2: 0x3840
 	;etc...
 	.macro set_vram_addr addr_h, addr_l
+		IN A, (#0xBF)
 		LD A, addr_l
-		OUT (#0xBE), A
-		vdp_delay
+		OUT (#0xBF), A
+		;vdp_delay
 		LD A, addr_h
-		AND A, #0x07
-		OR A, #0x78
-		OUT (#0xBE), A
-		vdp_delay
+		AND A, #0x3F
+		;OR A, #0x80
+		OUT (#0xBF), A
+		;vdp_delay
 	.endm
 	
 	.macro gotoxy x, y

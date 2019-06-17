@@ -58,7 +58,6 @@
 	SMS_RAM_BASE_ADDRESS=0xC000
 
 str_transfer_timed_out:
-	.ascii "                               " ; <- Padding; ToDo fix size for empty progressbar
 	.ascii " Timeout! Reset the console     "
 	.ascii " pressing the <RESET> button    "
 	.db 0x00
@@ -107,6 +106,7 @@ state_start_transfer:
 	JP state_first_soh
 
 state_timed_out:
+	set_vram_addr #0x3C, #0xFF
 	puts #str_transfer_timed_out
 	JP state_error
 
