@@ -71,13 +71,34 @@
 ;Next byte on A
 ;Resulting CRC in HL
 ;
-;Uses: AF, HL
+;Uses: AF, HL, HL'
+;Requires: crc16_xmodem_table_base
 .macro crc16_xmodem
 
 	;d: byte of data
 	;unsigned int tbl_idx;
 
-	;tbl_idx = ((crc >> 8) ^ d) & #0xff;
+	XOR A, H  ;<-- `A` now has the table index.
+	EXX
+		LD HL, #crc16_xmodem_table_base
+		LD L, A
+		;HL' now points to crc table; Low bytes
+	EXX
+
 	;crc = (crc_table[tbl_idx] ^ (crc << 8)) & #0xffff;
+	;Move H <- L
+	LD A, L
+	LD H, A
+
+	EXX
+		LD A, (HL) ; Get new CRC low byte
+		INC H      ; Point to the HI table
+	EXX
+	LD L, A ; Put CRC low it in place
+	EXX
+		LD A, (HL) ; Get CRC high table byte
+	EXX
+	XOR A, H ;
+	LD  H, A ;XOR hi byte and store it.
 
 .endm

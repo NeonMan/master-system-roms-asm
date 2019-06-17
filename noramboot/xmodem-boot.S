@@ -44,7 +44,8 @@
 	.ascii "<xmodem-boot.S>"
 	
 	.include /macros.inc/
-	.include /crc16-xmodem.inc/
+	;.include /crc16-xmodem.inc/
+	.include /crc16-xmodem-tbl.inc/
 	.include /serial.inc/
 	.include /xmodem.inc/
 	.include /vdp.inc/
@@ -396,4 +397,26 @@ state_error:
 ;Go back to the main routine
 JP xmodem_boot_ret
 
-	.ascii "</xmodem-boot.S>"
+.ascii "</xmodem-boot.S>"
+
+;Yep, here at the end lies the CRC table, which needs to be
+;Aligned to 256B boundaries for the hacks to work.
+.area    _HEADER (ABS)
+.org #0x7B00
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!PAD!PAD!PAD!"
+.ascii "PAD!CRC!PAD!CRC!" ;<-- Linker ignores my alignment !!
+crc16_xmodem_table_base:
+crc16_xmodem_table_lo
+crc16_xmodem_table_hi
