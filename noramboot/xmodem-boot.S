@@ -73,8 +73,8 @@ xmodem_boot::
 
 	;Check the marvelous state machine diagram, the dead trees version.
 state_init:
-	;Perform alignment checks since linker
-	;seems to be ignoring some .org directives
+;	;Perform alignment checks since linker
+;	;seems to be ignoring some .org directives
 ;	LD HL, #crc16_xmodem_table_base
 ;	LD A, L
 ;	AND A, A
@@ -418,23 +418,23 @@ JP xmodem_boot_ret
 .ascii "</xmodem-boot.S>"
 
 ;Yep, here at the end lies the CRC table, which needs to be
-;Aligned to 256B boundaries for the hacks to work.
-.area    _HEADER (ABS)
-.org #0x7B00
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "PAD!PAD!PAD!PAD!"
-.ascii "CRC!PAD!CRC!PAD!"
-.ascii "PAD!CRC!PAD!CRC!" ;<-- Linker ignores my alignment !!
-crc16_xmodem_table_base:
-;crc16_xmodem_table_lo
-;crc16_xmodem_table_hi
+;Aligned to 256B boundaries for the addressing hacks to work.
+;.area    _HEADER (ABS)
+;.org #0x7B00
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!"
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!"
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!"
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!"
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!"
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!"
+;	.ascii "CRC!PAD!CRC!PAD!"
+;	.ascii "PAD!CRC!PAD!CRC!" ;<-- Linker ignores my alignment !!
+;crc16_xmodem_table_base:
+;	crc16_xmodem_table_lo
+;	crc16_xmodem_table_hi
