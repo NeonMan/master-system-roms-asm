@@ -1,0 +1,14 @@
+Build/**
+build/**
+doxygen/**
+
+*.lst
+*.rel
+*.sym
+*.ihx
+*.rst
+*.lk
+*.map
+*.mem
+*.sms
+*.noi

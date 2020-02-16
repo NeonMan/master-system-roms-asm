@@ -32,32 +32,32 @@ reset_vector:
 
 	.org 0x0008
 rst_08:
-	JR 0x0000
+	JP 0xC008
 
 	.org 0x0010
 rst_10:
-	JR 0x0000
+	JP 0xC010
 
 	.org 0x0018
 rst_18:
-	JR 0x0000
+	JP 0xC018
 
 	.org 0x0020
 rst_20:
-	JR 0x0000
+	JP 0xC020
 
 	.org 0x0028
 rst_28:
-	JR 0x0000
+	JP 0xC028
 
 	.org 0x0030
 rst_30:
-	RET
+	JP 0xC030
 
 	.org 0x0038
 int_vector:
 rst_38:
-	JR 0x0000
+	JP 0xC038
 
 	;; RAM base address
 	.org 0xC000
