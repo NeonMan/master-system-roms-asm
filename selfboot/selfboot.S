@@ -57,6 +57,7 @@ rst_30:
 	.org 0x0038
 int_vector:
 rst_38:
+	DI
 	JP 0xC038
 
 	;; RAM base address
@@ -133,7 +134,7 @@ main:
 	JR NZ, vram_loop ;If we didn't finish, loop.
 
 	;Test VRAM data
-	LD C, #0x00  ; (same as vram loo; Counter from 0 to 128)
+	LD C, #0x00  ; (same as vram loop Counter from 0 to 128)
 	LD HL, #0x4000
 	;Initialize VDP, read at address 0x0000
 	CP (HL) ;
